@@ -1,10 +1,8 @@
 /**
- * Catálogo de eventos e assinatura HMAC de webhooks (Parte 6.B.4).
- * Puro: compartilhado entre `apps/api` (CRUD dos endpoints, enfileira entregas)
- * e `apps/worker` (worker de entrega assina e envia o POST) — pacotes não podem
- * depender de apps, então a lógica mora aqui (mesmo padrão de `inpi-metadata.ts`).
+ * Catálogo de eventos, tipos e funções puras de webhooks (Parte 6.B.4).
+ * Compatível com browser e Node.js — NÃO usa 'node:crypto'.
+ * Funções de assinatura HMAC estão em 'webhooks.signing.ts' (Node.js only).
  */
-import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 
 export const WEBHOOK_EVENT_TYPES = [
   'ingest.completed',
@@ -41,34 +39,16 @@ export function buildWebhookEventPayload<T>(
   now: Date = new Date(),
 ): WebhookEventPayload<T> {
   return {
-    id: `evt_${randomUUID()}`,
+    id: `evt_${globalThis.crypto.randomUUID()}`,
     event,
     occurred_at: now.toISOString(),
     data,
   };
 }
 
-/** Comparação em tempo constante — cópia local de `auth/domain/crypto.ts` (fronteira de pacote). */
-function safeEqualHex(a: string, b: string): boolean {
-  const ba = Buffer.from(a, 'hex');
-  const bb = Buffer.from(b, 'hex');
-  if (ba.length !== bb.length) return false;
-  return timingSafeEqual(ba, bb);
-}
-
 export interface ParsedSignature {
   timestamp: number;
   signature: string;
-}
-
-function computeHmac(secret: string, timestamp: number, body: string): string {
-  return createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
-}
-
-/** Monta `X-EduForge-Signature: t=<ts>,v1=<hmac_sha256>` (Parte 6.B.4). */
-export function buildSignatureHeader(secret: string, body: string, now: Date = new Date()): string {
-  const timestamp = Math.floor(now.getTime() / 1000);
-  return `t=${timestamp},v1=${computeHmac(secret, timestamp, body)}`;
 }
 
 export function parseSignatureHeader(header: string): ParsedSignature | null {
@@ -83,29 +63,12 @@ export function parseSignatureHeader(header: string): ParsedSignature | null {
   return { timestamp, signature };
 }
 
-const DEFAULT_TOLERANCE_SECONDS = 300;
-
-/** Verifica assinatura + janela anti-replay de 5 min (Parte 6.B.4). */
-export function verifyWebhookSignature(
-  secret: string,
-  header: string,
-  body: string,
-  now: Date = new Date(),
-  toleranceSeconds = DEFAULT_TOLERANCE_SECONDS,
-): boolean {
-  const parsed = parseSignatureHeader(header);
-  if (!parsed) return false;
-  const nowSeconds = Math.floor(now.getTime() / 1000);
-  if (Math.abs(nowSeconds - parsed.timestamp) > toleranceSeconds) return false;
-  return safeEqualHex(computeHmac(secret, parsed.timestamp, body), parsed.signature);
-}
-
-/** 13 tentativas (exponencial de 1min, cap de 4h) somam ~24,25h — Parte 6.B.4: "retry exponencial por 24h". */
+/** 13 tentativas (exponencial de 1min, cap de 4h) somam ~24,25h. */
 export const WEBHOOK_MAX_ATTEMPTS = 13;
 const WEBHOOK_BACKOFF_BASE_MS = 60_000;
 const WEBHOOK_BACKOFF_CAP_MS = 4 * 60 * 60_000;
 
-/** Estratégia de backoff custom do BullMQ (worker) — exponencial com cap. */
+/** Estratégia de backoff custom do BullMQ — exponencial com cap. */
 export function computeWebhookBackoffMs(attemptsMade: number): number {
   return Math.min(WEBHOOK_BACKOFF_BASE_MS * 2 ** (attemptsMade - 1), WEBHOOK_BACKOFF_CAP_MS);
 }

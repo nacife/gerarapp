@@ -1,5 +1,5 @@
 import { prisma } from '@eduforge/db';
-import type { SealedSecret } from '@eduforge/schemas';
+import type { SealedSecret } from '@eduforge/schemas/crypto';
 import type { RecordAttemptInput, WebhookEndpointForDelivery } from './pipeline';
 
 export class PrismaWebhookDeliveryRepository {

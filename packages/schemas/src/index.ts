@@ -15,4 +15,6 @@ export * from './content-map';
 export * from './manifest';
 export * from './inpi-metadata';
 export * from './webhooks';
+// crypto re-exportado apenas para Node.js. NÃO importe no browser.
+// API/worker server-side: import { ... } from '@eduforge/schemas/crypto'
 export * from './crypto';

@@ -10,7 +10,7 @@
   </head>
   <body>
     <div id="root"><p style="color:#94a3b8;padding:40px;font-family:sans-serif">Carregando aplicativo...</p></div>
-    <script>console.log('EduForge: script inline OK');window.addEventListener('error',function(e){document.getElementById('root').innerHTML='<div style=\"color:#f87171;padding:40px;font-family:monospace\"><h2>Erro JavaScript</h2><pre>'+e.message+'</pre><p>Arquivo: '+e.filename+'</p><p>Linha: '+e.lineno+'</p></div>';})</script>
+    <script>console.log('EduForge: script inline OK');window.addEventListener('error',function(e){var msg=e.message||'';var stack=e.error&&e.error.stack||'';document.getElementById('root').innerHTML='<div style=\"color:#f87171;padding:40px;font-family:monospace;font-size:13px;line-height:1.6\"><h2 style=\"color:#fff\">Erro JavaScript</h2><p><b>Mensagem:</b> '+msg.replace(/</g,'&lt;')+'</p><p><b>Arquivo:</b> '+e.filename+'</p><p><b>Linha:</b> '+e.lineno+':'+e.colno+'</p><pre style=\"background:#1a1a2e;padding:10px;overflow:auto;max-height:300px;white-space:pre-wrap;margin-top:10px\">'+stack.replace(/</g,'&lt;').split('\\n').slice(0,8).join('<br>')+'</pre></div>';})</script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

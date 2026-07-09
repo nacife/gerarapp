@@ -3,7 +3,12 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "baseUrl": "./",
+    "paths": {
+      "@eduforge/schemas/crypto": ["../../packages/schemas/src/crypto.ts"],
+      "@eduforge/schemas/webhooks": ["../../packages/schemas/src/webhooks.ts"]
+    }
   },
   "include": ["src"]
 }

@@ -2,13 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   WEBHOOK_EVENT_TYPES,
   WEBHOOK_MAX_ATTEMPTS,
-  buildSignatureHeader,
   buildWebhookEventPayload,
   computeWebhookBackoffMs,
   isValidWebhookEvent,
   parseSignatureHeader,
-  verifyWebhookSignature,
 } from './webhooks';
+import { buildSignatureHeader, verifyWebhookSignature } from './webhooks.signing';
 
 describe('WEBHOOK_EVENT_TYPES', () => {
   it('tem os 12 tipos de evento documentados (Parte 6.B.4)', () => {

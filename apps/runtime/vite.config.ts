@@ -2,11 +2,9 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// PWA básica (PRD M4 exige Lighthouse PWA >= 90; aqui fica o scaffold).
 export default defineConfig({
   plugins: [
     react(),
-    /* VitePWA desabilitado temporariamente — debug tela em branco
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -23,7 +21,15 @@ export default defineConfig({
           { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
         ],
       },
-    }), */
+    }),
   ],
   server: { port: 5173 },
+  optimizeDeps: {
+    exclude: ['@eduforge/schemas'],
+  },
+  resolve: {
+    alias: {
+      'node:crypto': 'node:crypto',
+    },
+  },
 });

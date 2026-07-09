@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { encryptSecret } from '@eduforge/schemas';
+import { encryptSecret } from '@eduforge/schemas/crypto';
 import { runWebhookDelivery, type RecordAttemptInput, type WebhookDeliveryPorts, type WebhookEndpointForDelivery, type HttpResponse } from './pipeline';
 
 const ENCRYPTION_KEY = 'a-32-char-or-longer-test-secret!';

@@ -1,4 +1,5 @@
-import { buildSignatureHeader, decryptSecret, type SealedSecret } from '@eduforge/schemas';
+import { buildSignatureHeader } from '@eduforge/schemas/webhooks';
+import { decryptSecret, type SealedSecret } from '@eduforge/schemas/crypto';
 
 export interface WebhookDeliveryJobData {
   deliveryId: string;

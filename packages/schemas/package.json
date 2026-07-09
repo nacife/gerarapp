@@ -10,11 +10,26 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./crypto": {
+      "types": "./dist/crypto.d.ts",
+      "import": "./dist/crypto.mjs",
+      "require": "./dist/crypto.js"
+    },
+    "./webhooks": {
+      "types": "./dist/webhooks.d.ts",
+      "import": "./dist/webhooks.mjs",
+      "require": "./dist/webhooks.js"
+    },
+    "./webhooks.signing": {
+      "types": "./dist/webhooks.signing.d.ts",
+      "import": "./dist/webhooks.signing.mjs",
+      "require": "./dist/webhooks.signing.js"
     }
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean --sourcemap",
+    "build": "tsup src/index.ts src/crypto.ts src/webhooks.ts src/webhooks.signing.ts --format cjs,esm --dts --clean --sourcemap",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "lint": "eslint src --ext .ts"

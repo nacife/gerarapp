@@ -2,7 +2,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 
 // Cifra reversível (secret TOTP, secret de webhook) mora em @eduforge/schemas
 // porque o worker também precisa decifrar (assinatura HMAC na entrega).
-export { encryptSecret, decryptSecret, type SealedSecret } from '@eduforge/schemas';
+export { encryptSecret, decryptSecret, type SealedSecret } from '@eduforge/schemas/crypto';
 
 /** Gera um token opaco (base64url) de alta entropia. */
 export function generateToken(bytes = 32): string {
