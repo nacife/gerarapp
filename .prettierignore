@@ -1,0 +1,9 @@
+node_modules
+dist
+.next
+.turbo
+coverage
+dev-dist
+pnpm-lock.yaml
+packages/db/src/generated
+PRD.md

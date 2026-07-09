@@ -1,0 +1,38 @@
+{
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Acesse seu estúdio de criação.",
+      "email": "E-mail",
+      "password": "Senha",
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "forgot": "Esqueci minha senha",
+      "noAccount": "Ainda não tem conta?",
+      "signupLink": "Criar conta",
+      "mfaTitle": "Verificação em duas etapas",
+      "mfaSubtitle": "Informe o código do seu app autenticador.",
+      "mfaCode": "Código de 6 dígitos",
+      "mfaSubmit": "Verificar",
+      "welcome": "Bem-vindo(a) de volta, {name}!"
+    },
+    "signup": {
+      "title": "Criar conta",
+      "subtitle": "De um PDF a um app de aprendizagem em minutos.",
+      "name": "Nome",
+      "email": "E-mail",
+      "password": "Senha",
+      "passwordHint": "Mínimo de 10 caracteres, com letras e números.",
+      "terms": "Li e aceito os Termos de Uso e a Política de Privacidade (LGPD).",
+      "submit": "Criar conta",
+      "submitting": "Criando...",
+      "hasAccount": "Já tem conta?",
+      "loginLink": "Entrar",
+      "success": "Conta criada! Enviamos um link de confirmação para {email}."
+    },
+    "errors": {
+      "generic": "Algo deu errado. Tente novamente.",
+      "acceptTerms": "É necessário aceitar os termos para continuar."
+    }
+  }
+}

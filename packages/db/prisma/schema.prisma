@@ -1,0 +1,938 @@
+// EduForge — schema completo do modelo de dados (PRD Parte 2 + Parte 5 §3.4).
+// Convenção: modelos/campos em camelCase no client; tabelas/colunas em snake_case
+// no banco via @map/@@map (PRD §0.6). IDs uuid, timestamps timestamptz.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  // Runtime da aplicação: role restrita (sem UPDATE/DELETE em tabelas WORM — §0.5.2).
+  url        = env("DATABASE_URL")
+  // Somente `prisma migrate`/`db seed`: role dona das tabelas (ignora GRANT/REVOKE).
+  directUrl  = env("DIRECT_DATABASE_URL")
+  extensions = [citext, vector]
+}
+
+// ─────────────────────────────── Enums ───────────────────────────────
+
+enum Role {
+  learner
+  creator
+  org_admin
+  support
+  admin
+  super_admin
+}
+
+enum UserStatus {
+  active
+  suspended
+  pending_deletion
+}
+
+enum OrgRole {
+  org_admin
+  editor
+  viewer
+}
+
+enum ProjectStatus {
+  draft
+  published
+  unpublished
+  blocked
+}
+
+enum AccessMode {
+  public
+  link
+  password
+  invite
+}
+
+enum SourceMime {
+  pdf
+  epub
+  docx
+  md
+}
+
+enum OcrStatus {
+  not_needed
+  pending
+  running
+  done
+  failed
+}
+
+enum ContentBlockKind {
+  concept
+  definition
+  example
+  exercise
+  summary
+  figure
+  table
+  formula
+}
+
+enum AppVersionStatus {
+  building
+  published
+  rolled_back
+}
+
+// Espelha packages/schemas INTERACTION_TYPES (fonte única, PRD Parte 6.A).
+enum InteractionType {
+  quiz
+  flashcard_deck
+  cloze
+  dragdrop
+  timeline
+  hotspot
+  scenario
+  audio
+  mindmap
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+enum InteractionOrigin {
+  ai_generated
+  ai_edited
+  manual
+}
+
+enum MediaKind {
+  extracted
+  stock
+  ai_generated
+  upload
+  tts
+  podcast
+}
+
+enum LearningEventType {
+  view
+  answer
+  complete
+  streak
+  battle
+  tutor_question
+}
+
+enum PlanKey {
+  free
+  pro
+  business
+}
+
+enum SubscriptionStatus {
+  trialing
+  active
+  past_due
+  canceled
+}
+
+enum InvoiceStatus {
+  draft
+  open
+  paid
+  void
+  uncollectible
+}
+
+enum CreditReason {
+  ingest
+  interactions
+  image
+  tts
+  tutor
+  grant
+  purchase
+  adjustment
+}
+
+enum ModerationSource {
+  classifier
+  report
+  dmca
+}
+
+enum ModerationStatus {
+  open
+  reviewing
+  resolved
+  takedown
+}
+
+enum FlagSubjectType {
+  user
+  org
+  plan
+}
+
+enum InpiFilingMode {
+  self_service
+  assisted
+}
+
+enum InpiFilingStatus {
+  draft
+  awaiting_poa
+  awaiting_payment
+  in_review
+  filed
+  granted
+  rejected
+  revoked
+}
+
+enum InpiFilingEventKind {
+  created
+  poa_signed
+  gru_paid
+  filed
+  rpi_dispatch
+  granted
+  note
+}
+
+// ─────────────────────────────── Núcleo ───────────────────────────────
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  email        String     @unique @db.Citext
+  passwordHash String?    @map("password_hash")
+  name         String
+  locale       String     @default("pt-BR")
+  role         Role       @default(creator)
+  mfa             Json? // { type, secret cifrado, backup codes, enabled } (RF-07)
+  status          UserStatus @default(active)
+  emailVerifiedAt DateTime?  @map("email_verified_at") @db.Timestamptz(6)
+  consent         Json? // LGPD: { version, acceptedAt, ip } (§0.5.7)
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  memberships               Membership[]
+  projects                  Project[]
+  subscriptions             Subscription[]
+  creditLedger              AiCreditLedger[]
+  sessions                  Session[]
+  authTokens                AuthToken[]
+  auditLogs                 AuditLog[]        @relation("AuditActor")
+  moderationCases           ModerationCase[]  @relation("ModerationAssignee")
+  inpiCertificatesRequested InpiCertificate[] @relation("InpiRequestedBy")
+  inpiCertificateVerifications InpiCertificateVerification[] @relation("InpiVerifiedBy")
+  inpiFilingsAsCustomer     InpiFiling[]      @relation("InpiCustomer")
+  inpiFilingsAsOperator     InpiFiling[]      @relation("InpiOperator")
+  apiKeys                   ApiKey[]
+  webhookEndpoints          WebhookEndpoint[]
+
+  @@index([role])
+  @@map("users")
+}
+
+enum AuthTokenType {
+  email_verify
+  password_reset
+}
+
+// Tokens de uso único para verificação de e-mail e recuperação de senha
+// (RF-07). Guardamos apenas o hash do token; o valor bruto vai por e-mail.
+model AuthToken {
+  id        String        @id @default(uuid()) @db.Uuid
+  userId    String        @map("user_id") @db.Uuid
+  type      AuthTokenType
+  tokenHash String        @unique @map("token_hash")
+  expiresAt DateTime      @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime?     @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@map("auth_tokens")
+}
+
+model Organization {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  branding  Json? // logo, cores, domínio
+  ssoConfig Json?    @map("sso_config") // SAML/OIDC cifrado
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  memberships Membership[]
+  projects    Project[]
+
+  @@map("organizations")
+}
+
+model Membership {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  orgId     String   @map("org_id") @db.Uuid
+  orgRole   OrgRole  @map("org_role")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+  @@index([orgId])
+  @@map("memberships")
+}
+
+model Project {
+  id           String        @id @default(uuid()) @db.Uuid
+  ownerUserId  String        @map("owner_user_id") @db.Uuid
+  orgId        String?       @map("org_id") @db.Uuid
+  title        String
+  slug         String        @unique // subdomínio
+  customDomain String?       @unique @map("custom_domain")
+  status             ProjectStatus @default(draft)
+  accessMode         AccessMode    @default(public) @map("access_mode")
+  accessSecret       String?       @map("access_secret") // hash de senha / link secreto
+  activeAppVersionId String?       @map("active_app_version_id") @db.Uuid // versão servida (RF-04)
+  senseiConfig       Json?         @map("sensei_config") // { name, avatar, tone } do tutor (RF-06.1)
+  createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner            User             @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  org              Organization?    @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  sourceFiles      SourceFile[]
+  contentMaps      ContentMap[]
+  appVersions      AppVersion[]
+  activeAppVersion AppVersion?      @relation("ActiveVersion", fields: [activeAppVersionId], references: [id], onDelete: SetNull)
+  themes           Theme[]
+  mediaAssets      MediaAsset[]
+  enrollments      Enrollment[]
+  moderationCases  ModerationCase[]
+  jobs             Job[]
+  interactions     Interaction[]
+  invites          ProjectInvite[]
+  apiKeys          ApiKey[]
+  webhookEndpoints WebhookEndpoint[]
+
+  @@index([ownerUserId])
+  @@index([orgId])
+  @@map("projects")
+}
+
+enum JobType {
+  ingest
+  generate
+  tts
+  inpi_package
+}
+
+enum JobStatus {
+  queued
+  running
+  succeeded
+  failed
+}
+
+// Estado persistido de jobs assíncronos (API GET /jobs/{id}, Parte 6.B).
+// Não constava no ER v1.1 — ADR-0020. Progresso por etapa em `progress`.
+model Job {
+  id        String    @id @default(uuid()) @db.Uuid
+  type      JobType
+  status    JobStatus @default(queued)
+  projectId String?   @map("project_id") @db.Uuid
+  refId     String?   @map("ref_id") @db.Uuid // ex.: source_file_id
+  progress  Json? // { current, steps: [{ key, label, status, pct }] }
+  error     String?
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("jobs")
+}
+
+model SourceFile {
+  id               String     @id @default(uuid()) @db.Uuid
+  projectId        String     @map("project_id") @db.Uuid
+  s3Key            String     @map("s3_key")
+  mime             SourceMime
+  sizeBytes        BigInt     @map("size_bytes")
+  sha256           String // integridade do original
+  ocrStatus        OcrStatus  @default(not_needed) @map("ocr_status")
+  extractionReport Json?      @map("extraction_report") // confiança por etapa
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("source_files")
+}
+
+model ContentMap {
+  id                  String    @id @default(uuid()) @db.Uuid
+  projectId           String    @map("project_id") @db.Uuid
+  revision            Int       @default(1)
+  tree                Json // capítulos/seções ordenados
+  structureConfidence Float?    @map("structure_confidence")
+  approvedAt          DateTime? @map("approved_at") @db.Timestamptz(6) // aceite do usuário
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  blocks  ContentBlock[]
+
+  @@unique([projectId, revision])
+  @@map("content_maps")
+}
+
+model ContentBlock {
+  id           String                       @id @default(uuid()) @db.Uuid
+  contentMapId String                       @map("content_map_id") @db.Uuid
+  parentId     String?                      @map("parent_id") @db.Uuid
+  position     Int                          @default(0)
+  kind         ContentBlockKind
+  contentMd    String                       @map("content_md")
+  sourceRef    Json?                        @map("source_ref") // página/offset no original
+  confidence   Float? // confiança da extração (0..1)
+  embedding    Unsupported("vector(1536)")? // pgvector p/ RAG do tutor
+
+  contentMap   ContentMap     @relation(fields: [contentMapId], references: [id], onDelete: Cascade)
+  parent       ContentBlock?  @relation("BlockHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children     ContentBlock[] @relation("BlockHierarchy")
+  interactions Interaction[]
+
+  @@index([contentMapId])
+  @@index([parentId])
+  @@map("content_blocks")
+}
+
+model AppVersion {
+  id             String           @id @default(uuid()) @db.Uuid
+  projectId      String           @map("project_id") @db.Uuid
+  versionNumber  Int              @map("version_number")
+  themeId        String?          @map("theme_id") @db.Uuid
+  manifest       Json // IMUTÁVEL após publicação (PRD §0.5.2)
+  manifestS3Key  String?          @map("manifest_s3_key")
+  bundleSha512   String?          @map("bundle_sha512") // hash do pacote canônico
+  status         AppVersionStatus @default(building)
+  publishedAt    DateTime?        @map("published_at") @db.Timestamptz(6)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  project           Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  theme             Theme?           @relation(fields: [themeId], references: [id], onDelete: SetNull)
+  interactions      Interaction[]
+  inpiCert          InpiCertificate?
+  enrollments       Enrollment[]
+  activeForProjects Project[]        @relation("ActiveVersion")
+
+  @@unique([projectId, versionNumber])
+  @@index([themeId])
+  @@map("app_versions")
+}
+
+model Interaction {
+  id             String            @id @default(uuid()) @db.Uuid
+  projectId      String            @map("project_id") @db.Uuid // escopo de autoria (M3)
+  appVersionId   String?           @map("app_version_id") @db.Uuid // null enquanto rascunho; setado ao publicar (M4)
+  contentBlockId String?           @map("content_block_id") @db.Uuid
+  type           InteractionType
+  payload        Json // validado por JSON Schema por tipo (Parte 6.A)
+  difficulty     Difficulty        @default(medium)
+  origin         InteractionOrigin @default(ai_generated)
+  position       Int               @default(0)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  project      Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  appVersion   AppVersion?     @relation(fields: [appVersionId], references: [id], onDelete: Cascade)
+  contentBlock ContentBlock?   @relation(fields: [contentBlockId], references: [id], onDelete: SetNull)
+  events       LearningEvent[]
+
+  @@index([projectId])
+  @@index([appVersionId])
+  @@index([contentBlockId])
+  @@map("interactions")
+}
+
+model Template {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique // modern|futurist|...
+  name        String
+  tokens      Json // layout, tipografia, motion
+  published   Boolean  @default(true)
+  minPlanTier Int      @default(0) @map("min_plan_tier")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  themes Theme[]
+
+  @@map("templates")
+}
+
+// Catálogo de paletas curadas (implícito por RF-03/RF-13 e API GET /palettes;
+// não constava no ER v1.1 — ADR-0003).
+model Palette {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  name        String
+  colors      Json // cores + roles + dark mode
+  wcagAa      Boolean  @default(true) @map("wcag_aa")
+  published   Boolean  @default(true)
+  minPlanTier Int      @default(0) @map("min_plan_tier")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("palettes")
+}
+
+model Theme {
+  id         String   @id @default(uuid()) @db.Uuid
+  templateId String   @map("template_id") @db.Uuid
+  projectId  String   @map("project_id") @db.Uuid
+  palette    Json // cores + dark mode
+  typography Json
+  effects    Json // confete, parallax, haptics on/off
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  template    Template     @relation(fields: [templateId], references: [id])
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  appVersions AppVersion[]
+
+  @@index([projectId])
+  @@index([templateId])
+  @@map("themes")
+}
+
+model MediaAsset {
+  id        String    @id @default(uuid()) @db.Uuid
+  projectId String    @map("project_id") @db.Uuid
+  s3Key     String    @map("s3_key")
+  kind      MediaKind
+  sha256    String?
+  meta      Json? // alt, licença, prompt de geração
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("media_assets")
+}
+
+// ────────────────────────── Aprendizes ──────────────────────────
+
+model Learner {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique @db.Citext
+  name         String
+  passwordHash String?  @map("password_hash") // conta leve
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  enrollments Enrollment[]
+  dna         LearningDna?
+
+  @@map("learners")
+}
+
+model Enrollment {
+  id              String    @id @default(uuid()) @db.Uuid
+  learnerId       String    @map("learner_id") @db.Uuid
+  projectId       String    @map("project_id") @db.Uuid
+  pinnedVersion   Int?      @map("pinned_version") // versão em uso
+  pinnedVersionId String?   @map("pinned_version_id") @db.Uuid
+  // Agregados de gamificação (RF-05) — escopo por app, conforme "ranking opcional por app".
+  xp              Int       @default(0)
+  streakDays      Int       @default(0) @map("streak_days")
+  lastActivityAt  DateTime? @map("last_activity_at") @db.Date
+  streakFreezeUsedAt DateTime? @map("streak_freeze_used_at") @db.Date
+  enrolledAt      DateTime  @default(now()) @map("enrolled_at") @db.Timestamptz(6)
+
+  learner     Learner           @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  appVersion  AppVersion?       @relation(fields: [pinnedVersionId], references: [id], onDelete: SetNull)
+  events      LearningEvent[]
+  progress    LearnerProgress[]
+  certificate Certificate?
+
+  @@unique([learnerId, projectId])
+  @@index([projectId])
+  @@map("enrollments")
+}
+
+// Alto volume, append-only. No MVP fica no Postgres atrás de AnalyticsStore;
+// particionamento por dia é TODO(prd:NFR) para escala (PRD §0.2).
+model LearningEvent {
+  id            String            @id @default(uuid()) @db.Uuid
+  enrollmentId  String            @map("enrollment_id") @db.Uuid
+  interactionId String?           @map("interaction_id") @db.Uuid
+  event         LearningEventType
+  detail        Json? // resposta, acerto, tempo_ms
+  occurredAt    DateTime          @default(now()) @map("occurred_at") @db.Timestamptz(6)
+
+  enrollment  Enrollment   @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  interaction Interaction? @relation(fields: [interactionId], references: [id], onDelete: SetNull)
+
+  @@index([enrollmentId, occurredAt])
+  @@index([interactionId])
+  @@map("learning_events")
+}
+
+model LearnerProgress {
+  enrollmentId   String    @map("enrollment_id") @db.Uuid
+  contentBlockId String    @map("content_block_id") @db.Uuid
+  mastery        Float     @default(0) // 0..1
+  xp             Int       @default(0)
+  streakDays     Int       @default(0) @map("streak_days")
+  // Estado do SM-2 (RF-02 flashcards). Granularidade = bloco de conteúdo
+  // (o schema do PRD não modela por card individual) — ADR-0037.
+  easeFactor     Float     @default(2.5) @map("ease_factor")
+  intervalDays   Int       @default(0) @map("interval_days")
+  repetitions    Int       @default(0)
+  nextReviewAt   DateTime? @map("next_review_at") @db.Timestamptz(6) // SM-2
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@id([enrollmentId, contentBlockId])
+  @@map("learner_progress")
+}
+
+model LearningDna {
+  learnerId String   @id @map("learner_id") @db.Uuid
+  profile   Json // retenção por tópico, horários, tipos
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  learner Learner @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+
+  @@map("learning_dna")
+}
+
+// Lista de e-mails convidados para apps em modo "invite" (RF-04/RF-05).
+model ProjectInvite {
+  id        String   @id @default(uuid()) @db.Uuid
+  projectId String   @map("project_id") @db.Uuid
+  email     String   @db.Citext
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, email])
+  @@map("project_invites")
+}
+
+model Certificate {
+  id           String   @id @default(uuid()) @db.Uuid
+  enrollmentId String   @unique @map("enrollment_id") @db.Uuid
+  verifyCode   String   @unique @map("verify_code") // QR público
+  pdfS3Key     String?  @map("pdf_s3_key")
+  issuedAt     DateTime @default(now()) @map("issued_at") @db.Timestamptz(6)
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@map("certificates")
+}
+
+// ────────────────────────── INPI ──────────────────────────
+
+// IMUTÁVEL: sem UPDATE/DELETE no código nem na permissão de banco (PRD §0.5.2).
+model InpiCertificate {
+  id                     String   @id @default(uuid()) @db.Uuid
+  appVersionId           String   @unique @map("app_version_id") @db.Uuid
+  algorithm              String   @default("SHA-512")
+  bundleHash             String   @unique @map("bundle_hash")
+  bundleHashSha256       String?  @map("bundle_hash_sha256") // conferência adicional (RF-16.2)
+  manifestCanonicalS3Key String?  @map("manifest_canonical_s3_key") // ZIP determinístico congelado (WORM)
+  declarationPdfS3Key    String?  @map("declaration_pdf_s3_key")
+  tsaTokenS3Key          String?  @map("tsa_token_s3_key") // carimbo de tempo RFC 3161, opcional
+  requestedById          String   @map("requested_by") @db.Uuid
+  generatedAt            DateTime @default(now()) @map("generated_at") @db.Timestamptz(6)
+
+  appVersion    AppVersion                  @relation(fields: [appVersionId], references: [id], onDelete: Cascade)
+  requestedBy   User                        @relation("InpiRequestedBy", fields: [requestedById], references: [id])
+  filing        InpiFiling?
+  verifications InpiCertificateVerification[]
+
+  @@map("inpi_certificates")
+}
+
+// Log append-only de verificações de integridade (RF-16.4) — o certificado é WORM,
+// então cada verificação é uma linha nova, nunca uma atualização do certificado.
+model InpiCertificateVerification {
+  id            String   @id @default(uuid()) @db.Uuid
+  certificateId String   @map("certificate_id") @db.Uuid
+  matched       Boolean
+  recomputedHash String  @map("recomputed_hash")
+  verifiedById  String?  @map("verified_by") @db.Uuid
+  verifiedAt    DateTime @default(now()) @map("verified_at") @db.Timestamptz(6)
+
+  certificate InpiCertificate @relation(fields: [certificateId], references: [id], onDelete: Cascade)
+  verifiedBy  User?           @relation("InpiVerifiedBy", fields: [verifiedById], references: [id])
+
+  @@index([certificateId])
+  @@map("inpi_certificate_verifications")
+}
+
+model InpiFiling {
+  id                String           @id @default(uuid()) @db.Uuid
+  inpiCertificateId String?          @unique @map("inpi_certificate_id") @db.Uuid
+  customerUserId    String           @map("customer_user_id") @db.Uuid
+  mode              InpiFilingMode
+  status            InpiFilingStatus @default(draft)
+  holder            Json? // titular PF/PJ, doc
+  authors           Json? // autores PF + CPF
+  poaPdfS3Key       String?          @map("poa_pdf_s3_key") // procuração assinada
+  gruNumber         String?          @map("gru_number") // nosso número
+  inpiProcessNumber String?          @map("inpi_process_number")
+  certificateS3Key  String?          @map("certificate_s3_key") // certificado do INPI
+  feeCentsService   Int?             @map("fee_cents_service")
+  feeCentsGru       Int?             @map("fee_cents_gru")
+  // Únicos itens do checklist do C.6 sem estado derivável de outra coluna
+  // (o resto — ZIP/Ficha/Procuração/GRU — é calculado a partir dos campos acima).
+  operatorChecklist Json?            @map("operator_checklist") // { dvSigned, doubleChecked, doubleCheckedBy }
+  assignedOperator  String?          @map("assigned_operator") @db.Uuid
+  filedAt           DateTime?        @map("filed_at") @db.Timestamptz(6)
+  grantedAt         DateTime?        @map("granted_at") @db.Timestamptz(6)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  inpiCertificate InpiCertificate?   @relation(fields: [inpiCertificateId], references: [id], onDelete: SetNull)
+  customer        User               @relation("InpiCustomer", fields: [customerUserId], references: [id])
+  operator        User?              @relation("InpiOperator", fields: [assignedOperator], references: [id])
+  events          InpiFilingEvent[]
+
+  @@index([customerUserId])
+  @@index([status])
+  @@map("inpi_filings")
+}
+
+model InpiFilingEvent {
+  id         String              @id @default(uuid()) @db.Uuid
+  filingId   String              @map("filing_id") @db.Uuid
+  kind       InpiFilingEventKind
+  detail     Json? // código do despacho RPI etc
+  occurredAt DateTime            @default(now()) @map("occurred_at") @db.Timestamptz(6)
+
+  filing InpiFiling @relation(fields: [filingId], references: [id], onDelete: Cascade)
+
+  @@index([filingId])
+  @@map("inpi_filing_events")
+}
+
+// ────────────────────────── Billing ──────────────────────────
+
+model Plan {
+  id             String   @id @default(uuid()) @db.Uuid
+  key            PlanKey  @unique
+  name           String
+  limits         Json // apps, MB, créditos IA, domínios
+  priceCentsMonth Int     @map("price_cents_month")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id               String             @id @default(uuid()) @db.Uuid
+  userId           String             @map("user_id") @db.Uuid
+  planId           String             @map("plan_id") @db.Uuid
+  status           SubscriptionStatus @default(active)
+  gatewayRef       String?            @map("gateway_ref")
+  currentPeriodEnd DateTime?          @map("current_period_end") @db.Timestamptz(6)
+  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan     Plan      @relation(fields: [planId], references: [id])
+  invoices Invoice[]
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id             String        @id @default(uuid()) @db.Uuid
+  subscriptionId String        @map("subscription_id") @db.Uuid
+  amountCents    Int           @map("amount_cents")
+  status         InvoiceStatus @default(open)
+  nfeKey         String?       @map("nfe_key") // nota fiscal
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@map("invoices")
+}
+
+// Razão contábil append-only: saldo = SUM(delta) (PRD §0.5.4).
+model AiCreditLedger {
+  id        String       @id @default(uuid()) @db.Uuid
+  userId    String       @map("user_id") @db.Uuid
+  delta     Int // negativo = consumo
+  reason    CreditReason
+  refId     String?      @map("ref_id") @db.Uuid // job relacionado
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("ai_credit_ledger")
+}
+
+// ────────────────────────── Auth / Admin ──────────────────────────
+
+model Session {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  refreshTokenHash String    @map("refresh_token_hash")
+  device           Json? // ip, user_agent
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// Append-only / WORM: sem UPDATE/DELETE (PRD §0.5.2).
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorId     String?  @map("actor_id") @db.Uuid
+  actorRole   String?  @map("actor_role")
+  action      String
+  targetType  String?  @map("target_type")
+  targetId    String?  @map("target_id") @db.Uuid
+  beforeAfter Json?    @map("before_after")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@map("audit_logs")
+}
+
+model ModerationCase {
+  id         String           @id @default(uuid()) @db.Uuid
+  projectId  String           @map("project_id") @db.Uuid
+  source     ModerationSource
+  status     ModerationStatus @default(open)
+  assigneeId String?          @map("assignee_id") @db.Uuid
+  evidence   Json?
+  createdAt  DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee User?   @relation("ModerationAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([status])
+  @@map("moderation_cases")
+}
+
+model FeatureFlag {
+  id         String   @id @default(uuid()) @db.Uuid
+  key        String   @unique
+  defaultOn  Boolean  @default(false) @map("default_on")
+  rolloutPct Int      @default(0) @map("rollout_pct")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  assignments FlagAssignment[]
+
+  @@map("feature_flags")
+}
+
+model FlagAssignment {
+  id          String          @id @default(uuid()) @db.Uuid
+  flagId      String          @map("flag_id") @db.Uuid
+  subjectType FlagSubjectType @map("subject_type")
+  subjectId   String          @map("subject_id") @db.Uuid
+  enabled     Boolean         @default(true)
+
+  flag FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+
+  @@unique([flagId, subjectType, subjectId])
+  @@map("flag_assignments")
+}
+
+// ────────────────────────── API pública / Webhooks ──────────────────────────
+
+enum ApiKeyEnvironment {
+  live
+  test
+}
+
+// Guardamos apenas o hash da chave; o valor bruto é mostrado uma única vez
+// na criação (mesmo padrão de AuthToken/refresh token — Parte 6.B.1).
+model ApiKey {
+  id          String            @id @default(uuid()) @db.Uuid
+  ownerUserId String            @map("owner_user_id") @db.Uuid
+  projectId   String?           @map("project_id") @db.Uuid // null = todos os projetos do dono
+  name        String
+  environment ApiKeyEnvironment @default(live)
+  keyPrefix   String            @map("key_prefix") // primeiros chars, só para listagem/identificação
+  keyHash     String            @unique @map("key_hash")
+  scopes      String[]
+  lastUsedAt  DateTime?         @map("last_used_at") @db.Timestamptz(6)
+  revokedAt   DateTime?         @map("revoked_at") @db.Timestamptz(6)
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  owner   User     @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([ownerUserId])
+  @@map("api_keys")
+}
+
+enum WebhookDeliveryStatus {
+  pending
+  success
+  failed
+  exhausted
+}
+
+model WebhookEndpoint {
+  id           String   @id @default(uuid()) @db.Uuid
+  ownerUserId  String   @map("owner_user_id") @db.Uuid
+  projectId    String?  @map("project_id") @db.Uuid // null = eventos de todos os projetos do dono
+  url          String
+  events       String[] // chaves dos 9 eventos (Parte 6.B.4)
+  secretSealed Json     @map("secret_sealed") // AES-256-GCM, mesmo padrão do segredo TOTP
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  owner      User              @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  project    Project?          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  deliveries WebhookDelivery[]
+
+  @@index([ownerUserId])
+  @@map("webhook_endpoints")
+}
+
+model WebhookDelivery {
+  id             String                @id @default(uuid()) @db.Uuid
+  endpointId     String                @map("endpoint_id") @db.Uuid
+  eventType      String                @map("event_type")
+  payload        Json
+  status         WebhookDeliveryStatus @default(pending)
+  attempts       Int                   @default(0)
+  responseStatus Int?                  @map("response_status")
+  responseBody   String?               @map("response_body")
+  lastAttemptAt  DateTime?             @map("last_attempt_at") @db.Timestamptz(6)
+  createdAt      DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  endpoint WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId])
+  @@index([status])
+  @@map("webhook_deliveries")
+}

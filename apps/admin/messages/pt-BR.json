@@ -1,0 +1,23 @@
+{
+  "login": {
+    "title": "Console administrativo",
+    "subtitle": "Acesso restrito a administradores.",
+    "email": "E-mail",
+    "password": "Senha",
+    "submit": "Entrar",
+    "submitting": "Entrando...",
+    "error": "Credenciais inválidas ou sem permissão."
+  },
+  "gate": {
+    "loading": "Carregando…",
+    "denied": "Acesso negado — esta conta não tem permissão administrativa.",
+    "mfaTitle": "Configure o MFA para continuar",
+    "mfaBody": "Contas administrativas exigem autenticação em duas etapas antes de qualquer ação (RF-07).",
+    "secretLabel": "Adicione este segredo ao seu app autenticador:",
+    "codeLabel": "Código de confirmação",
+    "enable": "Ativar MFA",
+    "enabling": "Ativando...",
+    "backupTitle": "Guarde seus códigos de backup",
+    "continue": "Entrar no console"
+  }
+}

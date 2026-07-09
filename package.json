@@ -1,0 +1,50 @@
+{
+  "name": "eduforge",
+  "version": "0.0.0",
+  "private": true,
+  "description": "EduForge — de um PDF a um aplicativo de aprendizagem publicado em menos de 30 minutos.",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "verify": "turbo run lint typecheck test",
+    "test:e2e": "playwright test",
+    "test:api": "pnpm --filter @eduforge/api test:api",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "db:generate": "pnpm --filter @eduforge/db db:generate",
+    "db:migrate": "pnpm --filter @eduforge/db db:migrate",
+    "db:reset": "pnpm --filter @eduforge/db db:reset",
+    "db:seed": "pnpm --filter @eduforge/db db:seed",
+    "db:studio": "pnpm --filter @eduforge/db db:studio",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v"
+  },
+  "pnpm": {
+    "overrides": {
+      "ioredis": "5.10.1"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@playwright/test": "^1.49.1",
+    "eslint": "^8.57.1",
+    "pdf-lib": "^1.17.1",
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

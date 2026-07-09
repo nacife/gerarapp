@@ -1,0 +1,71 @@
+name: eduforge
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: eduforge_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: eduforge
+      POSTGRES_PASSWORD: eduforge
+      POSTGRES_DB: eduforge
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eduforge -d eduforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    container_name: eduforge_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  minio:
+    image: minio/minio:latest
+    container_name: eduforge_minio
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: eduforge
+      MINIO_ROOT_PASSWORD: eduforge123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+
+  # One-shot job: creates the three buckets EduForge needs and exits.
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until mc alias set local http://minio:9000 eduforge eduforge123; do
+          echo 'aguardando MinIO...'; sleep 2;
+        done
+        mc mb --ignore-existing local/eduforge-uploads
+        mc mb --ignore-existing local/eduforge-apps
+        mc mb --ignore-existing local/eduforge-worm
+        echo 'buckets prontos'
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:
