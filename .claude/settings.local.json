@@ -182,7 +182,8 @@
       "Bash(git branch *)",
       "Bash(git push *)",
       "Bash(Get-ChildItem -Path \"C:\\\\projetos\\\\geraapp\" -Directory -Force)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(echo 'import { useState } from \"react\"; *)"
     ]
   }
 }
