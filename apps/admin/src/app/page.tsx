@@ -18,7 +18,10 @@ interface Me {
 
 const panels = [
   { title: 'Dashboard do Sistema', hint: 'Saúde, filas, estatísticas, manutenção', tag: 'Admin 1/2', href: '/sistema' },
+  { title: 'Analytics', hint: 'Métricas: usuários, projetos, créditos, crescimento', tag: 'Admin 3', href: '/analytics' },
   { title: 'Usuários & Organizações', hint: 'Buscar, suspender, sessões, impersonar, papel', tag: 'M6', href: '/usuarios' },
+  { title: 'Planos', hint: 'CRUD de planos (free/pro/business), limites, preços', tag: 'Admin 3', href: '/planos' },
+  { title: 'Monitor de Filas', hint: 'BullMQ: profundidade, falhas, retry, limpeza', tag: 'Admin 3', href: '/filas' },
   { title: 'Catálogo (Templates & Paletas)', hint: 'CRUD de templates e paletas de cores', tag: 'Admin 2', href: '/catalogo' },
   { title: 'Feature Flags', hint: 'Rollout %, por usuário/plano', tag: 'M6', href: '/flags' },
   { title: 'Fila INPI', hint: 'Protocolo e-Software, checklist, concessão', tag: 'M8', href: '/inpi' },
