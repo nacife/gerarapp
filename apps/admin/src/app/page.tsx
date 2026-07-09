@@ -29,6 +29,9 @@ const panels = [
   { title: 'Moderação de Conteúdo', hint: 'Casos de moderação, revisão, takedown', tag: 'Admin 4', href: '/moderacao' },
   { title: 'API Keys (Global)', hint: 'Listar/revogar chaves de todos os usuários', tag: 'Admin 4', href: '/api-keys-admin' },
   { title: 'Organizações', hint: 'CRUD de orgs, membros, projetos', tag: 'Admin 4', href: '/orgs' },
+  { title: 'Webhooks (Global)', hint: 'Monitor de entregas, falhas, reenvio', tag: 'Admin 5', href: '/webhooks-admin' },
+  { title: 'Rate Limiting', hint: 'Configurar limites, bloquear IPs', tag: 'Admin 5', href: '/rate-limit-admin' },
+  { title: 'E-mail Templates', hint: 'Editar templates de e-mails transacionais', tag: 'Admin 5', href: '/email-templates' },
   { title: 'Configuração de APIs', hint: 'Rate limits, créditos IA, endpoints, ambiente', tag: 'Admin 1', href: '/config' },
 ];
 
