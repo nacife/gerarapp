@@ -1,8 +1,9 @@
 'use client';
 
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import QRCode from 'qrcode';
 import { apiFetch } from '../../lib/api';
 
 interface Me {
@@ -32,6 +33,8 @@ export default function ConfiguracoesPage() {
   const [busy, setBusy] = useState(false);
 
   const [mfaSecret, setMfaSecret] = useState<string | null>(null);
+  const [mfaOtpauthUrl, setMfaOtpauthUrl] = useState<string | null>(null);
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const [mfaCode, setMfaCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[] | null>(null);
   const [disableCode, setDisableCode] = useState('');
@@ -62,9 +65,15 @@ export default function ConfiguracoesPage() {
   }
 
   async function startMfaSetup() {
-    const res = await apiFetch<{ secret: string }>('/auth/mfa/setup', { method: 'POST' });
-    if (res.ok && res.data) setMfaSecret(res.data.secret);
+    const res = await apiFetch<{ secret: string; otpauthUrl: string }>('/auth/mfa/setup', { method: 'POST' });
+    if (res.ok && res.data) { setMfaSecret(res.data.secret); setMfaOtpauthUrl(res.data.otpauthUrl); }
   }
+
+  // Renderiza QR code quando otpauthUrl estiver disponível
+  useEffect(() => {
+    if (!mfaOtpauthUrl || !qrCanvasRef.current) return;
+    QRCode.toCanvas(qrCanvasRef.current, mfaOtpauthUrl, { width: 200, margin: 1, color: { dark: '#e2e8f0', light: '#0f172a' } });
+  }, [mfaOtpauthUrl]);
 
   async function enableMfa(e: FormEvent) {
     e.preventDefault();
@@ -211,7 +220,13 @@ export default function ConfiguracoesPage() {
             </div>
           ) : (
             <form onSubmit={enableMfa} className="space-y-3">
-              <p className="text-xs text-slate-400">Adicione este segredo ao seu app autenticador:</p>
+              <p className="text-xs text-slate-400">Escaneie o QR code com seu app autenticador:</p>
+              {mfaOtpauthUrl && (
+                <div className="flex justify-center rounded-lg bg-white p-3">
+                  <canvas ref={qrCanvasRef} />
+                </div>
+              )}
+              <p className="text-xs text-slate-500">Ou insira o segredo manualmente:</p>
               <code className="block break-all rounded bg-slate-950 px-3 py-2 font-mono text-sm text-emerald-300">
                 {mfaSecret}
               </code>

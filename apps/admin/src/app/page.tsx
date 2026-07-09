@@ -1,9 +1,10 @@
 'use client';
 
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import QRCode from 'qrcode';
 import { apiFetch } from '../lib/api';
 
 const ADMIN_ROLES = ['admin', 'super_admin', 'support'];
@@ -43,6 +44,8 @@ export default function AdminHome() {
   const [me, setMe] = useState<Me | null>(null);
   const [phase, setPhase] = useState<Phase>('loading');
   const [secret, setSecret] = useState<string | null>(null);
+  const [otpauthUrl, setOtpauthUrl] = useState<string | null>(null);
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const [code, setCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +66,7 @@ export default function AdminHome() {
       const setup = await apiFetch<{ secret: string; otpauthUrl: string }>('/auth/mfa/setup', {
         method: 'POST',
       });
-      if (setup.ok && setup.data) setSecret(setup.data.secret);
+      if (setup.ok && setup.data) { setSecret(setup.data.secret); setOtpauthUrl(setup.data.otpauthUrl); }
       setPhase('mfa');
       return;
     }
@@ -73,6 +76,12 @@ export default function AdminHome() {
   useEffect(() => {
     void load();
   }, []);
+
+  // Renderiza QR code quando otpauthUrl estiver disponível
+  useEffect(() => {
+    if (!otpauthUrl || !qrCanvasRef.current) return;
+    QRCode.toCanvas(qrCanvasRef.current, otpauthUrl, { width: 200, margin: 1, color: { dark: '#e2e8f0', light: '#0f172a' } });
+  }, [otpauthUrl]);
 
   async function enableMfa(e: FormEvent) {
     e.preventDefault();
@@ -143,6 +152,11 @@ export default function AdminHome() {
           ) : (
             <form onSubmit={enableMfa} className="mt-5 space-y-3">
               <p className="text-xs text-zinc-400">{t('secretLabel')}</p>
+              {otpauthUrl && (
+                <div className="flex justify-center rounded-lg bg-white p-3">
+                  <canvas ref={qrCanvasRef} />
+                </div>
+              )}
               <code className="block break-all rounded bg-zinc-900 px-3 py-2 font-mono text-sm text-emerald-300">
                 {secret ?? '…'}
               </code>
