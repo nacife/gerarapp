@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import IORedis, { type Redis } from 'ioredis';
 import { getEnv } from '@eduforge/config';
 import { LearningModule } from '../learning/learning.module';
 import { SenseiController, SenseiPublicController } from './sensei.controller';
@@ -12,19 +11,12 @@ import {
   PrismaSenseiEventRepository,
 } from './adapters/prisma.repositories';
 
-const SENSEI_REDIS = Symbol('SENSEI_REDIS');
-
 @Module({
   imports: [LearningModule],
   controllers: [SenseiController, SenseiPublicController],
   providers: [
     {
-      provide: SENSEI_REDIS,
-      useFactory: (): Redis => new IORedis(getEnv().REDIS_URL, { maxRetriesPerRequest: null }),
-    },
-    {
       provide: SenseiService,
-      inject: [SENSEI_REDIS],
       useFactory: () =>
         new SenseiService(
           new PrismaSenseiProjectRepository(),

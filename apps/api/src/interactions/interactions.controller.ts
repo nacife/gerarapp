@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query } from '@nestjs/common';
 import { CurrentUser, RequireScope, type AuthenticatedUser } from '../common/decorators';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
+import { paginationSchema, type Paginated, type PaginationDto } from '../common/pagination';
 import { InteractionsService } from './interactions.service';
 import {
   editInteractionSchema,
@@ -39,8 +40,15 @@ export class ProjectInteractionsController {
 
   @Get(':id/interactions')
   @RequireScope('content:read')
-  async list(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return (await this.interactions.list(id, user.id)).map(view);
+  async list(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Query(new ZodValidationPipe(paginationSchema)) pagination: PaginationDto,
+  ): Promise<Paginated<ReturnType<typeof view>>> {
+    const all = await this.interactions.list(id, user.id);
+    const total = all.length;
+    const items = all.slice(pagination.offset, pagination.offset + pagination.limit).map(view);
+    return { items, total, offset: pagination.offset, limit: pagination.limit };
   }
 }
 

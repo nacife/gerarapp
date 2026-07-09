@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const signupSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1),
+  password: z.string().min(10, 'Senha deve ter no mínimo 10 caracteres (RF-07).'),
   name: z.string().min(1).max(120),
   locale: z.string().max(10).optional(),
   acceptTerms: z.literal(true, {
@@ -13,7 +13,7 @@ export type SignupDto = z.infer<typeof signupSchema>;
 
 export const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1),
+  password: z.string().min(10, 'Senha deve ter no mínimo 10 caracteres (RF-07).'),
 });
 export type LoginDto = z.infer<typeof loginSchema>;
 
@@ -31,7 +31,7 @@ export type EmailDto = z.infer<typeof emailSchema>;
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1),
-  password: z.string().min(1),
+  password: z.string().min(10, 'Senha deve ter no mínimo 10 caracteres (RF-07).'),
 });
 export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
 
