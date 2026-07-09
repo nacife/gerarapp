@@ -2,7 +2,10 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 
 // Cifra reversível (secret TOTP, secret de webhook) mora em @eduforge/schemas
 // porque o worker também precisa decifrar (assinatura HMAC na entrega).
-export { encryptSecret, decryptSecret, type SealedSecret } from '@eduforge/schemas/crypto';
+// Import via dist/ porque o API usa moduleResolution: "node" (NestJS)
+// que não suporta package.json "exports". O barrel NÃO exporta crypto
+// porque 'node:crypto' quebra o Vite no runtime do browser.
+export { encryptSecret, decryptSecret, type SealedSecret } from '@eduforge/schemas/dist/crypto';
 
 /** Gera um token opaco (base64url) de alta entropia. */
 export function generateToken(bytes = 32): string {

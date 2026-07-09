@@ -12,11 +12,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "baseUrl": "./",
-    "resolveJsonModule": true,
-    "paths": {
-      "@eduforge/schemas/crypto": ["../../packages/schemas/src/crypto.ts"],
-      "@eduforge/schemas/webhooks": ["../../packages/schemas/src/webhooks.ts"]
-    }
+    "resolveJsonModule": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
