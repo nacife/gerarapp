@@ -26,6 +26,9 @@ const panels = [
   { title: 'Feature Flags', hint: 'Rollout %, por usuário/plano', tag: 'M6', href: '/flags' },
   { title: 'Fila INPI', hint: 'Protocolo e-Software, checklist, concessão', tag: 'M8', href: '/inpi' },
   { title: 'Auditoria', hint: 'Logs globais de ações administrativas', tag: 'Admin 1', href: '/auditoria' },
+  { title: 'Moderação de Conteúdo', hint: 'Casos de moderação, revisão, takedown', tag: 'Admin 4', href: '/moderacao' },
+  { title: 'API Keys (Global)', hint: 'Listar/revogar chaves de todos os usuários', tag: 'Admin 4', href: '/api-keys-admin' },
+  { title: 'Organizações', hint: 'CRUD de orgs, membros, projetos', tag: 'Admin 4', href: '/orgs' },
   { title: 'Configuração de APIs', hint: 'Rate limits, créditos IA, endpoints, ambiente', tag: 'Admin 1', href: '/config' },
 ];
 

@@ -20,6 +20,9 @@ import { AdminCatalogController } from './catalog.controller';
 import { PlansController } from './plans.controller';
 import { AnalyticsAdminController } from './analytics-admin.controller';
 import { QueueAdminController } from './queue-admin.controller';
+import { ModerationController } from './moderation.controller';
+import { ApiKeysAdminController } from './api-keys-admin.controller';
+import { OrgsController } from './orgs.controller';
 import { MaintenanceInterceptor } from './maintenance.interceptor';
 import { AdminUsersService } from './admin-users.service';
 import { FeatureFlagsService } from './feature-flags.service';
@@ -34,7 +37,7 @@ import {
 
 @Module({
   imports: [AuthModule, ApiKeysModule],
-  controllers: [AdminUsersController, FeatureFlagsController, AdminApiKeysController, SystemController, ApiConfigController, AdminCatalogController, PlansController, AnalyticsAdminController, QueueAdminController],
+  controllers: [AdminUsersController, FeatureFlagsController, AdminApiKeysController, SystemController, ApiConfigController, AdminCatalogController, PlansController, AnalyticsAdminController, QueueAdminController, ModerationController, ApiKeysAdminController, OrgsController],
   providers: [
     { provide: AuditService, useFactory: () => new AuditService(new PrismaAuditLogRepository()) },
     {
