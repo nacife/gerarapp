@@ -25,6 +25,11 @@
       "types": "./dist/webhooks.signing.d.ts",
       "import": "./dist/webhooks.signing.mjs",
       "require": "./dist/webhooks.signing.js"
+    },
+    "./dist/*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.mjs",
+      "require": "./dist/*.js"
     }
   },
   "files": ["dist"],

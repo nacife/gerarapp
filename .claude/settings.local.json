@@ -187,7 +187,8 @@
       "PowerShell($conn = Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn\\) { Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host \"Killed process on 5173\" } else { Write-Host \"No process on 5173\" })",
       "PowerShell($conn = Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn\\) { Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host \"Killed\" })",
       "PowerShell(Remove-Item *)",
-      "Bash(grep -v \"//\")"
+      "Bash(grep -v \"//\")",
+      "PowerShell($conn = Get-NetTCPConnection -LocalPort 3333 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn\\) { Write-Host \"API PID: $\\($conn.OwningProcess\\)\" } else { Write-Host \"API NOT RUNNING on 3333\" })"
     ]
   }
 }

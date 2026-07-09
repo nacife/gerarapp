@@ -26,7 +26,7 @@ export function LearnerAuth({
     const body = mode === 'signup' ? { email, name, password } : { email, password };
     const res = await apiFetch(path, { method: 'POST', body });
     setLoading(false);
-    if (!res.ok) return setError(res.problem?.detail ?? 'Não foi possível continuar.');
+    if (!res.ok) return setError(res.problem?.detail ?? res.problem?.title ?? 'Não foi possível continuar.');
     onAuthenticated();
   }
 
