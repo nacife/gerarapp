@@ -11,9 +11,12 @@ import { ApiKeysService } from '../api-keys/api-keys.service';
 import { AdminUsersController } from './admin-users.controller';
 import { FeatureFlagsController } from './feature-flags.controller';
 import { AdminApiKeysController } from './admin-api-keys.controller';
+import { SystemController } from './system.controller';
+import { ApiConfigController } from './api-config.controller';
 import { AdminUsersService } from './admin-users.service';
 import { FeatureFlagsService } from './feature-flags.service';
 import { AdminApiKeysService } from './admin-api-keys.service';
+import { SystemService } from './system.service';
 import { AuditService } from './audit.service';
 import {
   PrismaAdminUserRepository,
@@ -23,7 +26,7 @@ import {
 
 @Module({
   imports: [AuthModule, ApiKeysModule],
-  controllers: [AdminUsersController, FeatureFlagsController, AdminApiKeysController],
+  controllers: [AdminUsersController, FeatureFlagsController, AdminApiKeysController, SystemController, ApiConfigController],
   providers: [
     { provide: AuditService, useFactory: () => new AuditService(new PrismaAuditLogRepository()) },
     {
@@ -48,6 +51,11 @@ import {
       provide: AdminApiKeysService,
       inject: [ApiKeysService, AuditService],
       useFactory: (apiKeys: ApiKeysService, audit: AuditService) => new AdminApiKeysService(apiKeys, audit),
+    },
+    {
+      provide: SystemService,
+      inject: [AuditService],
+      useFactory: (audit: AuditService) => new SystemService(audit),
     },
   ],
   exports: [FeatureFlagsService, AuditService],

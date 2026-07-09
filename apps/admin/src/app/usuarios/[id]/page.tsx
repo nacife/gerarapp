@@ -229,6 +229,35 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
           </p>
         )}
 
+        {/* Alterar papel + Reset MFA */}
+        <div className="flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-3">
+          <select
+            value={detail.role}
+            onChange={async (e) => {
+              const newRole = e.target.value;
+              const res = await apiFetch(`/admin/users/${userId}/role`, { method: 'POST', body: { role: newRole } });
+              setMsg(res.ok ? `Papel alterado para ${newRole}.` : (res.problem?.detail ?? 'Falha.'));
+              if (res.ok) loadDetail();
+            }}
+            className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none"
+          >
+            <option value="learner">Learner</option>
+            <option value="creator">Creator</option>
+            <option value="admin">Admin</option>
+            <option value="support">Support</option>
+          </select>
+          <button
+            onClick={async () => {
+              const res = await apiFetch(`/admin/users/${userId}/reset-mfa`, { method: 'POST' });
+              setMsg(res.ok ? 'MFA removido.' : (res.problem?.detail ?? 'Falha.'));
+            }}
+            disabled={busy}
+            className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-300 hover:bg-amber-500/20 disabled:opacity-50"
+          >
+            🔐 Resetar MFA
+          </button>
+        </div>
+
         <form onSubmit={grantCredits} className="flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-3">
           <input
             type="number"

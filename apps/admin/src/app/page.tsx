@@ -17,10 +17,12 @@ interface Me {
 }
 
 const panels = [
-  { title: 'Usuários & Organizações', hint: 'RF-12 · suspender, sessões, impersonar', tag: 'M6', href: '/usuarios' },
-  { title: 'Feature Flags', hint: 'RF-13 · rollout %, por usuário/plano', tag: 'M6', href: '/flags' },
-  { title: 'Fila INPI', hint: 'RF-17 · protocolo e-Software', tag: 'M8', href: '/inpi' },
-  { title: 'Saúde do pipeline', hint: 'RF-15 · filas, latência, custo IA', tag: 'M6', href: null },
+  { title: 'Dashboard do Sistema', hint: 'Saúde, filas, estatísticas em tempo real', tag: 'Admin 1', href: '/sistema' },
+  { title: 'Usuários & Organizações', hint: 'Buscar, suspender, sessões, impersonar, papel', tag: 'M6', href: '/usuarios' },
+  { title: 'Feature Flags', hint: 'Rollout %, por usuário/plano', tag: 'M6', href: '/flags' },
+  { title: 'Fila INPI', hint: 'Protocolo e-Software, checklist, concessão', tag: 'M8', href: '/inpi' },
+  { title: 'Auditoria', hint: 'Logs globais de ações administrativas', tag: 'Admin 1', href: '/auditoria' },
+  { title: 'Configuração de APIs', hint: 'Rate limits, créditos IA, endpoints, ambiente', tag: 'Admin 1', href: '/config' },
 ];
 
 type Phase = 'loading' | 'denied' | 'mfa' | 'console';
@@ -179,33 +181,20 @@ export default function AdminHome() {
         </div>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2">
-        {panels.map((p) =>
-          p.href ? (
-            <Link
-              key={p.title}
-              href={p.href}
-              className="flex items-start justify-between rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 transition hover:-translate-y-0.5 hover:border-zinc-600"
-            >
-              <div>
-                <p className="font-semibold">{p.title}</p>
-                <p className="mt-1 text-sm text-zinc-500">{p.hint}</p>
-              </div>
-              <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">{p.tag}</span>
-            </Link>
-          ) : (
-            <div
-              key={p.title}
-              className="flex items-start justify-between rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 opacity-50"
-            >
-              <div>
-                <p className="font-semibold">{p.title}</p>
-                <p className="mt-1 text-sm text-zinc-500">{p.hint}</p>
-              </div>
-              <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">{p.tag}</span>
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {panels.map((p) => (
+          <Link
+            key={p.title}
+            href={p.href!}
+            className="flex items-start justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 transition hover:-translate-y-0.5 hover:border-cyan-500/30 hover:bg-white/[0.04]"
+          >
+            <div>
+              <p className="font-semibold text-gray-200">{p.title}</p>
+              <p className="mt-1 text-sm text-gray-500">{p.hint}</p>
             </div>
-          ),
-        )}
+            <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-xs text-cyan-300">{p.tag}</span>
+          </Link>
+        ))}
       </section>
     </main>
   );
