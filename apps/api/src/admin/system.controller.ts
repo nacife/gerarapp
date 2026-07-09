@@ -41,4 +41,18 @@ export class SystemController {
   resetMfa(@Param('id') id: string) {
     return this.system.resetMfa(id);
   }
+
+  /** Modo manutenção — status atual */
+  @Get('maintenance')
+  @Roles('admin', 'super_admin')
+  getMaintenance() {
+    return this.system.getMaintenanceMode();
+  }
+
+  /** Modo manutenção — ativar/desativar */
+  @Post('maintenance')
+  @Roles('admin', 'super_admin')
+  setMaintenance(@Body() body: { enable: boolean }) {
+    return this.system.setMaintenanceMode(body.enable);
+  }
 }

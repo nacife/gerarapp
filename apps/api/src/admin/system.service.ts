@@ -1,11 +1,16 @@
+import { Inject } from '@nestjs/common';
 import { prisma, Prisma } from '@eduforge/db';
-import IORedis from 'ioredis';
+import IORedis, { type Redis } from 'ioredis';
 import { getEnv } from '@eduforge/config';
 import { Errors } from '../common/errors';
 import { AuditService } from './audit.service';
+import { SHARED_REDIS } from '../common/redis.module';
 
 export class SystemService {
-  constructor(private readonly audit: AuditService) {}
+  constructor(
+    private readonly audit: AuditService,
+    @Inject(SHARED_REDIS) private readonly redis: Redis,
+  ) {}
 
   async getHealth() {
     const env = getEnv();
@@ -100,5 +105,19 @@ export class SystemService {
     await prisma.user.update({ where: { id: userId }, data: { mfa: Prisma.DbNull } });
 
     return { userId, mfaReset: true };
+  }
+
+  async getMaintenanceMode() {
+    const mode = await this.redis.get('maintenance:mode');
+    return { enabled: mode === 'on' };
+  }
+
+  async setMaintenanceMode(enable: boolean) {
+    if (enable) {
+      await this.redis.set('maintenance:mode', 'on');
+    } else {
+      await this.redis.del('maintenance:mode');
+    }
+    return { enabled: enable };
   }
 }

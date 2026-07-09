@@ -188,7 +188,9 @@
       "PowerShell($conn = Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn\\) { Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host \"Killed\" })",
       "PowerShell(Remove-Item *)",
       "Bash(grep -v \"//\")",
-      "PowerShell($conn = Get-NetTCPConnection -LocalPort 3333 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn\\) { Write-Host \"API PID: $\\($conn.OwningProcess\\)\" } else { Write-Host \"API NOT RUNNING on 3333\" })"
+      "PowerShell($conn = Get-NetTCPConnection -LocalPort 3333 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn\\) { Write-Host \"API PID: $\\($conn.OwningProcess\\)\" } else { Write-Host \"API NOT RUNNING on 3333\" })",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'db={d[\\\\\"db\\\\\"]} redis={d[\\\\\"redis\\\\\"]} users={d[\\\\\"users\\\\\"]} projects={d[\\\\\"projects\\\\\"]} queues={len\\(d[\\\\\"queues\\\\\"]\\)} filas'\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'db={d[\\\\\"db\\\\\"]} redis={d[\\\\\"redis\\\\\"]} users={d[\\\\\"users\\\\\"][\\\\\"total\\\\\"]} projects={d[\\\\\"projects\\\\\"][\\\\\"total\\\\\"]} queues={len\\(d[\\\\\"queues\\\\\"]\\)}'\\)\")"
     ]
   }
 }

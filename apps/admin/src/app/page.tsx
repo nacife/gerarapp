@@ -17,8 +17,9 @@ interface Me {
 }
 
 const panels = [
-  { title: 'Dashboard do Sistema', hint: 'Saúde, filas, estatísticas em tempo real', tag: 'Admin 1', href: '/sistema' },
+  { title: 'Dashboard do Sistema', hint: 'Saúde, filas, estatísticas, manutenção', tag: 'Admin 1/2', href: '/sistema' },
   { title: 'Usuários & Organizações', hint: 'Buscar, suspender, sessões, impersonar, papel', tag: 'M6', href: '/usuarios' },
+  { title: 'Catálogo (Templates & Paletas)', hint: 'CRUD de templates e paletas de cores', tag: 'Admin 2', href: '/catalogo' },
   { title: 'Feature Flags', hint: 'Rollout %, por usuário/plano', tag: 'M6', href: '/flags' },
   { title: 'Fila INPI', hint: 'Protocolo e-Software, checklist, concessão', tag: 'M8', href: '/inpi' },
   { title: 'Auditoria', hint: 'Logs globais de ações administrativas', tag: 'Admin 1', href: '/auditoria' },
