@@ -9,7 +9,8 @@
     <title>EduForge</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><p style="color:#94a3b8;padding:40px;font-family:sans-serif">Carregando aplicativo...</p></div>
+    <script>console.log('EduForge: script inline OK');window.addEventListener('error',function(e){document.getElementById('root').innerHTML='<div style=\"color:#f87171;padding:40px;font-family:monospace\"><h2>Erro JavaScript</h2><pre>'+e.message+'</pre><p>Arquivo: '+e.filename+'</p><p>Linha: '+e.lineno+'</p></div>';})</script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

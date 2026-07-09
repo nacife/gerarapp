@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   plugins: [
     react(),
+    /* VitePWA desabilitado temporariamente — debug tela em branco
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -22,7 +23,7 @@ export default defineConfig({
           { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
         ],
       },
-    }),
+    }), */
   ],
   server: { port: 5173 },
 });
