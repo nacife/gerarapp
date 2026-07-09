@@ -58,7 +58,7 @@ export default function LoginPage() {
     <main className="grid min-h-screen place-items-center px-6 py-12">
       <div className="w-full max-w-sm">
         <Link href="/" className="mb-8 flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-sky-400 to-fuchsia-500 font-black text-slate-950">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-sky-400 to-fuchsia-500 font-black text-gray-950">
             E
           </span>
           <span className="font-semibold tracking-tight">EduForge</span>
@@ -68,7 +68,7 @@ export default function LoginPage() {
           <form onSubmit={submitMfa} className="space-y-4">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">{t('mfaTitle')}</h1>
-              <p className="mt-1 text-sm text-slate-400">{t('mfaSubtitle')}</p>
+              <p className="mt-1 text-sm text-gray-400">{t('mfaSubtitle')}</p>
             </div>
             <input
               autoFocus
@@ -81,7 +81,7 @@ export default function LoginPage() {
             {error && <p className="text-sm text-rose-400">{error}</p>}
             <button
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-br from-sky-400 to-fuchsia-500 px-4 py-3 font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60"
+              className="w-full rounded-xl bg-gradient-to-br from-sky-400 to-fuchsia-500 px-4 py-3 font-semibold text-gray-950 transition hover:brightness-110 disabled:opacity-60"
             >
               {loading ? t('submitting') : t('mfaSubmit')}
             </button>
@@ -90,10 +90,10 @@ export default function LoginPage() {
           <form onSubmit={submitLogin} className="space-y-4">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
-              <p className="mt-1 text-sm text-slate-400">{t('subtitle')}</p>
+              <p className="mt-1 text-sm text-gray-400">{t('subtitle')}</p>
             </div>
             <label className="block text-sm">
-              <span className="text-slate-400">{t('email')}</span>
+              <span className="text-gray-400">{t('email')}</span>
               <input
                 type="email"
                 required
@@ -103,7 +103,7 @@ export default function LoginPage() {
               />
             </label>
             <label className="block text-sm">
-              <span className="text-slate-400">{t('password')}</span>
+              <span className="text-gray-400">{t('password')}</span>
               <input
                 type="password"
                 required
@@ -115,11 +115,11 @@ export default function LoginPage() {
             {error && <p className="text-sm text-rose-400">{error}</p>}
             <button
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-br from-sky-400 to-fuchsia-500 px-4 py-3 font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60"
+              className="w-full rounded-xl bg-gradient-to-br from-sky-400 to-fuchsia-500 px-4 py-3 font-semibold text-gray-950 transition hover:brightness-110 disabled:opacity-60"
             >
               {loading ? t('submitting') : t('submit')}
             </button>
-            <p className="text-center text-sm text-slate-400">
+            <p className="text-center text-sm text-gray-400">
               {t('noAccount')}{' '}
               <Link href="/cadastro" className="text-sky-400 hover:underline">
                 {t('signupLink')}

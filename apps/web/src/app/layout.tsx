@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import ImpersonationBanner from './ImpersonationBanner';
+import { MeshBackground } from '../components/MeshBackground';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -17,9 +18,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang={locale}>
       <body className="font-sans">
+        <MeshBackground />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ImpersonationBanner />
-          {children}
+          <main className="relative z-10">{children}</main>
         </NextIntlClientProvider>
       </body>
     </html>

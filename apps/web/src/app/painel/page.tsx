@@ -48,7 +48,7 @@ const STATUS_LABEL: Record<DisplayStatus, string> = {
 };
 
 const STATUS_STYLE: Record<DisplayStatus, string> = {
-  draft: 'bg-slate-800 text-slate-400',
+  draft: 'bg-white/[0.04] text-gray-400',
   published: 'bg-emerald-500/15 text-emerald-300',
   pending_update: 'bg-amber-500/15 text-amber-300',
 };
@@ -62,7 +62,7 @@ function UsageBar({ label, used, limit, suffix = '' }: { label: string; used: nu
   const pct = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
   return (
     <div>
-      <div className="flex items-center justify-between text-xs text-slate-500">
+      <div className="flex items-center justify-between text-xs text-gray-500">
         <span>{label}</span>
         <span>
           {used}
@@ -70,7 +70,7 @@ function UsageBar({ label, used, limit, suffix = '' }: { label: string; used: nu
           {suffix}
         </span>
       </div>
-      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-800">
+      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/[0.04]">
         <div
           className={`h-full rounded-full ${pct >= 90 ? 'bg-rose-400' : 'bg-gradient-to-r from-sky-400 to-fuchsia-500'}`}
           style={{ width: `${pct}%` }}
@@ -106,7 +106,7 @@ export default function PainelPage() {
   }
 
   if (loading || !me) {
-    return <main className="grid min-h-screen place-items-center text-slate-400">Carregando…</main>;
+    return <main className="grid min-h-screen place-items-center text-gray-400">Carregando…</main>;
   }
 
   const projects = home?.projects ?? [];
@@ -114,23 +114,23 @@ export default function PainelPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-6 py-12">
-      <header className="flex items-center justify-between border-b border-slate-800 pb-6">
+      <header className="flex items-center justify-between border-b border-white/[0.06] pb-6">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-sky-400 to-fuchsia-500 font-black text-slate-950">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-gradient font-black text-slate-950">
             E
           </span>
           <div>
             <p className="font-semibold">Olá, {me.name}</p>
-            <p className="text-xs text-slate-500">{me.email}</p>
+            <p className="text-xs text-gray-500">{me.email}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/configuracoes" className="text-sm text-slate-400 hover:text-white">
+          <Link href="/configuracoes" className="text-sm text-gray-400 hover:text-gray-200">
             Configurações
           </Link>
           <button
             onClick={logout}
-            className="rounded-lg border border-slate-800 px-4 py-2 text-sm text-slate-300 transition hover:border-slate-600"
+            className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm text-slate-300 transition hover:border-slate-600"
           >
             Sair
           </button>
@@ -140,14 +140,14 @@ export default function PainelPage() {
       <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
         <Link
           href="/novo"
-          className="flex items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-fuchsia-500 px-5 py-6 text-lg font-semibold text-slate-950 shadow-lg shadow-fuchsia-500/20 transition hover:brightness-110"
+          className="flex items-center justify-center rounded-2xl bg-cyan-gradient px-5 py-6 text-lg font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:brightness-110"
         >
           + Novo app a partir de arquivo
         </Link>
 
         {usage && (
-          <div className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-            <p className="text-xs uppercase tracking-wider text-slate-500">
+          <div className="space-y-3 rounded-2xl border border-white/[0.06] glass p-4">
+            <p className="text-xs uppercase tracking-wider text-gray-500">
               Plano <span className="text-slate-300">{usage.planKey}</span>
             </p>
             <UsageBar label="Apps" used={usage.usage.apps} limit={usage.limits.apps} />
@@ -156,7 +156,7 @@ export default function PainelPage() {
               used={usage.usage.aiCreditsBalance}
               limit={usage.limits.aiCreditsMonthly}
             />
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-gray-500">
               Armazenamento: {formatBytes(usage.usage.storageBytes)} / {usage.limits.uploadMb} MB por arquivo
             </p>
           </div>
@@ -165,10 +165,10 @@ export default function PainelPage() {
 
       {home && home.highlights.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Destaques</h2>
+          <h2 className="text-sm font-medium uppercase tracking-wider text-gray-500">Destaques</h2>
           <div className="space-y-1.5">
             {home.highlights.map((h, i) => (
-              <p key={i} className="rounded-lg border border-slate-800 bg-slate-900/40 px-3 py-2 text-sm text-slate-300">
+              <p key={i} className="rounded-lg border border-white/[0.06] bg-slate-900/40 px-3 py-2 text-sm text-slate-300">
                 ✨ {h}
               </p>
             ))}
@@ -177,11 +177,11 @@ export default function PainelPage() {
       )}
 
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-gray-500">
           Meus apps ({projects.length})
         </h2>
         {projects.length === 0 ? (
-          <p className="text-sm text-slate-500">Nenhum app ainda. Envie um arquivo para começar.</p>
+          <p className="text-sm text-gray-500">Nenhum app ainda. Envie um arquivo para começar.</p>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {projects.map((p) => {
@@ -189,7 +189,7 @@ export default function PainelPage() {
               return (
                 <div
                   key={p.id}
-                  className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 transition hover:-translate-y-0.5 hover:bg-slate-900"
+                  className="overflow-hidden rounded-xl border border-white/[0.06] glass transition hover:-translate-y-0.5 hover:bg-slate-900"
                 >
                   <Link href={p.displayStatus === 'published' ? `/projeto/${p.id}/revisar` : `/projeto/${p.id}/mapa`}>
                     <div
@@ -203,18 +203,18 @@ export default function PainelPage() {
                           {STATUS_LABEL[p.displayStatus]}
                         </span>
                       </div>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-gray-500">
                         {p.slug} · {p.interactionCount} interações
                       </p>
                       {p.displayStatus !== 'draft' && (
-                        <p className="mt-2 text-xs text-slate-400">{p.sessionsThisWeek} sessões esta semana</p>
+                        <p className="mt-2 text-xs text-gray-400">{p.sessionsThisWeek} sessões esta semana</p>
                       )}
                     </div>
                   </Link>
                   {p.displayStatus !== 'draft' && (
                     <Link
                       href={`/projeto/${p.id}/analytics`}
-                      className="block border-t border-slate-800 px-4 py-2 text-xs text-sky-400 hover:underline"
+                      className="block border-t border-white/[0.06] px-4 py-2 text-xs text-sky-400 hover:underline"
                     >
                       Ver analytics →
                     </Link>

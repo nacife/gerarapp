@@ -67,4 +67,7 @@ export const PALETTES: PaletteSeed[] = [
   palette('citrico', 'Cítrico', { primary: '#65a30d', secondary: '#3f6212', accent: '#fde047' }),
   palette('rubi', 'Rubi', { primary: '#e11d48', secondary: '#9f1239', accent: '#fda4af' }),
   palette('indigo', 'Índigo', { primary: '#4f46e5', secondary: '#3730a3', accent: '#818cf8' }),
+  // Premium — M10+
+  palette('ciano-premium', 'Ciano Premium', { primary: '#06b6d4', secondary: '#0891b2', accent: '#22d3ee' }),
+  palette('grafite-premium', 'Grafite Premium', { primary: '#334155', secondary: '#1e293b', accent: '#06b6d4' }),
 ];

@@ -180,7 +180,9 @@
       "Bash(git add *)",
       "Bash(git remote *)",
       "Bash(git branch *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\projetos\\\\geraapp\" -Directory -Force)",
+      "Bash(Select-Object Name)"
     ]
   }
 }
