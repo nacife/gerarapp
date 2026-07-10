@@ -14,8 +14,10 @@ export interface RateLimitOptions {
   windowSec?: number;
 }
 
-export const RateLimit = (opts?: RateLimitOptions) =>
-  Reflect.defineMetadata(RATE_LIMIT_KEY, opts ?? {}, Reflect);
+export const RateLimit = (opts?: RateLimitOptions): MethodDecorator =>
+  (_target, _propertyKey, descriptor) => {
+    Reflect.defineMetadata(RATE_LIMIT_KEY, opts ?? {}, descriptor.value!);
+  };
 
 /**
  * Decorator para pular rate limiting (ex.: webhooks entrantes).

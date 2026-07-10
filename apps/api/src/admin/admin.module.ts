@@ -17,15 +17,6 @@ import { AdminApiKeysController } from './admin-api-keys.controller';
 import { SystemController } from './system.controller';
 import { ApiConfigController } from './api-config.controller';
 import { AdminCatalogController } from './catalog.controller';
-import { PlansController } from './plans.controller';
-import { AnalyticsAdminController } from './analytics-admin.controller';
-import { QueueAdminController } from './queue-admin.controller';
-import { ModerationController } from './moderation.controller';
-import { ApiKeysAdminController } from './api-keys-admin.controller';
-import { OrgsController } from './orgs.controller';
-import { WebhooksAdminController } from './webhooks-admin.controller';
-import { RateLimitAdminController } from './rate-limit-admin.controller';
-import { EmailTemplatesController } from './email-templates.controller';
 import { AiConfigController } from './ai-config.controller';
 import { MaintenanceInterceptor } from './maintenance.interceptor';
 import { AdminUsersService } from './admin-users.service';
@@ -41,7 +32,7 @@ import {
 
 @Module({
   imports: [AuthModule, ApiKeysModule],
-  controllers: [AdminUsersController, FeatureFlagsController, AdminApiKeysController, SystemController, ApiConfigController, AdminCatalogController, PlansController, AnalyticsAdminController, QueueAdminController, ModerationController, ApiKeysAdminController, OrgsController, WebhooksAdminController, RateLimitAdminController, EmailTemplatesController, AiConfigController],
+  controllers: [AdminUsersController, FeatureFlagsController, AdminApiKeysController, SystemController, ApiConfigController, AdminCatalogController, AiConfigController],
   providers: [
     { provide: AuditService, useFactory: () => new AuditService(new PrismaAuditLogRepository()) },
     {
