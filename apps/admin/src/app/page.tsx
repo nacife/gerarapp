@@ -33,6 +33,7 @@ const panels = [
   { title: 'Webhooks (Global)', hint: 'Monitor de entregas, falhas, reenvio', tag: 'Admin 5', href: '/webhooks-admin' },
   { title: 'Rate Limiting', hint: 'Configurar limites, bloquear IPs', tag: 'Admin 5', href: '/rate-limit-admin' },
   { title: 'E-mail Templates', hint: 'Editar templates de e-mails transacionais', tag: 'Admin 5', href: '/email-templates' },
+  { title: 'IA / LLMs', hint: 'Chaves API (Anthropic, OpenAI, Google), modelos, créditos', tag: 'AI', href: '/ai-config' },
   { title: 'Configuração de APIs', hint: 'Rate limits, créditos IA, endpoints, ambiente', tag: 'Admin 1', href: '/config' },
 ];
 
