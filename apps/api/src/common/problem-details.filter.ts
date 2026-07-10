@@ -55,8 +55,7 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       };
     } else {
       body = { type: 'about:blank', title: 'Erro interno do servidor', status: 500, trace_id: traceId };
-      // eslint-disable-next-line no-console
-      console.error(`[${traceId}]`, exception);
+      try { const { logger } = await import('./logger'); logger.error({ traceId, err: exception }, 'Erro interno'); } catch { /* logger indisponível */ }
     }
 
     void reply.status(status).header('content-type', 'application/problem+json').send(body);

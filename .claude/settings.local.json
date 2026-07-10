@@ -190,7 +190,9 @@
       "Bash(grep -v \"//\")",
       "PowerShell($conn = Get-NetTCPConnection -LocalPort 3333 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn\\) { Write-Host \"API PID: $\\($conn.OwningProcess\\)\" } else { Write-Host \"API NOT RUNNING on 3333\" })",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'db={d[\\\\\"db\\\\\"]} redis={d[\\\\\"redis\\\\\"]} users={d[\\\\\"users\\\\\"]} projects={d[\\\\\"projects\\\\\"]} queues={len\\(d[\\\\\"queues\\\\\"]\\)} filas'\\)\")",
-      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'db={d[\\\\\"db\\\\\"]} redis={d[\\\\\"redis\\\\\"]} users={d[\\\\\"users\\\\\"][\\\\\"total\\\\\"]} projects={d[\\\\\"projects\\\\\"][\\\\\"total\\\\\"]} queues={len\\(d[\\\\\"queues\\\\\"]\\)}'\\)\")"
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'db={d[\\\\\"db\\\\\"]} redis={d[\\\\\"redis\\\\\"]} users={d[\\\\\"users\\\\\"][\\\\\"total\\\\\"]} projects={d[\\\\\"projects\\\\\"][\\\\\"total\\\\\"]} queues={len\\(d[\\\\\"queues\\\\\"]\\)}'\\)\")",
+      "Bash(sed -i 's/  @Post\\('\\\\''signup'\\\\''\\)/  @Post\\('\\\\''signup'\\\\''\\)\\\\n  @RateLimit\\({ max: 10, windowSec: 60 }\\)/' apps/api/src/learning/learner-auth.controller.ts)",
+      "Bash(sed -i 's/  @Post\\('\\\\''login'\\\\''\\)/  @Post\\('\\\\''login'\\\\''\\)\\\\n  @RateLimit\\({ max: 20, windowSec: 60 }\\)/' apps/api/src/learning/learner-auth.controller.ts)"
     ]
   }
 }

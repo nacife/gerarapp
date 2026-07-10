@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, Inject, Post, Res, UseGuards } from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
 import { Public } from '../common/decorators';
+import { RateLimit } from '../common/rate-limit.guard';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { LearnerAuthService } from './learner-auth.service';
 import { AuthenticatedLearner, CurrentLearner, LearnerAuthGuard } from './learner-auth.guard';
@@ -22,6 +23,7 @@ export class LearnerAuthController {
   ) {}
 
   @Post('signup')
+  @RateLimit({ max: 10, windowSec: 60 })
   @HttpCode(201)
   async signup(
     @Body(new ZodValidationPipe(learnerSignupSchema)) dto: LearnerSignupDto,
@@ -33,6 +35,7 @@ export class LearnerAuthController {
   }
 
   @Post('login')
+  @RateLimit({ max: 20, windowSec: 60 })
   @HttpCode(200)
   async login(
     @Body(new ZodValidationPipe(learnerLoginSchema)) dto: LearnerLoginDto,
