@@ -46,8 +46,6 @@ export const TEMPLATE_TOKENS: Record<string, TemplateTokens> = {
     typography: { heading: 'Inter', body: 'Inter', scale: 1.2 },
     motion: { level: 'subtle', respectsReducedMotion: true },
   },
-};
-
   academic: { key: 'academic', name: 'Acadêmico', navigation: 'editorial', surface: 'bordered', radius: 'md', typography: { heading: 'Georgia', body: 'Inter', scale: 1.4 }, motion: { level: 'subtle', respectsReducedMotion: true } },
   playful: { key: 'playful', name: 'Divertido', navigation: 'cards', surface: 'soft-shadow', radius: 'xl', typography: { heading: 'Nunito', body: 'Nunito', scale: 1.3 }, motion: { level: 'rich', respectsReducedMotion: true } },
   corporate: { key: 'corporate', name: 'Corporativo', navigation: 'cards', surface: 'flat', radius: 'sm', typography: { heading: 'Inter', body: 'Inter', scale: 1.15 }, motion: { level: 'subtle', respectsReducedMotion: true } },
