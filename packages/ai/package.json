@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",
-    "@eduforge/schemas": "workspace:*"
+    "@eduforge/schemas": "workspace:*",
+    "openai": "^6.46.0"
   }
 }

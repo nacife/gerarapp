@@ -13,46 +13,69 @@ export class AiConfigController {
   @Roles('admin', 'super_admin')
   async getConfig() {
     const env = getEnv();
-    const [anthropicKey, openaiKey, googleKey] = await Promise.all([
+    const [anthropicKey, openaiKey, deepseekKey, fallbackOrderRaw, mockFallbackRaw, anthropicModel, openaiModel, deepseekModel] = await Promise.all([
       this.redis.get('ai:anthropic_key'),
       this.redis.get('ai:openai_key'),
-      this.redis.get('ai:google_key'),
+      this.redis.get('ai:deepseek_key'),
+      this.redis.get('ai:fallback_order'),
+      this.redis.get('ai:mock_fallback'),
+      this.redis.get('ai:anthropic_model'),
+      this.redis.get('ai:openai_model'),
+      this.redis.get('ai:deepseek_model'),
     ]);
+
+    const fallbackOrder: string[] = fallbackOrderRaw ? JSON.parse(fallbackOrderRaw) : ['anthropic', 'deepseek', 'openai'];
 
     return {
       provider: env.AI_PROVIDER,
-      models: {
-        structure: env.AI_MODEL_STRUCTURE ?? 'claude-sonnet-5',
-        interactions: env.AI_MODEL_INTERACTIONS ?? 'claude-sonnet-5',
-        tutor: env.AI_MODEL_STRUCTURE ?? 'claude-sonnet-5',
+      providers: {
+        anthropic: {
+          model: anthropicModel ?? env.AI_MODEL_STRUCTURE ?? 'claude-sonnet-4-6',
+          hasKey: !!(anthropicKey || env.ANTHROPIC_API_KEY),
+          keyPreview: anthropicKey ? mask(anthropicKey) : (env.ANTHROPIC_API_KEY ? mask(env.ANTHROPIC_API_KEY) : null),
+          keySource: anthropicKey ? 'redis' : env.ANTHROPIC_API_KEY ? 'env' : 'none',
+        },
+        openai: {
+          model: openaiModel ?? 'gpt-4o',
+          hasKey: !!openaiKey,
+          keyPreview: openaiKey ? mask(openaiKey) : null,
+          keySource: openaiKey ? 'redis' : 'none',
+        },
+        deepseek: {
+          model: deepseekModel ?? 'deepseek-chat',
+          hasKey: !!deepseekKey,
+          keyPreview: deepseekKey ? mask(deepseekKey) : null,
+          keySource: deepseekKey ? 'redis' : 'none',
+        },
       },
-      keys: {
-        anthropic: anthropicKey ? mask(anthropicKey) : (env.ANTHROPIC_API_KEY ? mask(env.ANTHROPIC_API_KEY) : null),
-        openai: openaiKey ? mask(openaiKey) : null,
-        google: googleKey ? mask(googleKey) : null,
-      },
-      keysSource: {
-        anthropic: anthropicKey ? 'redis' : env.ANTHROPIC_API_KEY ? 'env' : 'none',
-        openai: openaiKey ? 'redis' : 'none',
-        google: googleKey ? 'redis' : 'none',
-      },
-      note: 'Chaves no Redis têm precedência sobre .env. Altere aqui sem reiniciar a API.',
+      fallbackOrder,
+      mockFallback: mockFallbackRaw !== 'false',
+      note: 'As chaves no Redis têm precedência sobre .env.',
     };
   }
 
-  @Post('key')
+  @Post('provider')
   @Roles('admin', 'super_admin')
-  async setKey(@Body() body: { provider: string; apiKey: string }) {
+  async saveProvider(@Body() body: { provider: string; apiKey: string; model?: string }) {
     if (!body.apiKey || !body.provider) return { error: 'provider e apiKey são obrigatórios' };
     await this.redis.set(`ai:${body.provider}_key`, body.apiKey);
-    return { saved: true, provider: body.provider, preview: mask(body.apiKey) };
+    if (body.model) await this.redis.set(`ai:${body.provider}_model`, body.model);
+    return { saved: true, provider: body.provider };
   }
 
-  @Post('key/clear')
+  @Post('provider/clear')
   @Roles('admin', 'super_admin')
-  async clearKey(@Body() body: { provider: string }) {
+  async clearProvider(@Body() body: { provider: string }) {
     await this.redis.del(`ai:${body.provider}_key`);
     return { cleared: true, provider: body.provider };
+  }
+
+  @Post('fallback')
+  @Roles('admin', 'super_admin')
+  async saveFallback(@Body() body: { order: string[]; mockFallback: boolean }) {
+    await this.redis.set('ai:fallback_order', JSON.stringify(body.order));
+    await this.redis.set('ai:mock_fallback', body.mockFallback ? 'true' : 'false');
+    return { saved: true, order: body.order, mockFallback: body.mockFallback };
   }
 
   @Get('usage')
