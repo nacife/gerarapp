@@ -33,11 +33,21 @@ export class PrismaMediaRepository implements MediaRepository {
     });
     if (!map) return null;
 
-    // Aceita qualquer bloco do mapa aprovado (capítulo raiz OU seção filha).
-    return prisma.contentBlock.findFirst({
+    // Tenta como UUID de ContentBlock primeiro
+    const block = await prisma.contentBlock.findFirst({
       where: { id: chapterId, contentMapId: map.id },
+      select: { id: true, contentMd: true, parentId: true },
+    });
+    if (block) return block;
+
+    // Fallback: tenta como tree node ID (ex: "c1") — procura blocos filhos
+    // e retorna o primeiro section block como representante do capítulo
+    const childBlock = await prisma.contentBlock.findFirst({
+      where: { parentId: chapterId, contentMapId: map.id },
+      orderBy: { position: 'asc' },
       select: { id: true, contentMd: true },
     });
+    return childBlock;
   }
 
   async createJob(projectId: string, chapterId: string): Promise<string> {
