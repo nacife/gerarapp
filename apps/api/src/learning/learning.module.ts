@@ -5,7 +5,7 @@ import { LearnerAuthController } from './learner-auth.controller';
 import { EnrollmentController, LeaderboardController } from './enrollment.controller';
 import { CertificatesController } from './certificates.controller';
 import { LearnersController } from './learners.controller';
-import { DnaController } from './dna/dna.controller';
+import { DnaPublicController, DnaCreatorController } from './dna/dna.controller';
 import { LearningDnaService } from './dna/learning-dna.service';
 
 import { LearnerAuthService } from './learner-auth.service';
@@ -35,7 +35,7 @@ import { WebhooksService } from '../webhooks/webhooks.service';
 
 @Module({
   imports: [WebhooksModule],
-  controllers: [LearnerAuthController, EnrollmentController, LeaderboardController, CertificatesController, LearnersController, DnaController],
+  controllers: [LearnerAuthController, EnrollmentController, LeaderboardController, CertificatesController, LearnersController, DnaPublicController, DnaCreatorController],
   providers: [
     LearnerAuthGuard,
     { provide: LearningDnaService, useFactory: () => new LearningDnaService() },
