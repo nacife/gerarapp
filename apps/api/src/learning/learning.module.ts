@@ -5,6 +5,8 @@ import { LearnerAuthController } from './learner-auth.controller';
 import { EnrollmentController, LeaderboardController } from './enrollment.controller';
 import { CertificatesController } from './certificates.controller';
 import { LearnersController } from './learners.controller';
+import { DnaController } from './dna/dna.controller';
+import { LearningDnaService } from './dna/learning-dna.service';
 
 import { LearnerAuthService } from './learner-auth.service';
 import { EnrollmentService } from './enrollment.service';
@@ -33,9 +35,10 @@ import { WebhooksService } from '../webhooks/webhooks.service';
 
 @Module({
   imports: [WebhooksModule],
-  controllers: [LearnerAuthController, EnrollmentController, LeaderboardController, CertificatesController, LearnersController],
+  controllers: [LearnerAuthController, EnrollmentController, LeaderboardController, CertificatesController, LearnersController, DnaController],
   providers: [
     LearnerAuthGuard,
+    { provide: LearningDnaService, useFactory: () => new LearningDnaService() },
     {
       provide: LEARNER_TOKEN_SERVICE,
       useFactory: () => new JwtLearnerTokenService(getEnv().JWT_SECRET, LEARNER_AUTH.accessTokenTtlSec),
