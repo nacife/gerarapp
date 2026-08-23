@@ -17,7 +17,7 @@ export interface AiProviderConfig {
   /** Fallback final: se true, MockAiProvider é usado quando todos falham */
   mockFallback?: boolean;
   // ─────── Legacy (compatibilidade) ───────
-  provider?: 'mock' | 'anthropic';
+  provider?: 'mock' | 'anthropic' | 'openai' | 'deepseek';
   apiKey?: string;
   models?: { structure?: string; interactions?: string; tutor?: string };
 }
