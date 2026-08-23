@@ -1,5 +1,5 @@
 import { AI_CREDITS, QUEUES, getEnv, loadRootEnv } from '@eduforge/config';
-import { createAiProvider } from '@eduforge/ai';
+import { createAppAiProvider } from './common/ai.factory';
 import { computeWebhookBackoffMs } from '@eduforge/schemas';
 import { Queue, Worker } from 'bullmq';
 import IORedis from 'ioredis';
@@ -64,11 +64,7 @@ async function main() {
     storage: new S3IngestStorage(),
     extractor: new MimeDocumentExtractor(),
     ocr: new MockOcrProvider(),
-    ai: createAiProvider({
-      provider: env.AI_PROVIDER,
-      apiKey: env.ANTHROPIC_API_KEY,
-      models: { structure: env.AI_MODEL_STRUCTURE, interactions: env.AI_MODEL_INTERACTIONS },
-    }),
+    ai: createAppAiProvider(),
     repo: new PrismaIngestRepository(),
   };
   const ingestWorker = new Worker(

@@ -24,14 +24,15 @@ export class SmtpMailer implements Mailer {
     if (config.url) {
       this.transporter = nodemailer.createTransport(config.url);
     } else {
+      const port = config.port ?? 587;
       this.transporter = nodemailer.createTransport({
         host: config.host ?? 'smtp.gmail.com',
-        port: config.port ?? 587,
-        secure: false, // STARTTLS
-        auth: {
+        port,
+        secure: port === 465, // SSL direto na 465; STARTTLS na 587/25
+        auth: config.user && config.pass ? {
           user: config.user,
           pass: config.pass,
-        },
+        } : undefined,
       });
     }
     this.from = config.from ?? config.user ?? 'noreply@eduforge.app';

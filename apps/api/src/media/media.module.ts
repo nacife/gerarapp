@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import type { Redis } from 'ioredis';
-import { getEnv } from '@eduforge/config';
-import { createAiProvider } from '@eduforge/ai';
+import { createAppAiProvider } from '../common/ai.factory';
 import { SHARED_REDIS } from '../common/redis.module';
 import { MediaController, PublicMediaController } from './media.controller';
 import { MediaService } from './media.service';
@@ -24,10 +23,7 @@ import { BullMqTtsEnqueuer } from './adapters/enqueuer';
           new S3MediaStorage(),
           new PrismaMediaCreditsRepository(),
           new BullMqTtsEnqueuer(redis),
-          createAiProvider({
-            provider: getEnv().AI_PROVIDER as 'mock' | 'anthropic',
-            apiKey: getEnv().ANTHROPIC_API_KEY,
-          }),
+          createAppAiProvider(),
         ),
     },
   ],

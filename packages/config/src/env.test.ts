@@ -60,7 +60,25 @@ describe('loadEnv', () => {
       /ANTHROPIC_API_KEY/,
     );
     expect(() =>
-      loadEnv({ ...validEnv, AI_PROVIDER: 'anthropic', ANTHROPIC_API_KEY: 'sk-test' }),
+      loadEnv({ ...validEnv, AI_PROVIDER: 'anthropic', ANTHROPIC_API_KEY: 'sk-ant-test' }),
+    ).not.toThrow();
+  });
+
+  it('exige OPENAI_API_KEY quando AI_PROVIDER=openai', () => {
+    expect(() => loadEnv({ ...validEnv, AI_PROVIDER: 'openai' })).toThrowError(
+      /OPENAI_API_KEY/,
+    );
+    expect(() =>
+      loadEnv({ ...validEnv, AI_PROVIDER: 'openai', OPENAI_API_KEY: 'sk-openai-test' }),
+    ).not.toThrow();
+  });
+
+  it('exige DEEPSEEK_API_KEY quando AI_PROVIDER=deepseek', () => {
+    expect(() => loadEnv({ ...validEnv, AI_PROVIDER: 'deepseek' })).toThrowError(
+      /DEEPSEEK_API_KEY/,
+    );
+    expect(() =>
+      loadEnv({ ...validEnv, AI_PROVIDER: 'deepseek', DEEPSEEK_API_KEY: 'sk-deepseek-test' }),
     ).not.toThrow();
   });
 

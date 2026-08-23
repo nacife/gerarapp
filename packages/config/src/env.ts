@@ -38,9 +38,20 @@ export const envSchema = z
       .min(16, 'REFRESH_TOKEN_PEPPER deve ter ao menos 16 caracteres'),
     AUTH_ENCRYPTION_KEY: z.string().min(32, 'AUTH_ENCRYPTION_KEY deve ter ao menos 32 caracteres'),
 
-    // IA
-    AI_PROVIDER: z.enum(['mock', 'anthropic']).default('mock'),
+    // IA (mock em dev; anthropic, openai, deepseek ou multi em produção)
+    AI_PROVIDER: z.enum(['mock', 'anthropic', 'openai', 'deepseek', 'multi']).default('mock'),
     ANTHROPIC_API_KEY: z.string().optional(),
+    OPENAI_API_KEY: z.string().optional(),
+    DEEPSEEK_API_KEY: z.string().optional(),
+    AI_FALLBACK_TO_MOCK: z
+      .preprocess((val) => {
+        if (typeof val === 'string') {
+          if (val.toLowerCase() === 'false' || val === '0') return false;
+          if (val.toLowerCase() === 'true' || val === '1') return true;
+        }
+        return val;
+      }, z.boolean())
+      .default(false),
     AI_MODEL_STRUCTURE: z.string().min(1).default('claude-sonnet-5'),
     AI_MODEL_INTERACTIONS: z.string().min(1).default('claude-sonnet-5'),
 
@@ -74,6 +85,20 @@ export const envSchema = z
         code: z.ZodIssueCode.custom,
         path: ['ANTHROPIC_API_KEY'],
         message: 'ANTHROPIC_API_KEY é obrigatório quando AI_PROVIDER=anthropic',
+      });
+    }
+    if (val.AI_PROVIDER === 'openai' && !val.OPENAI_API_KEY) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['OPENAI_API_KEY'],
+        message: 'OPENAI_API_KEY é obrigatório quando AI_PROVIDER=openai',
+      });
+    }
+    if (val.AI_PROVIDER === 'deepseek' && !val.DEEPSEEK_API_KEY) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['DEEPSEEK_API_KEY'],
+        message: 'DEEPSEEK_API_KEY é obrigatório quando AI_PROVIDER=deepseek',
       });
     }
     if (val.MAILER === 'smtp' && !val.SMTP_URL && !val.SMTP_HOST) {

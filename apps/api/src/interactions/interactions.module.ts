@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import IORedis, { type Redis } from 'ioredis';
-import { getEnv } from '@eduforge/config';
-import { createAiProvider } from '@eduforge/ai';
+import { createAppAiProvider } from '../common/ai.factory';
 import { InteractionsController, ProjectInteractionsController } from './interactions.controller';
 import { CreditsController } from './credits.controller';
 import { InteractionsService } from './interactions.service';
@@ -34,7 +33,6 @@ const INTERACTIONS_REDIS = Symbol('INTERACTIONS_REDIS');
       provide: InteractionsService,
       inject: [INTERACTIONS_REDIS],
       useFactory: (redis: Redis) => {
-        const env = getEnv();
         return new InteractionsService(
           new PrismaProjectRepository(),
           new PrismaContentMapRepository(),
@@ -42,11 +40,7 @@ const INTERACTIONS_REDIS = Symbol('INTERACTIONS_REDIS');
           new PrismaInteractionRepository(),
           new PrismaCreditRepository(),
           new BullMqGenerateEnqueuer(redis),
-          createAiProvider({
-            provider: env.AI_PROVIDER,
-            apiKey: env.ANTHROPIC_API_KEY,
-            models: { structure: env.AI_MODEL_STRUCTURE, interactions: env.AI_MODEL_INTERACTIONS },
-          }),
+          createAppAiProvider(),
         );
       },
     },
