@@ -190,6 +190,17 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       create: { projectId, email },
     });
   }
+
+  async createTimeCapsule(input: { enrollmentId: string; message: string }): Promise<string> {
+    const row = await prisma.timeCapsule.create({
+      data: {
+        enrollmentId: input.enrollmentId,
+        message: input.message,
+        delivered: false,
+      },
+    });
+    return row.id;
+  }
 }
 
 function mapProgress(row: {

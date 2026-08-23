@@ -12,6 +12,7 @@ export interface ManifestInteraction {
 
 export interface ThemeData {
   templateKey: string;
+  presentationMode?: 'standard' | 'story';
   palette: { light: Record<string, string>; dark: Record<string, string> };
   typography: Record<string, unknown>;
   effects: Record<string, unknown>;
@@ -67,6 +68,7 @@ export function buildManifest(input: {
     access: { mode: input.accessMode },
     theme: {
       template: input.theme.templateKey,
+      presentationMode: input.theme.presentationMode ?? 'standard',
       tokens: tokens as unknown as Record<string, unknown>,
       palette: input.theme.palette,
       typography: input.theme.typography,

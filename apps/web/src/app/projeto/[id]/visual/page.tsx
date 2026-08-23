@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '../../../../lib/api';
@@ -31,6 +31,34 @@ export default function VisualPage({ params }: { params: { id: string } }) {
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [device, setDevice] = useState<'mobile' | 'tablet' | 'desktop'>('mobile');
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+
+  // Enviar tema para o iframe
+  useEffect(() => {
+    if (!iframeRef.current || !palette || !template) return;
+    const tpl = templates.find((t) => t.key === template);
+    iframeRef.current.contentWindow?.postMessage({
+      type: 'UPDATE_THEME',
+      theme: dark ? palette.dark : palette.light,
+      templateConfig: tpl
+    }, '*');
+  }, [palette, dark, template, templates]);
+
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'PREVIEW_READY' && palette) {
+        const tpl = templates.find((t) => t.key === template);
+        iframeRef.current?.contentWindow?.postMessage({
+          type: 'UPDATE_THEME',
+          theme: dark ? palette.dark : palette.light,
+          templateConfig: tpl
+        }, '*');
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [palette, dark, template, templates]);
 
   useEffect(() => {
     (async () => {
@@ -194,38 +222,43 @@ export default function VisualPage({ params }: { params: { id: string } }) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Prévia</h2>
-            <button onClick={() => setDark((d) => !d)} className="text-xs text-slate-400">
-              {dark ? '🌙 escuro' : '☀ claro'}
-            </button>
-          </div>
-          {c && (
-            <div
-              className="rounded-2xl border p-5"
-              style={{ background: c.bg, color: c.text, borderColor: c.border }}
-            >
-              <div className="flex items-center gap-2">
-                <span
-                  className="grid h-8 w-8 place-items-center rounded-lg font-black"
-                  style={{ background: c.primary, color: c.bg }}
-                >
-                  E
-                </span>
-                <strong>Biologia Viva</strong>
+            <div className="flex items-center gap-2">
+              <div className="flex rounded-lg border border-slate-700 bg-slate-900 p-1">
+                <button
+                  onClick={() => setDevice('mobile')}
+                  className={`px-2 py-1 text-xs rounded ${device === 'mobile' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}
+                >📱</button>
+                <button
+                  onClick={() => setDevice('tablet')}
+                  className={`px-2 py-1 text-xs rounded ${device === 'tablet' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}
+                >💻</button>
+                <button
+                  onClick={() => setDevice('desktop')}
+                  className={`px-2 py-1 text-xs rounded ${device === 'desktop' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}
+                >🖥️</button>
               </div>
-              <h3 className="mt-4 text-lg font-bold" style={{ color: c.primary }}>
-                A Célula
-              </h3>
-              <p className="mt-1 text-sm" style={{ color: c.muted }}>
-                A membrana plasmática é uma bicamada lipídica…
-              </p>
-              <button
-                className="mt-3 rounded-lg px-3 py-1.5 text-sm font-semibold"
-                style={{ background: c.primary, color: c.bg }}
-              >
-                Quiz rápido
+              <button onClick={() => setDark((d) => !d)} className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-300 hover:text-white">
+                {dark ? '🌙 escuro' : '☀️ claro'}
               </button>
             </div>
-          )}
+          </div>
+          
+          <div className="flex justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-4">
+            <div
+              className="overflow-hidden rounded-xl border border-slate-700 shadow-2xl transition-all duration-300"
+              style={{
+                width: device === 'mobile' ? '375px' : device === 'tablet' ? '768px' : '100%',
+                height: '600px',
+              }}
+            >
+              <iframe
+                ref={iframeRef}
+                src="http://localhost:5173/preview"
+                className="h-full w-full border-none bg-white"
+                title="App Preview"
+              />
+            </div>
+          </div>
 
           <button
             onClick={saveAndContinue}

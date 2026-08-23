@@ -63,6 +63,10 @@ export class InMemoryEnrollmentRepository implements EnrollmentRepository {
     this.learnerNames.set(learnerId, name);
   }
 
+  async createTimeCapsule(input: { enrollmentId: string; message: string }): Promise<string> {
+    return Promise.resolve('mock-id');
+  }
+
   async findPublicProjectBySlug(slug: string): Promise<PublicProjectInfo | null> {
     return this.projects.get(slug) ?? null;
   }

@@ -15,6 +15,7 @@ export type PaletteSeed = {
   key: string;
   name: string;
   colors: { light: PaletteColors; dark: PaletteColors };
+  minPlanTier?: number;
 };
 
 /** Neutros fixos claros/escuros; cada paleta varia primary/secondary/accent. */
@@ -22,10 +23,12 @@ function palette(
   key: string,
   name: string,
   brand: { primary: string; secondary: string; accent: string },
+  minPlanTier: number = 0,
 ): PaletteSeed {
   return {
     key,
     name,
+    minPlanTier,
     colors: {
       light: {
         bg: '#ffffff',
@@ -68,6 +71,22 @@ export const PALETTES: PaletteSeed[] = [
   palette('rubi', 'Rubi', { primary: '#e11d48', secondary: '#9f1239', accent: '#fda4af' }),
   palette('indigo', 'Índigo', { primary: '#4f46e5', secondary: '#3730a3', accent: '#818cf8' }),
   // Premium — M10+
-  palette('ciano-premium', 'Ciano Premium', { primary: '#06b6d4', secondary: '#0891b2', accent: '#22d3ee' }),
-  palette('grafite-premium', 'Grafite Premium', { primary: '#334155', secondary: '#1e293b', accent: '#06b6d4' }),
+  palette('ciano-premium', 'Ciano Premium', { primary: '#06b6d4', secondary: '#0891b2', accent: '#22d3ee' }, 1),
+  palette('grafite-premium', 'Grafite Premium', { primary: '#334155', secondary: '#1e293b', accent: '#06b6d4' }, 1),
+  // M13: 15 novas paletas Premium
+  palette('outono', 'Outono', { primary: '#d97706', secondary: '#92400e', accent: '#f59e0b' }, 1),
+  palette('galaxia', 'Galáxia', { primary: '#6366f1', secondary: '#4338ca', accent: '#a855f7' }, 1),
+  palette('pessego', 'Pêssego', { primary: '#f97316', secondary: '#c2410c', accent: '#fb923c' }, 1),
+  palette('vaporwave', 'Vaporwave', { primary: '#ec4899', secondary: '#be185d', accent: '#06b6d4' }, 1),
+  palette('cibernetico', 'Cibernético', { primary: '#14b8a6', secondary: '#0f766e', accent: '#f43f5e' }, 1),
+  palette('pastel', 'Pastel', { primary: '#f472b6', secondary: '#db2777', accent: '#a78bfa' }, 1),
+  palette('vintage', 'Vintage', { primary: '#78716c', secondary: '#44403c', accent: '#a8a29e' }, 1),
+  palette('deserto', 'Deserto', { primary: '#b45309', secondary: '#78350f', accent: '#d97706' }, 1),
+  palette('aurora', 'Aurora', { primary: '#10b981', secondary: '#059669', accent: '#6366f1' }, 1),
+  palette('meia-noite', 'Meia-noite', { primary: '#312e81', secondary: '#1e1b4b', accent: '#4f46e5' }, 1),
+  palette('amora', 'Amora', { primary: '#86198f', secondary: '#4a044e', accent: '#d946ef' }, 1),
+  palette('crepusculo', 'Crepúsculo', { primary: '#4c1d95', secondary: '#2e1065', accent: '#e11d48' }, 1),
+  palette('floresta-profunda', 'Floresta Profunda', { primary: '#166534', secondary: '#14532d', accent: '#22c55e' }, 1),
+  palette('vulcao', 'Vulcão', { primary: '#9f1239', secondary: '#881337', accent: '#f43f5e' }, 1),
+  palette('glaciar', 'Glaciar', { primary: '#0369a1', secondary: '#0c4a6e', accent: '#38bdf8' }, 1),
 ];

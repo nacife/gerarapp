@@ -67,6 +67,7 @@ export interface EnrollmentRepository {
   addInvite(projectId: string, email: string): Promise<void>;
   /** Top 10 matrículas por XP de um app publicado (slug). */
   getLeaderboard(slug: string): Promise<{ enrollmentId: string; learnerName: string; xp: number }[]>;
+  createTimeCapsule(input: { enrollmentId: string; message: string }): Promise<string>;
 }
 
 export interface ProgressRow {
@@ -146,4 +147,13 @@ export interface CertificatePdfBuilder {
     verifyUrl: string;
     qrPng: Buffer;
   }): Promise<Buffer>;
+}
+
+export interface TimeCapsuleEnqueuer {
+  enqueue(input: {
+    capsuleId: string;
+    learnerEmail: string;
+    message: string;
+    delayMs: number;
+  }): Promise<void>;
 }

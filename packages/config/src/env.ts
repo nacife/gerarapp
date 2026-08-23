@@ -39,6 +39,11 @@ export const envSchema = z
     OCR_PROVIDER: z.enum(['tesseract']).default('tesseract'),
     MAILER: z.enum(['console', 'smtp']).default('console'),
     SMTP_URL: z.string().optional(),
+    SMTP_HOST: z.string().optional(),
+    SMTP_PORT: z.coerce.number().int().positive().optional(),
+    SMTP_USER: z.string().optional(),
+    SMTP_PASS: z.string().optional(),
+    SMTP_FROM: z.string().optional(),
 
     // URLs públicas
     APP_BASE_URL: z.string().url(),
@@ -62,11 +67,11 @@ export const envSchema = z
         message: 'ANTHROPIC_API_KEY é obrigatório quando AI_PROVIDER=anthropic',
       });
     }
-    if (val.MAILER === 'smtp' && !val.SMTP_URL) {
+    if (val.MAILER === 'smtp' && !val.SMTP_URL && !val.SMTP_HOST) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['SMTP_URL'],
-        message: 'SMTP_URL é obrigatório quando MAILER=smtp',
+        message: 'SMTP_URL ou SMTP_HOST é obrigatório quando MAILER=smtp',
       });
     }
   });

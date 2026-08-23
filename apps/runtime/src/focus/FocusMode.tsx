@@ -31,7 +31,7 @@ export function FocusMode({
   // Extrai palavras do conteúdo
   const words = contentMd
     .replace(/^#{1,6}\s+/gm, '')
-    .replace(/[*_`>\[\]]/g, '')
+    .replace(/[*_`>[\]]/g, '')
     .split(/\s+/)
     .filter((w) => w.length > 0);
 

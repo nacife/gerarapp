@@ -14,11 +14,12 @@ import { EventsService } from './events.service';
 import { CertificateService } from './certificate.service';
 
 import { LearnerAuthGuard } from './learner-auth.guard';
-import { LEARNER_COOKIE_OPTS, LEARNER_TOKEN_SERVICE, PROJECT_REPOSITORY } from './tokens';
+import { LEARNER_COOKIE_OPTS, LEARNER_TOKEN_SERVICE, PROJECT_REPOSITORY, TIME_CAPSULE_ENQUEUER } from './tokens';
 import { JwtLearnerTokenService } from './domain/learner-token';
 import { SystemClock } from '../auth/domain/clock';
 import { Argon2idHasher } from '../auth/domain/password-hasher';
 import { PrismaProjectRepository } from '../projects/adapters/prisma.repositories';
+import { BullMqTimeCapsuleEnqueuer } from './adapters/time-capsule.enqueuer';
 
 import {
   PrismaCertificateRepository,
@@ -44,6 +45,11 @@ import { WebhooksService } from '../webhooks/webhooks.service';
       useFactory: () => new JwtLearnerTokenService(getEnv().JWT_SECRET, LEARNER_AUTH.accessTokenTtlSec),
     },
     {
+      provide: TIME_CAPSULE_ENQUEUER,
+      inject: ['Redis'],
+      useFactory: (redis) => new BullMqTimeCapsuleEnqueuer(redis),
+    },
+    {
       provide: LEARNER_COOKIE_OPTS,
       useFactory: () => ({
         secure: getEnv().NODE_ENV === 'production',
@@ -62,14 +68,15 @@ import { WebhooksService } from '../webhooks/webhooks.service';
     },
     {
       provide: EnrollmentService,
-      inject: [WebhooksService],
-      useFactory: (webhooks: WebhooksService) =>
+      inject: [WebhooksService, TIME_CAPSULE_ENQUEUER],
+      useFactory: (webhooks: WebhooksService, timeCapsuleEnqueuer: any) =>
         new EnrollmentService(
           new PrismaEnrollmentRepository(),
           new PrismaProgressRepository(),
           new PrismaCertificateRepository(),
           new Argon2idHasher(),
           webhooks,
+          timeCapsuleEnqueuer
         ),
     },
     {

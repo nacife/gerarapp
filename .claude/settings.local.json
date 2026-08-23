@@ -192,7 +192,11 @@
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'db={d[\\\\\"db\\\\\"]} redis={d[\\\\\"redis\\\\\"]} users={d[\\\\\"users\\\\\"]} projects={d[\\\\\"projects\\\\\"]} queues={len\\(d[\\\\\"queues\\\\\"]\\)} filas'\\)\")",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'db={d[\\\\\"db\\\\\"]} redis={d[\\\\\"redis\\\\\"]} users={d[\\\\\"users\\\\\"][\\\\\"total\\\\\"]} projects={d[\\\\\"projects\\\\\"][\\\\\"total\\\\\"]} queues={len\\(d[\\\\\"queues\\\\\"]\\)}'\\)\")",
       "Bash(sed -i 's/  @Post\\('\\\\''signup'\\\\''\\)/  @Post\\('\\\\''signup'\\\\''\\)\\\\n  @RateLimit\\({ max: 10, windowSec: 60 }\\)/' apps/api/src/learning/learner-auth.controller.ts)",
-      "Bash(sed -i 's/  @Post\\('\\\\''login'\\\\''\\)/  @Post\\('\\\\''login'\\\\''\\)\\\\n  @RateLimit\\({ max: 20, windowSec: 60 }\\)/' apps/api/src/learning/learner-auth.controller.ts)"
+      "Bash(sed -i 's/  @Post\\('\\\\''login'\\\\''\\)/  @Post\\('\\\\''login'\\\\''\\)\\\\n  @RateLimit\\({ max: 20, windowSec: 60 }\\)/' apps/api/src/learning/learner-auth.controller.ts)",
+      "PowerShell($conn = Get-NetTCPConnection -LocalPort 3333 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn\\) { Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host \"Killed API PID $\\($conn.OwningProcess\\)\" } else { Write-Host \"API not running\" })",
+      "PowerShell(Get-Process *)",
+      "PowerShell($conn = Get-NetTCPConnection -LocalPort 3333 -ErrorAction SilentlyContinue | Select-Object LocalPort, OwningProcess, State; if \\($conn\\) { Write-Host \"API: PID $\\($conn.OwningProcess\\) State $\\($conn.State\\)\" } else { Write-Host \"API NOT RUNNING\" }; $conn2 = Get-NetTCPConnection -LocalPort 3002 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($conn2\\) { Write-Host \"Web: PID $\\($conn2.OwningProcess\\)\" } else { Write-Host \"Web NOT RUNNING\" })",
+      "PowerShell(Stop-Process *)"
     ]
   }
 }

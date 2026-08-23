@@ -198,6 +198,42 @@ export class AuthService {
     return { status: 'authenticated', session };
   }
 
+  async socialLogin(input: {
+    email: string;
+    name: string;
+    device: DeviceInfo;
+  }): Promise<LoginResult> {
+    const email = input.email.toLowerCase();
+    let user = await this.users.findByEmail(email);
+
+    if (!user) {
+      // Auto-signup para login social
+      user = await this.users.create({
+        email,
+        name: input.name,
+        role: 'creator',
+        locale: 'pt-BR',
+        passwordHash: '',
+        consent: {
+          version: '1.0',
+          acceptedAt: this.clock.now().toISOString(),
+          ip: input.device.ip,
+        },
+      });
+      // Marca email como verificado pois vem do provedor social
+      await this.users.markEmailVerified(user.id, this.clock.now());
+    } else {
+      if (user.status === 'suspended') throw Errors.accountSuspended();
+    }
+
+    if (user.mfa?.enabled) {
+      return { status: 'mfa_required', challengeToken: this.challenge.sign(user.id) };
+    }
+
+    const session = await this.issueSession(user, input.device);
+    return { status: 'authenticated', session };
+  }
+
   async loginMfa(input: {
     challengeToken: string;
     code: string;

@@ -48,8 +48,90 @@ export class MimeDocumentExtractor implements DocumentExtractor {
     return { text, pageCount: 1, hasTextLayer: text.trim().length > 0 };
   }
 
-  private epub(buffer: Buffer): ExtractedDoc {
-    // TODO(prd:RF-01): extração EPUB dedicada (epub2). Fallback: remove tags.
+  private async epub(buffer: Buffer): Promise<ExtractedDoc> {
+    try {
+      // EPUB is a ZIP archive; parse it to extract structured text
+      const JSZip = (await import('jszip')).default;
+      const zip = await JSZip.loadAsync(buffer);
+
+      // Read container.xml to find the OPF file
+      const containerXml = await zip.file('META-INF/container.xml')?.async('text');
+      if (!containerXml) {
+        return this.epubFallback(buffer);
+      }
+
+      // Extract OPF path from container
+      const rootfileMatch = containerXml.match(/full-path="([^"]+)"/);
+      const opfPath = rootfileMatch?.[1];
+      if (!opfPath) {
+        return this.epubFallback(buffer);
+      }
+
+      const opfContent = await zip.file(opfPath)?.async('text');
+      if (!opfContent) {
+        return this.epubFallback(buffer);
+      }
+
+      // Get base directory of OPF for resolving relative paths
+      const opfDir = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/') + 1) : '';
+
+      // Extract manifest items (id → href mapping)
+      const manifestItems = new Map<string, string>();
+      const itemRegex = /<item\s+[^>]*id="([^"]+)"[^>]*href="([^"]+)"[^>]*media-type="([^"]+)"[^>]*/g;
+      let itemMatch;
+      while ((itemMatch = itemRegex.exec(opfContent)) !== null) {
+        if (itemMatch[3]?.includes('html') || itemMatch[3]?.includes('xml')) {
+          manifestItems.set(itemMatch[1]!, itemMatch[2]!);
+        }
+      }
+
+      // Extract spine order
+      const spineIds: string[] = [];
+      const itemrefRegex = /<itemref\s+[^>]*idref="([^"]+)"/g;
+      let spineMatch;
+      while ((spineMatch = itemrefRegex.exec(opfContent)) !== null) {
+        spineIds.push(spineMatch[1]!);
+      }
+
+      // Read spine items in order, extract text
+      const parts: string[] = [];
+      for (const id of spineIds) {
+        const href = manifestItems.get(id);
+        if (!href) continue;
+        const filePath = opfDir + href;
+        const html = await zip.file(filePath)?.async('text');
+        if (!html) continue;
+        // Strip HTML tags, normalize whitespace
+        const text = html
+          .replace(/<script[\s\S]*?<\/script>/gi, '')
+          .replace(/<style[\s\S]*?<\/style>/gi, '')
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<\/?(p|div|h[1-6]|li|tr|blockquote)[^>]*>/gi, '\n')
+          .replace(/<[^>]+>/g, '')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+        if (text.length > 0) parts.push(text);
+      }
+
+      const fullText = parts.join('\n\n');
+      return {
+        text: fullText,
+        pageCount: parts.length || 1,
+        hasTextLayer: fullText.trim().length > 50,
+      };
+    } catch {
+      return this.epubFallback(buffer);
+    }
+  }
+
+  /** Fallback básico: remove tags do EPUB se o parser estruturado falhar. */
+  private epubFallback(buffer: Buffer): ExtractedDoc {
     const text = buffer.toString('utf8').replace(/<[^>]+>/g, ' ');
     return { text, pageCount: 1, hasTextLayer: text.trim().length > 50 };
   }

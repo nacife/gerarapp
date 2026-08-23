@@ -61,6 +61,7 @@ export const QUEUES = {
   anonymize: 'account-anonymize',
   webhookDelivery: 'webhook-delivery',
   senseiEmbed: 'sensei-embed',
+  timeCapsule: 'time-capsule',
 } as const;
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
 

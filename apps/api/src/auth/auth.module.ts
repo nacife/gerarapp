@@ -6,6 +6,7 @@ import { AUTH, getEnv } from '@eduforge/config';
 import { AuthController } from './auth.controller';
 import { MfaController } from './mfa.controller';
 import { AccountController } from './account.controller';
+import { SocialLoginController } from './social-login.controller';
 import { AuthService } from './auth.service';
 import { MfaService } from './mfa.service';
 import { AccountService } from './account.service';
@@ -26,6 +27,7 @@ import {
 } from './adapters/prisma.repositories';
 import { RedisLoginAttemptStore } from './adapters/redis.store';
 import { ConsoleMailer } from './adapters/console.mailer';
+import { SmtpMailer } from './adapters/smtp.mailer';
 import { BullMqDeletionEnqueuer } from './adapters/enqueuer';
 
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -37,7 +39,7 @@ import { ApiKeysModule } from '../api-keys/api-keys.module';
 
 @Module({
   imports: [ApiKeysModule],
-  controllers: [AuthController, MfaController, AccountController],
+  controllers: [AuthController, MfaController, AccountController, SocialLoginController],
   providers: [
     {
       provide: AUTH_REDIS,
@@ -66,7 +68,13 @@ import { ApiKeysModule } from '../api-keys/api-keys.module';
           new PrismaSessionRepository(),
           new PrismaAuthTokenRepository(),
           new RedisLoginAttemptStore(redis),
-          new ConsoleMailer(),
+          env.MAILER === 'smtp'
+            ? new SmtpMailer(
+                env.SMTP_URL
+                  ? { url: env.SMTP_URL }
+                  : { host: env.SMTP_HOST, port: env.SMTP_PORT, user: env.SMTP_USER, pass: env.SMTP_PASS, from: env.SMTP_FROM },
+              )
+            : new ConsoleMailer(),
           new Argon2idHasher(),
           new LocalBreachedPasswordChecker(),
           new OtplibTotpService(),

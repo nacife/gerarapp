@@ -8,8 +8,10 @@ import { AuthenticatedLearner, CurrentLearner, LearnerAuthGuard } from './learne
 import {
   enrollSchema,
   recordEventSchema,
+  timeCapsuleSchema,
   type EnrollDto,
   type RecordEventDto,
+  type TimeCapsuleDto,
 } from './dto/schemas';
 
 @Public()
@@ -57,6 +59,19 @@ export class EnrollmentController {
   @Get('enrollments/:id/achievements')
   achievements(@CurrentLearner() learner: AuthenticatedLearner, @Param('id') id: string) {
     return this.enrollments.getAchievements(id, learner.id);
+  }
+
+  @Post('enrollments/:id/time-capsule')
+  @HttpCode(202)
+  async createTimeCapsule(
+    @CurrentLearner() learner: AuthenticatedLearner,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(timeCapsuleSchema)) dto: TimeCapsuleDto,
+  ) {
+    const me = await this.learnerAuth.me(learner.id);
+    // Delay reduzido (1-2 min) para testes locais conforme plano (60s)
+    const delayMs = 60 * 1000;
+    return this.enrollments.createTimeCapsule(id, learner.id, me.email, dto.message, delayMs);
   }
 }
 

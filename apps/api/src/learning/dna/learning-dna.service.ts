@@ -11,7 +11,7 @@ export interface DnaProfile {
 const STOP_WORDS = new Set(['de','da','do','em','no','na','que','e','o','a','os','as','um','uma','para','com','se','não','é','foi','por','dos','das']);
 
 function extractKeywords(md: string): string[] {
-  return md.toLowerCase().replace(/[#*_`>\[\]()]/g, '').split(/[\s,.;:!?]+/).filter(w => w.length > 3 && !STOP_WORDS.has(w));
+  return md.toLowerCase().replace(/[#*_`>[\]()]/g, '').split(/[\s,.;:!?]+/).filter(w => w.length > 3 && !STOP_WORDS.has(w));
 }
 
 export class LearningDnaService {

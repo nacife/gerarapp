@@ -12,6 +12,7 @@ export const manifestSchema = z.object({
   access: z.object({ mode: accessModeSchema }),
   theme: z.object({
     template: z.string(),
+    presentationMode: z.enum(['standard', 'story']).optional(),
     tokens: z.record(z.unknown()),
     palette: z.object({
       light: z.record(z.string()),

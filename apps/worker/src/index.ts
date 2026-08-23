@@ -26,6 +26,7 @@ import { runSenseiEmbedding, type SenseiEmbedJobData } from './sensei/pipeline';
 import { PrismaSenseiEmbedRepository } from './sensei/repository';
 import { runPodcastGeneration, type PodcastJobData } from './podcast/pipeline';
 import { PrismaPodcastRepository, S3MediaStorage } from './podcast/repository';
+import { processTimeCapsule, type TimeCapsuleJobData } from './time-capsule/pipeline';
 
 async function main() {
   loadRootEnv();
@@ -221,7 +222,17 @@ async function main() {
     { connection },
   );
 
-  const workers = [systemWorker, anonymizeWorker, ingestWorker, generateWorker, inpiWorker, webhookWorker, senseiWorker, podcastWorker];
+  // Time Capsule (M14)
+  const timeCapsuleWorker = new Worker(
+    QUEUES.timeCapsule,
+    async (job) => {
+      const data = job.data as TimeCapsuleJobData;
+      await processTimeCapsule(data);
+    },
+    { connection },
+  );
+
+  const workers = [systemWorker, anonymizeWorker, ingestWorker, generateWorker, inpiWorker, webhookWorker, senseiWorker, podcastWorker, timeCapsuleWorker];
   for (const w of workers) {
     w.on('failed', (job, err) => {
       // eslint-disable-next-line no-console

@@ -237,7 +237,7 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
               const newRole = e.target.value;
               const res = await apiFetch(`/admin/users/${userId}/role`, { method: 'POST', body: { role: newRole } });
               setMsg(res.ok ? `Papel alterado para ${newRole}.` : (res.problem?.detail ?? 'Falha.'));
-              if (res.ok) loadDetail();
+              if (res.ok) void load();
             }}
             className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none"
           >

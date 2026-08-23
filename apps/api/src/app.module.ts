@@ -17,6 +17,7 @@ import { SenseiModule } from './sensei/sensei.module';
 import { MediaModule } from './media/media.module';
 import { SharedRedisModule } from './common/redis.module';
 import { GlobalRateLimitGuard } from './common/rate-limit.guard';
+import { RealtimeModule } from './realtime/realtime.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { GlobalRateLimitGuard } from './common/rate-limit.guard';
     ApiKeysModule,
     WebhooksModule,
     OpenApiModule,
+    RealtimeModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: GlobalRateLimitGuard },

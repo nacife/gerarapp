@@ -27,3 +27,8 @@ export type RecordEventDto = z.infer<typeof recordEventSchema>;
 
 export const inviteSchema = z.object({ email: z.string().email() });
 export type InviteDto = z.infer<typeof inviteSchema>;
+
+export const timeCapsuleSchema = z.object({
+  message: z.string().min(1).max(5000),
+});
+export type TimeCapsuleDto = z.infer<typeof timeCapsuleSchema>;

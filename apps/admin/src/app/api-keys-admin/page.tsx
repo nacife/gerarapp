@@ -19,7 +19,7 @@ export default function ApiKeysAdminPage() {
   const router = useRouter();
   const [keys, setKeys] = useState<ApiKeyRow[]>([]);
   const [stats, setStats] = useState<{ total: number; active: number; revoked: number; uniqueUsers: number } | null>(null);
-  const [scopes, setScopes] = useState<ScopeItem[]>([]);
+  const [, setScopes] = useState<ScopeItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'list' | 'create'>('list');
 
@@ -47,7 +47,11 @@ export default function ApiKeysAdminPage() {
 
   function toggleScope(s: string) {
     const next = new Set(selectedScopes);
-    next.has(s) ? next.delete(s) : next.add(s);
+    if (next.has(s)) {
+      next.delete(s);
+    } else {
+      next.add(s);
+    }
     setSelectedScopes(next);
   }
 

@@ -93,7 +93,7 @@ function build() {
     new InMemoryWebhookEnqueuer(),
     'test-encryption-key-32-chars-ok',
   );
-  const enrollmentService = new EnrollmentService(enrollments, progress, certificatesRepo, hasher, webhooks);
+  const enrollmentService = new EnrollmentService(enrollments, progress, certificatesRepo, hasher, webhooks, { enqueue: async () => {} });
   const certificateService = new CertificateService(
     enrollments,
     progress,

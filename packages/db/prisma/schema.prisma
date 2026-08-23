@@ -211,6 +211,8 @@ model User {
   id           String     @id @default(uuid()) @db.Uuid
   email        String     @unique @db.Citext
   passwordHash String?    @map("password_hash")
+  provider     String?
+  providerId   String?    @map("provider_id")
   name         String
   locale       String     @default("pt-BR")
   role         Role       @default(creator)
@@ -235,6 +237,7 @@ model User {
   inpiFilingsAsOperator     InpiFiling[]      @relation("InpiOperator")
   apiKeys                   ApiKey[]
   webhookEndpoints          WebhookEndpoint[]
+  supportTickets            SupportTicket[]
 
   @@index([role])
   @@map("users")
@@ -557,8 +560,9 @@ model Enrollment {
   project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
   appVersion  AppVersion?       @relation(fields: [pinnedVersionId], references: [id], onDelete: SetNull)
   events      LearningEvent[]
-  progress    LearnerProgress[]
-  certificate Certificate?
+  progress     LearnerProgress[]
+  certificate  Certificate?
+  timeCapsules TimeCapsule[]
 
   @@unique([learnerId, projectId])
   @@index([projectId])
@@ -636,6 +640,19 @@ model Certificate {
   enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
 
   @@map("certificates")
+}
+
+model TimeCapsule {
+  id           String   @id @default(uuid()) @db.Uuid
+  enrollmentId String   @map("enrollment_id") @db.Uuid
+  message      String
+  delivered    Boolean  @default(false)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@index([enrollmentId])
+  @@map("time_capsules")
 }
 
 // ────────────────────────── INPI ──────────────────────────
@@ -935,4 +952,40 @@ model WebhookDelivery {
   @@index([endpointId])
   @@index([status])
   @@map("webhook_deliveries")
+}
+
+// ────────────────────────── M12 (Admin Completo) ──────────────────────────
+
+enum TicketStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+model SupportTicket {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String       @map("user_id") @db.Uuid
+  subject     String
+  message     String
+  status      TicketStatus @default(open)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("support_tickets")
+}
+
+model EmailTemplate {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  subject     String
+  bodyHtml    String   @map("body_html")
+  bodyText    String?  @map("body_text")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("email_templates")
 }

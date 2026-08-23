@@ -9,6 +9,7 @@ import type {
   EnrolledLearnerRow,
   EnrollmentRepository,
   ProgressRepository,
+  TimeCapsuleEnqueuer,
 } from './ports';
 
 export interface ProgressSnapshot {
@@ -28,6 +29,7 @@ export class EnrollmentService {
     private readonly certificates: CertificateRepository,
     private readonly hasher: SecretHasher,
     private readonly webhooks: WebhooksService,
+    private readonly capsuleEnqueuer: TimeCapsuleEnqueuer,
   ) {}
 
   async enroll(input: {
@@ -126,6 +128,26 @@ export class EnrollmentService {
       name: abbreviateName(r.learnerName),
       xp: r.xp,
     }));
+  }
+
+  async createTimeCapsule(
+    enrollmentId: string,
+    learnerId: string,
+    learnerEmail: string,
+    message: string,
+    delayMs: number
+  ) {
+    const enrollment = await this.repo.findByIdForLearner(enrollmentId, learnerId);
+    if (!enrollment) throw Errors.notFound('Matrícula');
+
+    const capsuleId = await this.repo.createTimeCapsule({ enrollmentId, message });
+    await this.capsuleEnqueuer.enqueue({
+      capsuleId,
+      learnerEmail,
+      message,
+      delayMs,
+    });
+    return { success: true };
   }
 }
 

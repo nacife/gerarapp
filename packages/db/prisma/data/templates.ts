@@ -64,4 +64,52 @@ export const TEMPLATES: TemplateSeed[] = [
       motion: { level: 'subtle', respectsReducedMotion: true },
     },
   },
+  {
+    key: 'academic',
+    name: 'Acadêmico',
+    minPlanTier: 0,
+    tokens: {
+      navigation: 'text',
+      surface: 'bordered',
+      radius: 'none',
+      typography: { heading: 'Merriweather', body: 'Merriweather', scale: 1.1 },
+      motion: { level: 'subtle', respectsReducedMotion: true },
+    },
+  },
+  {
+    key: 'playful',
+    name: 'Playful',
+    minPlanTier: 0,
+    tokens: {
+      navigation: 'cards',
+      surface: 'soft-shadow',
+      radius: 'xl',
+      typography: { heading: 'Quicksand', body: 'Nunito', scale: 1.4 },
+      motion: { level: 'rich', respectsReducedMotion: true },
+    },
+  },
+  {
+    key: 'corporate',
+    name: 'Corporativo',
+    minPlanTier: 1,
+    tokens: {
+      navigation: 'editorial',
+      surface: 'flat',
+      radius: 'sm',
+      typography: { heading: 'Roboto', body: 'Roboto', scale: 1.25 },
+      motion: { level: 'subtle', respectsReducedMotion: true },
+    },
+  },
+  {
+    key: 'brutalist',
+    name: 'Brutalista',
+    minPlanTier: 0,
+    tokens: {
+      navigation: 'cards',
+      surface: 'flat',
+      radius: 'none',
+      typography: { heading: 'Space Mono', body: 'Space Mono', scale: 1.333 },
+      motion: { level: 'subtle', respectsReducedMotion: true },
+    },
+  },
 ];

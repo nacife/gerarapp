@@ -1,23 +1,25 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Roles } from '../common/decorators';
-import IORedis, { type Redis } from 'ioredis';
-import { Inject } from '@nestjs/common';
-import { SHARED_REDIS } from '../common/redis.module';
+import { prisma } from '@eduforge/db';
 
 const TEMPLATE_KEYS = ['welcome', 'verify-email', 'password-reset', 'certificate', 'invite'];
 
 @Controller('admin/email-templates')
 export class EmailTemplatesController {
-  constructor(@Inject(SHARED_REDIS) private readonly redis: Redis) {}
-
   @Get()
   @Roles('admin', 'super_admin')
   async list() {
+    const records = await prisma.emailTemplate.findMany();
+    const map = new Map(records.map(r => [r.key, r]));
+
     const templates: Record<string, { subject: string; body: string }> = {};
     for (const key of TEMPLATE_KEYS) {
-      const subject = await this.redis.get(`email:${key}:subject`) ?? getDefault(key).subject;
-      const body = await this.redis.get(`email:${key}:body`) ?? getDefault(key).body;
-      templates[key] = { subject, body };
+      const dbVal = map.get(key);
+      const def = getDefault(key);
+      templates[key] = {
+        subject: dbVal?.subject ?? def.subject,
+        body: dbVal?.bodyHtml ?? def.body,
+      };
     }
     return templates;
   }
@@ -25,8 +27,11 @@ export class EmailTemplatesController {
   @Post()
   @Roles('admin', 'super_admin')
   async save(@Body() body: { key: string; subject: string; body: string }) {
-    await this.redis.set(`email:${body.key}:subject`, body.subject);
-    await this.redis.set(`email:${body.key}:body`, body.body);
+    await prisma.emailTemplate.upsert({
+      where: { key: body.key },
+      create: { key: body.key, subject: body.subject, bodyHtml: body.body },
+      update: { subject: body.subject, bodyHtml: body.body },
+    });
     return { saved: true };
   }
 }
