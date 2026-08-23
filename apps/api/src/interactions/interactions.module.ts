@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import IORedis, { type Redis } from 'ioredis';
+import { getEnv } from '@eduforge/config';
 import { createAppAiProvider } from '../common/ai.factory';
 import { InteractionsController, ProjectInteractionsController } from './interactions.controller';
 import { CreditsController } from './credits.controller';
