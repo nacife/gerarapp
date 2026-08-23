@@ -4,7 +4,10 @@ export const suspendSchema = z.object({ reason: z.string().min(1).max(500) });
 export type SuspendDto = z.infer<typeof suspendSchema>;
 
 export const grantCreditsSchema = z.object({
-  delta: z.number().int().refine((n) => n !== 0, 'delta não pode ser zero'),
+  delta: z
+    .number()
+    .int()
+    .refine((n) => n !== 0, 'delta não pode ser zero'),
   reason: z.string().min(1).max(200),
 });
 export type GrantCreditsDto = z.infer<typeof grantCreditsSchema>;

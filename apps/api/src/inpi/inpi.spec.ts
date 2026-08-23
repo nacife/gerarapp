@@ -92,7 +92,11 @@ describe('InpiService.listForProject / getCertificate', () => {
     const kit = build();
     const project = kit.projects.seedProject(OWNER);
     const version = kit.projects.seedPublishedVersion(project.id, 1);
-    kit.certificates.seed({ projectId: project.id, ownerUserId: OWNER, appVersionId: version.appVersionId });
+    kit.certificates.seed({
+      projectId: project.id,
+      ownerUserId: OWNER,
+      appVersionId: version.appVersionId,
+    });
 
     const list = await kit.service.listForProject(project.id, OWNER);
     expect(list).toHaveLength(1);
@@ -103,7 +107,10 @@ describe('InpiService.listForProject / getCertificate', () => {
 
   it('getCertificate inclui URLs assinadas e a Ficha de Registro', async () => {
     const kit = build();
-    const project = kit.projects.seedProject(OWNER, { title: 'Biologia Viva', slug: 'biologia-viva' });
+    const project = kit.projects.seedProject(OWNER, {
+      title: 'Biologia Viva',
+      slug: 'biologia-viva',
+    });
     const version = kit.projects.seedPublishedVersion(project.id, 3);
     const cert = kit.certificates.seed({
       projectId: project.id,
@@ -124,7 +131,11 @@ describe('InpiService.listForProject / getCertificate', () => {
     const kit = build();
     const project = kit.projects.seedProject(OWNER);
     const version = kit.projects.seedPublishedVersion(project.id, 1);
-    const cert = kit.certificates.seed({ projectId: project.id, ownerUserId: OWNER, appVersionId: version.appVersionId });
+    const cert = kit.certificates.seed({
+      projectId: project.id,
+      ownerUserId: OWNER,
+      appVersionId: version.appVersionId,
+    });
 
     const err = await expectError(() => kit.service.getCertificate(cert.id, 'intruso'));
     expect(err.slug).toBe('not-found');

@@ -44,7 +44,10 @@ describe('runSenseiEmbedding', () => {
   });
 
   it('lotes maiores que o batch (32) são processados por inteiro', async () => {
-    const blocks = Array.from({ length: 70 }, (_, i) => ({ id: `b${i}`, contentMd: `Bloco número ${i} sobre biologia.` }));
+    const blocks = Array.from({ length: 70 }, (_, i) => ({
+      id: `b${i}`,
+      contentMd: `Bloco número ${i} sobre biologia.`,
+    }));
     const repo = new FakeRepo(blocks);
     const out = await runSenseiEmbedding({ projectId: 'p1' }, { ai, repo });
     expect(out.embedded).toBe(70);

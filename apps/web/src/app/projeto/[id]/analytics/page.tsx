@@ -55,7 +55,10 @@ function Bar({ label, pct }: { label: string; pct: number }) {
         <span>{pct}%</span>
       </div>
       <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-800">
-        <div className="h-full rounded-full bg-gradient-to-r from-sky-400 to-fuchsia-500" style={{ width: `${pct}%` }} />
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-sky-400 to-fuchsia-500"
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );
@@ -99,7 +102,9 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
               key={r.days}
               onClick={() => setDays(r.days)}
               className={`rounded-lg px-3 py-1.5 text-xs transition ${
-                days === r.days ? 'bg-sky-500/20 text-sky-300' : 'border border-slate-800 text-slate-400 hover:border-slate-600'
+                days === r.days
+                  ? 'bg-sky-500/20 text-sky-300'
+                  : 'border border-slate-800 text-slate-400 hover:border-slate-600'
               }`}
             >
               {r.label}
@@ -111,7 +116,9 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
       {!loaded ? (
         <p className="text-slate-500">Carregando…</p>
       ) : !summary?.published ? (
-        <p className="text-sm text-slate-500">Publique o app para começar a coletar dados de analytics.</p>
+        <p className="text-sm text-slate-500">
+          Publique o app para começar a coletar dados de analytics.
+        </p>
       ) : (
         <>
           <section className="grid grid-cols-3 gap-3">
@@ -131,7 +138,9 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
 
           {summary.completionByChapter.length > 0 && (
             <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Conclusão por capítulo</h2>
+              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+                Conclusão por capítulo
+              </h2>
               {summary.completionByChapter.map((c) => (
                 <Bar key={c.chapterId} label={c.chapterTitle} pct={c.pct} />
               ))}
@@ -140,8 +149,12 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
 
           {summary.abandonmentFunnel.length > 0 && (
             <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Funil de abandono</h2>
-              <p className="text-xs text-slate-500">% de matrículas que alcançaram cada capítulo.</p>
+              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+                Funil de abandono
+              </h2>
+              <p className="text-xs text-slate-500">
+                % de matrículas que alcançaram cada capítulo.
+              </p>
               {summary.abandonmentFunnel.map((c) => (
                 <Bar key={c.chapterId} label={c.chapterTitle} pct={c.pct} />
               ))}
@@ -151,7 +164,9 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
           {heatmap && heatmap.rows.length > 0 && (
             <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Mapa de dificuldade</h2>
+                <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+                  Mapa de dificuldade
+                </h2>
                 <a
                   href={`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333'}/v1/projects/${projectId}/analytics/heatmap.csv?from=${encodeURIComponent(new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString())}`}
                   className="text-xs text-sky-400 hover:underline"
@@ -167,8 +182,12 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
                     key={r.interactionId}
                     className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm"
                   >
-                    <span className="text-slate-300">{TYPE_LABEL[r.interactionType] ?? r.interactionType}</span>
-                    <span className={`text-xs ${r.errorRatePct >= 50 ? 'text-rose-400' : 'text-slate-500'}`}>
+                    <span className="text-slate-300">
+                      {TYPE_LABEL[r.interactionType] ?? r.interactionType}
+                    </span>
+                    <span
+                      className={`text-xs ${r.errorRatePct >= 50 ? 'text-rose-400' : 'text-slate-500'}`}
+                    >
                       {r.errorRatePct}% de erro ({r.wrongCount}/{r.wrongCount + r.correctCount})
                     </span>
                   </div>

@@ -29,9 +29,7 @@ function pathParameters(path: string): Record<string, unknown>[] {
     in: 'path',
     required: true,
     schema:
-      name === 'slug' || name === 'code'
-        ? { type: 'string' }
-        : { type: 'string', format: 'uuid' },
+      name === 'slug' || name === 'code' ? { type: 'string' } : { type: 'string', format: 'uuid' },
   }));
 }
 
@@ -59,7 +57,10 @@ function securityFor(entry: RouteEntry): Record<string, string[]>[] | undefined 
 }
 
 /** Monta o documento OpenAPI 3.1 a partir do registro declarativo — puro e determinístico. */
-export function buildOpenApiDocument(routes: RouteEntry[], version: string): Record<string, unknown> {
+export function buildOpenApiDocument(
+  routes: RouteEntry[],
+  version: string,
+): Record<string, unknown> {
   const paths: Record<string, Record<string, unknown>> = {};
 
   for (const entry of routes) {
@@ -74,7 +75,8 @@ export function buildOpenApiDocument(routes: RouteEntry[], version: string): Rec
           content: { 'application/json': { schema: { type: 'object' } } },
         },
         default: {
-          description: 'Erro no formato Problem Details (RFC 9457) — códigos por domínio na Parte 6.B.5.',
+          description:
+            'Erro no formato Problem Details (RFC 9457) — códigos por domínio na Parte 6.B.5.',
           content: {
             'application/problem+json': {
               schema: { $ref: '#/components/schemas/ProblemDetails' },
@@ -139,7 +141,8 @@ export function buildOpenApiDocument(routes: RouteEntry[], version: string): Rec
           in: 'header',
           required: true,
           schema: { type: 'string', minLength: 8 },
-          description: 'Chave de idempotência (B.1) — repetir a mesma chave devolve a resposta original.',
+          description:
+            'Chave de idempotência (B.1) — repetir a mesma chave devolve a resposta original.',
         },
       },
       schemas: {

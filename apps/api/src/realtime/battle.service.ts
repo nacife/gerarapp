@@ -18,12 +18,12 @@ export class BattleService {
       battle = { players: [], state: 'waiting' };
       this.activeBattles.set(enrollmentId, battle);
     }
-    if (!battle.players.find(p => p.id === player.id)) {
+    if (!battle.players.find((p) => p.id === player.id)) {
       battle.players.push({ ...player, score: 0 });
     }
-    
+
     this.events.next({ enrollmentId, event: { type: 'join', data: { players: battle.players } } });
-    
+
     // Auto-start if 2 players are present (for MVP/testing)
     if (battle.players.length >= 2 && battle.state === 'waiting') {
       battle.state = 'playing';
@@ -36,17 +36,20 @@ export class BattleService {
   submitScore(enrollmentId: string, playerId: string, scoreDelta: number) {
     const battle = this.activeBattles.get(enrollmentId);
     if (!battle) return;
-    const p = battle.players.find(p => p.id === playerId);
+    const p = battle.players.find((p) => p.id === playerId);
     if (p) {
       p.score += scoreDelta;
-      this.events.next({ enrollmentId, event: { type: 'score', data: { players: battle.players } } });
+      this.events.next({
+        enrollmentId,
+        event: { type: 'score', data: { players: battle.players } },
+      });
     }
   }
 
   stream(enrollmentId: string): Observable<{ data: BattleEvent }> {
     return this.events.asObservable().pipe(
-      filter(e => e.enrollmentId === enrollmentId),
-      map(e => ({ data: e.event }))
+      filter((e) => e.enrollmentId === enrollmentId),
+      map((e) => ({ data: e.event })),
     );
   }
 }

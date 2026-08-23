@@ -15,7 +15,8 @@ export class AnalyticsService {
   ) {}
 
   async summary(projectId: string, ownerId: string, from: Date, to: Date) {
-    if (!(await this.projects.findByIdForOwner(projectId, ownerId))) throw Errors.notFound('Projeto');
+    if (!(await this.projects.findByIdForOwner(projectId, ownerId)))
+      throw Errors.notFound('Projeto');
     const data = await this.analytics.getRawData(projectId, from, to);
     if (!data) return { published: false as const };
 
@@ -23,14 +24,23 @@ export class AnalyticsService {
       published: true as const,
       sessions: data.sessions,
       activeUsers: data.activeUsers,
-      completionByChapter: computeCompletionByChapter(data.chapters, data.enrollmentIds, data.doneBlocksByEnrollment),
-      abandonmentFunnel: computeAbandonmentFunnel(data.chapters, data.enrollmentIds, data.touchedBlocksByEnrollment),
+      completionByChapter: computeCompletionByChapter(
+        data.chapters,
+        data.enrollmentIds,
+        data.doneBlocksByEnrollment,
+      ),
+      abandonmentFunnel: computeAbandonmentFunnel(
+        data.chapters,
+        data.enrollmentIds,
+        data.touchedBlocksByEnrollment,
+      ),
       totalEnrollments: data.enrollmentIds.length,
     };
   }
 
   async heatmap(projectId: string, ownerId: string, from: Date, to: Date) {
-    if (!(await this.projects.findByIdForOwner(projectId, ownerId))) throw Errors.notFound('Projeto');
+    if (!(await this.projects.findByIdForOwner(projectId, ownerId)))
+      throw Errors.notFound('Projeto');
     const data = await this.analytics.getRawData(projectId, from, to);
     if (!data) return { published: false as const, rows: [] };
     return { published: true as const, rows: computeDifficultyHeatmap(data.answerEvents) };

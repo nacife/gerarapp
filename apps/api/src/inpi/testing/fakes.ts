@@ -27,7 +27,11 @@ export class InMemoryInpiProjectRepository implements InpiProjectRepository {
     return project;
   }
 
-  seedPublishedVersion(projectId: string, versionNumber: number, publishedAt = new Date('2026-06-01T00:00:00Z')) {
+  seedPublishedVersion(
+    projectId: string,
+    versionNumber: number,
+    publishedAt = new Date('2026-06-01T00:00:00Z'),
+  ) {
     const row = { appVersionId: randomUUID(), projectId, versionNumber, publishedAt };
     this.versions.push(row);
     return row;
@@ -42,8 +46,13 @@ export class InMemoryInpiProjectRepository implements InpiProjectRepository {
     return this.versions.filter((v) => v.projectId === projectId).map((v) => ({ ...v }));
   }
 
-  async getPublishedVersion(projectId: string, versionNumber: number): Promise<InpiVersionRow | null> {
-    const v = this.versions.find((x) => x.projectId === projectId && x.versionNumber === versionNumber);
+  async getPublishedVersion(
+    projectId: string,
+    versionNumber: number,
+  ): Promise<InpiVersionRow | null> {
+    const v = this.versions.find(
+      (x) => x.projectId === projectId && x.versionNumber === versionNumber,
+    );
     return v ? { ...v } : null;
   }
 
@@ -55,9 +64,16 @@ export class InMemoryInpiProjectRepository implements InpiProjectRepository {
 }
 
 export class InMemoryInpiCertificateRepository implements InpiCertificateRepository {
-  rows: (InpiCertificateRow & { verificationsLog: { matched: boolean; verifiedAt: Date }[] })[] = [];
+  rows: (InpiCertificateRow & { verificationsLog: { matched: boolean; verifiedAt: Date }[] })[] =
+    [];
 
-  seed(input: Partial<InpiCertificateRow> & { appVersionId: string; projectId: string; ownerUserId: string }) {
+  seed(
+    input: Partial<InpiCertificateRow> & {
+      appVersionId: string;
+      projectId: string;
+      ownerUserId: string;
+    },
+  ) {
     const row = {
       id: input.id ?? randomUUID(),
       projectId: input.projectId,
@@ -120,7 +136,11 @@ export class InMemoryInpiJobRepository implements InpiJobRepository {
 
 export class FakeInpiEnqueuer implements InpiEnqueuer {
   enqueued: { jobId: string; appVersionId: string; requestedById: string }[] = [];
-  async enqueuePackage(input: { jobId: string; appVersionId: string; requestedById: string }): Promise<void> {
+  async enqueuePackage(input: {
+    jobId: string;
+    appVersionId: string;
+    requestedById: string;
+  }): Promise<void> {
     this.enqueued.push(input);
   }
 }

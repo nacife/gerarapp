@@ -145,7 +145,11 @@ export class AuthService {
 
   async verifyEmail(rawToken: string): Promise<void> {
     const tokenHash = hashToken(rawToken, this.config.refreshTokenPepper);
-    const record = await this.authTokens.findValidByHash(tokenHash, 'email_verify', this.clock.now());
+    const record = await this.authTokens.findValidByHash(
+      tokenHash,
+      'email_verify',
+      this.clock.now(),
+    );
     if (!record) throw Errors.invalidToken();
     await this.users.markEmailVerified(record.userId, this.clock.now());
     await this.authTokens.markUsed(record.id, this.clock.now());
@@ -331,7 +335,10 @@ export class AuthService {
   }
 
   /** Perfil (nome, idioma) — RF-11. */
-  async updateProfile(userId: string, patch: { name?: string; locale?: string }): Promise<PublicUser> {
+  async updateProfile(
+    userId: string,
+    patch: { name?: string; locale?: string },
+  ): Promise<PublicUser> {
     await this.users.updateProfile(userId, patch);
     return this.me(userId);
   }
@@ -361,7 +368,11 @@ export class AuthService {
   async resetPassword(rawToken: string, newPassword: string): Promise<void> {
     await this.assertPasswordAcceptable(newPassword);
     const tokenHash = hashToken(rawToken, this.config.refreshTokenPepper);
-    const record = await this.authTokens.findValidByHash(tokenHash, 'password_reset', this.clock.now());
+    const record = await this.authTokens.findValidByHash(
+      tokenHash,
+      'password_reset',
+      this.clock.now(),
+    );
     if (!record) throw Errors.invalidToken();
 
     const passwordHash = await this.hasher.hash(newPassword);

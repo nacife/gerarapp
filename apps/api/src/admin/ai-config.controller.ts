@@ -13,7 +13,16 @@ export class AiConfigController {
   @Roles('admin', 'super_admin')
   async getConfig() {
     const env = getEnv();
-    const [anthropicKey, openaiKey, deepseekKey, fallbackOrderRaw, mockFallbackRaw, anthropicModel, openaiModel, deepseekModel] = await Promise.all([
+    const [
+      anthropicKey,
+      openaiKey,
+      deepseekKey,
+      fallbackOrderRaw,
+      mockFallbackRaw,
+      anthropicModel,
+      openaiModel,
+      deepseekModel,
+    ] = await Promise.all([
       this.redis.get('ai:anthropic_key'),
       this.redis.get('ai:openai_key'),
       this.redis.get('ai:deepseek_key'),
@@ -24,7 +33,9 @@ export class AiConfigController {
       this.redis.get('ai:deepseek_model'),
     ]);
 
-    const fallbackOrder: string[] = fallbackOrderRaw ? JSON.parse(fallbackOrderRaw) : ['anthropic', 'deepseek', 'openai'];
+    const fallbackOrder: string[] = fallbackOrderRaw
+      ? JSON.parse(fallbackOrderRaw)
+      : ['anthropic', 'deepseek', 'openai'];
 
     return {
       provider: env.AI_PROVIDER,
@@ -32,7 +43,11 @@ export class AiConfigController {
         anthropic: {
           model: anthropicModel ?? env.AI_MODEL_STRUCTURE ?? 'claude-sonnet-4-6',
           hasKey: !!(anthropicKey || env.ANTHROPIC_API_KEY),
-          keyPreview: anthropicKey ? mask(anthropicKey) : (env.ANTHROPIC_API_KEY ? mask(env.ANTHROPIC_API_KEY) : null),
+          keyPreview: anthropicKey
+            ? mask(anthropicKey)
+            : env.ANTHROPIC_API_KEY
+              ? mask(env.ANTHROPIC_API_KEY)
+              : null,
           keySource: anthropicKey ? 'redis' : env.ANTHROPIC_API_KEY ? 'env' : 'none',
         },
         openai: {
@@ -93,7 +108,12 @@ export class AiConfigController {
       tutor: Math.abs(totalTutor._sum.delta ?? 0),
       podcast: Math.abs(totalPodcast._sum.delta ?? 0),
       illustration: Math.abs(totalIllustration._sum.delta ?? 0),
-      total: Math.abs((totalCredits._sum.delta ?? 0) + (totalTutor._sum.delta ?? 0) + (totalPodcast._sum.delta ?? 0) + (totalIllustration._sum.delta ?? 0)),
+      total: Math.abs(
+        (totalCredits._sum.delta ?? 0) +
+          (totalTutor._sum.delta ?? 0) +
+          (totalPodcast._sum.delta ?? 0) +
+          (totalIllustration._sum.delta ?? 0),
+      ),
     };
   }
 }

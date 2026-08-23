@@ -2,10 +2,7 @@ import { Module } from '@nestjs/common';
 import IORedis, { type Redis } from 'ioredis';
 import { getEnv } from '@eduforge/config';
 import { createAiProvider } from '@eduforge/ai';
-import {
-  InteractionsController,
-  ProjectInteractionsController,
-} from './interactions.controller';
+import { InteractionsController, ProjectInteractionsController } from './interactions.controller';
 import { CreditsController } from './credits.controller';
 import { InteractionsService } from './interactions.service';
 import { CreditsService } from './credits.service';
@@ -14,7 +11,10 @@ import {
   PrismaJobRepository,
   PrismaProjectRepository,
 } from '../projects/adapters/prisma.repositories';
-import { PrismaCreditRepository, PrismaInteractionRepository } from './adapters/prisma.repositories';
+import {
+  PrismaCreditRepository,
+  PrismaInteractionRepository,
+} from './adapters/prisma.repositories';
 import { BullMqGenerateEnqueuer } from './adapters/enqueuer';
 
 const INTERACTIONS_REDIS = Symbol('INTERACTIONS_REDIS');

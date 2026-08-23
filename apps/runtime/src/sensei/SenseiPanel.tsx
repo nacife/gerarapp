@@ -39,7 +39,9 @@ export function SenseiPanel({
   theme: RuntimeTheme;
 }) {
   const [open, setOpen] = useState(false);
-  const [config, setConfig] = useState<{ name: string; avatar: string; indexed: boolean } | null>(null);
+  const [config, setConfig] = useState<{ name: string; avatar: string; indexed: boolean } | null>(
+    null,
+  );
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState('');
   const [mode, setMode] = useState('default');
@@ -52,7 +54,11 @@ export function SenseiPanel({
     if (!open || config) return;
     apiFetch<SenseiConfig>(`/public/apps/${encodeURIComponent(slug)}/sensei`).then((res) => {
       if (res.ok && res.data) {
-        setConfig({ name: res.data.config.name, avatar: res.data.config.avatar, indexed: res.data.indexed });
+        setConfig({
+          name: res.data.config.name,
+          avatar: res.data.config.avatar,
+          indexed: res.data.indexed,
+        });
       }
     });
   }, [open, config, slug]);
@@ -86,11 +92,12 @@ export function SenseiPanel({
         },
       ]);
     } else {
-      const msg = res.status === 402
-        ? 'Créditos de IA do criador esgotados.'
-        : res.status === 409
-          ? 'Conteúdo ainda não indexado. Publique o app para habilitar o Sensei.'
-          : res.problem?.detail ?? 'Erro ao consultar o Sensei.';
+      const msg =
+        res.status === 402
+          ? 'Créditos de IA do criador esgotados.'
+          : res.status === 409
+            ? 'Conteúdo ainda não indexado. Publique o app para habilitar o Sensei.'
+            : (res.problem?.detail ?? 'Erro ao consultar o Sensei.');
       setError(msg);
     }
 
@@ -124,8 +131,13 @@ export function SenseiPanel({
             style={{ background: theme.accent, color: theme.bg }}
             className="flex items-center justify-between rounded-t-xl px-4 py-3 font-semibold"
           >
-            <span>{avatar} {name}</span>
-            <button onClick={() => setOpen(false)} className="text-lg leading-none opacity-70 hover:opacity-100">
+            <span>
+              {avatar} {name}
+            </span>
+            <button
+              onClick={() => setOpen(false)}
+              className="text-lg leading-none opacity-70 hover:opacity-100"
+            >
               ✕
             </button>
           </div>
@@ -133,7 +145,10 @@ export function SenseiPanel({
           {/* Histórico */}
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
             {!config?.indexed && (
-              <div style={{ background: theme.border }} className="rounded-lg p-3 text-center text-sm">
+              <div
+                style={{ background: theme.border }}
+                className="rounded-lg p-3 text-center text-sm"
+              >
                 ⚠️ Conteúdo ainda não indexado. Peça ao criador que publique o app.
               </div>
             )}

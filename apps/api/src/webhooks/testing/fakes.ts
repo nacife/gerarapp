@@ -119,7 +119,8 @@ export class InMemoryWebhookProjectRepository implements WebhookProjectRepositor
 }
 
 export class InMemoryWebhookEnqueuer implements WebhookEnqueuer {
-  calls: Array<{ deliveryId: string; endpointId: string; eventType: string; payload: unknown }> = [];
+  calls: Array<{ deliveryId: string; endpointId: string; eventType: string; payload: unknown }> =
+    [];
 
   async enqueueDelivery(input: {
     deliveryId: string;

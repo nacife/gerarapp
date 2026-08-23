@@ -27,7 +27,10 @@ export interface StoryMap {
 const REGION_EMOJIS = ['🏰', '🌋', '🌊', '🏔️', '🌴', '🏜️', '❄️', '🌪️', '🌌', '🏛️'];
 
 /** Converte capítulos em regiões narrativas com mapa ilustrado */
-export function buildStoryMap(chapterTitles: string[], blockIdsByChapter: Map<string, string[]>): StoryMap {
+export function buildStoryMap(
+  chapterTitles: string[],
+  blockIdsByChapter: Map<string, string[]>,
+): StoryMap {
   const regions: StoryRegion[] = chapterTitles.map((title, i) => ({
     id: `region-${i}`,
     name: title,
@@ -46,10 +49,19 @@ export function buildStoryMap(chapterTitles: string[], blockIdsByChapter: Map<st
   };
 }
 
-const GUARDIAN_NAMES = ['Guardião do Saber', 'Mestre dos Mistérios', 'Sentinelas do Conhecimento', 'Oráculo Ancestral', 'Dragão da Sabedoria'];
+const GUARDIAN_NAMES = [
+  'Guardião do Saber',
+  'Mestre dos Mistérios',
+  'Sentinelas do Conhecimento',
+  'Oráculo Ancestral',
+  'Dragão da Sabedoria',
+];
 
 /** Transforma metadados de quiz em "desafio de guardião" com temática narrativa */
-export function buildGuardianChallenge(quizTitle: string, chapterIndex: number): { guardianName: string; flavorText: string } {
+export function buildGuardianChallenge(
+  quizTitle: string,
+  chapterIndex: number,
+): { guardianName: string; flavorText: string } {
   return {
     guardianName: GUARDIAN_NAMES[chapterIndex % GUARDIAN_NAMES.length]!,
     flavorText: `Para avançar além de "${quizTitle}", você deve enfrentar o ${GUARDIAN_NAMES[chapterIndex % GUARDIAN_NAMES.length]}. Responda corretamente para desbloquear o próximo território!`,

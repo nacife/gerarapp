@@ -51,7 +51,10 @@ export function InteractionRunner({
   const payload = interaction.payload as { objective?: string; xp?: number };
 
   return (
-    <div style={{ background: theme.surface, borderColor: theme.border }} className="rounded-xl border p-4">
+    <div
+      style={{ background: theme.surface, borderColor: theme.border }}
+      className="rounded-xl border p-4"
+    >
       <div className="mb-3 flex items-center justify-between gap-2">
         <span
           style={{ background: theme.accent, color: theme.bg }}
@@ -80,23 +83,65 @@ function renderBody(
 ) {
   switch (interaction.type) {
     case 'quiz':
-      return <QuizView payload={interaction.payload as Quiz} theme={theme} onComplete={onComplete} />;
+      return (
+        <QuizView payload={interaction.payload as Quiz} theme={theme} onComplete={onComplete} />
+      );
     case 'flashcard_deck':
-      return <FlashcardsView payload={interaction.payload as FlashcardDeck} theme={theme} onComplete={onComplete} />;
+      return (
+        <FlashcardsView
+          payload={interaction.payload as FlashcardDeck}
+          theme={theme}
+          onComplete={onComplete}
+        />
+      );
     case 'cloze':
-      return <ClozeView payload={interaction.payload as Cloze} theme={theme} onComplete={onComplete} />;
+      return (
+        <ClozeView payload={interaction.payload as Cloze} theme={theme} onComplete={onComplete} />
+      );
     case 'dragdrop':
-      return <DragDropView payload={interaction.payload as Dragdrop} theme={theme} onComplete={onComplete} />;
+      return (
+        <DragDropView
+          payload={interaction.payload as Dragdrop}
+          theme={theme}
+          onComplete={onComplete}
+        />
+      );
     case 'timeline':
-      return <TimelineView payload={interaction.payload as Timeline} theme={theme} onComplete={onComplete} />;
+      return (
+        <TimelineView
+          payload={interaction.payload as Timeline}
+          theme={theme}
+          onComplete={onComplete}
+        />
+      );
     case 'hotspot':
-      return <HotspotView payload={interaction.payload as Hotspot} theme={theme} onComplete={onComplete} />;
+      return (
+        <HotspotView
+          payload={interaction.payload as Hotspot}
+          theme={theme}
+          onComplete={onComplete}
+        />
+      );
     case 'scenario':
-      return <ScenarioView payload={interaction.payload as Scenario} theme={theme} onComplete={onComplete} />;
+      return (
+        <ScenarioView
+          payload={interaction.payload as Scenario}
+          theme={theme}
+          onComplete={onComplete}
+        />
+      );
     case 'audio':
-      return <AudioView payload={interaction.payload as Audio} theme={theme} onComplete={onComplete} />;
+      return (
+        <AudioView payload={interaction.payload as Audio} theme={theme} onComplete={onComplete} />
+      );
     case 'mindmap':
-      return <MindmapView payload={interaction.payload as Mindmap} theme={theme} onComplete={onComplete} />;
+      return (
+        <MindmapView
+          payload={interaction.payload as Mindmap}
+          theme={theme}
+          onComplete={onComplete}
+        />
+      );
     default:
       return (
         <p style={{ color: theme.muted }} className="text-sm">

@@ -94,6 +94,8 @@ export async function runWebhookDelivery(
   });
 
   if (!result.ok) {
-    throw new Error(`webhook delivery failed: ${result.status ?? 'network error'} — ${data.eventType} → ${endpoint.url}`);
+    throw new Error(
+      `webhook delivery failed: ${result.status ?? 'network error'} — ${data.eventType} → ${endpoint.url}`,
+    );
   }
 }

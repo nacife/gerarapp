@@ -18,24 +18,104 @@ interface Me {
 }
 
 const panels = [
-  { title: 'Dashboard do Sistema', hint: 'Saúde, filas, estatísticas, manutenção', tag: 'Admin 1/2', href: '/sistema' },
-  { title: 'Analytics', hint: 'Métricas: usuários, projetos, créditos, crescimento', tag: 'Admin 3', href: '/analytics' },
-  { title: 'Usuários & Organizações', hint: 'Buscar, suspender, sessões, impersonar, papel', tag: 'M6', href: '/usuarios' },
-  { title: 'Planos', hint: 'CRUD de planos (free/pro/business), limites, preços', tag: 'Admin 3', href: '/planos' },
-  { title: 'Monitor de Filas', hint: 'BullMQ: profundidade, falhas, retry, limpeza', tag: 'Admin 3', href: '/filas' },
-  { title: 'Catálogo (Templates & Paletas)', hint: 'CRUD de templates e paletas de cores', tag: 'Admin 2', href: '/catalogo' },
+  {
+    title: 'Dashboard do Sistema',
+    hint: 'Saúde, filas, estatísticas, manutenção',
+    tag: 'Admin 1/2',
+    href: '/sistema',
+  },
+  {
+    title: 'Analytics',
+    hint: 'Métricas: usuários, projetos, créditos, crescimento',
+    tag: 'Admin 3',
+    href: '/analytics',
+  },
+  {
+    title: 'Usuários & Organizações',
+    hint: 'Buscar, suspender, sessões, impersonar, papel',
+    tag: 'M6',
+    href: '/usuarios',
+  },
+  {
+    title: 'Planos',
+    hint: 'CRUD de planos (free/pro/business), limites, preços',
+    tag: 'Admin 3',
+    href: '/planos',
+  },
+  {
+    title: 'Monitor de Filas',
+    hint: 'BullMQ: profundidade, falhas, retry, limpeza',
+    tag: 'Admin 3',
+    href: '/filas',
+  },
+  {
+    title: 'Catálogo (Templates & Paletas)',
+    hint: 'CRUD de templates e paletas de cores',
+    tag: 'Admin 2',
+    href: '/catalogo',
+  },
   { title: 'Feature Flags', hint: 'Rollout %, por usuário/plano', tag: 'M6', href: '/flags' },
-  { title: 'Fila INPI', hint: 'Protocolo e-Software, checklist, concessão', tag: 'M8', href: '/inpi' },
-  { title: 'Auditoria', hint: 'Logs globais de ações administrativas', tag: 'Admin 1', href: '/auditoria' },
-  { title: 'Moderação de Conteúdo', hint: 'Casos de moderação, revisão, takedown', tag: 'Admin 4', href: '/moderacao' },
-  { title: 'API Keys (Global)', hint: 'Listar/revogar chaves de todos os usuários', tag: 'Admin 4', href: '/api-keys-admin' },
+  {
+    title: 'Fila INPI',
+    hint: 'Protocolo e-Software, checklist, concessão',
+    tag: 'M8',
+    href: '/inpi',
+  },
+  {
+    title: 'Auditoria',
+    hint: 'Logs globais de ações administrativas',
+    tag: 'Admin 1',
+    href: '/auditoria',
+  },
+  {
+    title: 'Moderação de Conteúdo',
+    hint: 'Casos de moderação, revisão, takedown',
+    tag: 'Admin 4',
+    href: '/moderacao',
+  },
+  {
+    title: 'API Keys (Global)',
+    hint: 'Listar/revogar chaves de todos os usuários',
+    tag: 'Admin 4',
+    href: '/api-keys-admin',
+  },
   { title: 'Organizações', hint: 'CRUD de orgs, membros, projetos', tag: 'Admin 4', href: '/orgs' },
-  { title: 'Webhooks (Global)', hint: 'Monitor de entregas, falhas, reenvio', tag: 'Admin 5', href: '/webhooks-admin' },
-  { title: 'Rate Limiting', hint: 'Configurar limites, bloquear IPs', tag: 'Admin 5', href: '/rate-limit-admin' },
-  { title: 'E-mail Templates', hint: 'Editar templates de e-mails transacionais', tag: 'Admin 5', href: '/email-templates' },
-  { title: 'IA / LLMs', hint: 'Chaves API (Anthropic, OpenAI, Google), modelos, créditos', tag: 'AI', href: '/ai-config' },
-  { title: 'Configuração de APIs', hint: 'Rate limits, créditos IA, endpoints, ambiente', tag: 'Admin 1', href: '/config' },
-  { title: 'Manuais do Sistema', hint: 'Manuais do usuário e técnico (Documentação interna)', tag: 'Docs', href: '/manuais' },
+  {
+    title: 'Webhooks (Global)',
+    hint: 'Monitor de entregas, falhas, reenvio',
+    tag: 'Admin 5',
+    href: '/webhooks-admin',
+  },
+  {
+    title: 'Rate Limiting',
+    hint: 'Configurar limites, bloquear IPs',
+    tag: 'Admin 5',
+    href: '/rate-limit-admin',
+  },
+  {
+    title: 'E-mail Templates',
+    hint: 'Editar templates de e-mails transacionais',
+    tag: 'Admin 5',
+    href: '/email-templates',
+  },
+  {
+    title: 'IA / LLMs',
+    hint: 'Chaves API (Anthropic, OpenAI, Google), modelos, créditos',
+    tag: 'AI',
+    href: '/ai-config',
+  },
+  {
+    title: 'Configuração de APIs',
+    hint: 'Rate limits, créditos IA, endpoints, ambiente',
+    tag: 'Admin 1',
+    href: '/config',
+  },
+  {
+    title: 'Manuais do Sistema',
+    hint: 'Manuais do usuário e técnico (Documentação interna)',
+    tag: 'Docs',
+    href: '/manuais',
+  },
 ];
 
 type Phase = 'loading' | 'denied' | 'mfa' | 'console';
@@ -68,7 +148,10 @@ export default function AdminHome() {
       const setup = await apiFetch<{ secret: string; otpauthUrl: string }>('/auth/mfa/setup', {
         method: 'POST',
       });
-      if (setup.ok && setup.data) { setSecret(setup.data.secret); setOtpauthUrl(setup.data.otpauthUrl); }
+      if (setup.ok && setup.data) {
+        setSecret(setup.data.secret);
+        setOtpauthUrl(setup.data.otpauthUrl);
+      }
       setPhase('mfa');
       return;
     }
@@ -82,7 +165,11 @@ export default function AdminHome() {
   // Renderiza QR code quando otpauthUrl estiver disponível
   useEffect(() => {
     if (!otpauthUrl || !qrCanvasRef.current) return;
-    QRCode.toCanvas(qrCanvasRef.current, otpauthUrl, { width: 200, margin: 1, color: { dark: '#e2e8f0', light: '#0f172a' } });
+    QRCode.toCanvas(qrCanvasRef.current, otpauthUrl, {
+      width: 200,
+      margin: 1,
+      color: { dark: '#e2e8f0', light: '#0f172a' },
+    });
   }, [otpauthUrl]);
 
   async function enableMfa(e: FormEvent) {
@@ -111,7 +198,9 @@ export default function AdminHome() {
   }
 
   if (phase === 'loading') {
-    return <main className="grid min-h-screen place-items-center text-zinc-500">{t('loading')}</main>;
+    return (
+      <main className="grid min-h-screen place-items-center text-zinc-500">{t('loading')}</main>
+    );
   }
 
   if (phase === 'denied') {
@@ -218,7 +307,9 @@ export default function AdminHome() {
               <p className="font-semibold text-gray-200">{p.title}</p>
               <p className="mt-1 text-sm text-gray-500">{p.hint}</p>
             </div>
-            <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-xs text-cyan-300">{p.tag}</span>
+            <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-xs text-cyan-300">
+              {p.tag}
+            </span>
           </Link>
         ))}
       </section>

@@ -61,7 +61,9 @@ export default function ManuaisPage() {
         <button
           onClick={() => setTab('usuario')}
           className={`pb-3 text-sm font-medium ${
-            tab === 'usuario' ? 'border-b-2 border-indigo-500 text-indigo-400' : 'text-zinc-400 hover:text-zinc-200'
+            tab === 'usuario'
+              ? 'border-b-2 border-indigo-500 text-indigo-400'
+              : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
           Manual do Usuário
@@ -70,7 +72,9 @@ export default function ManuaisPage() {
           <button
             onClick={() => setTab('tecnico')}
             className={`pb-3 text-sm font-medium ${
-              tab === 'tecnico' ? 'border-b-2 border-indigo-500 text-indigo-400' : 'text-zinc-400 hover:text-zinc-200'
+              tab === 'tecnico'
+                ? 'border-b-2 border-indigo-500 text-indigo-400'
+                : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
             Manual Técnico

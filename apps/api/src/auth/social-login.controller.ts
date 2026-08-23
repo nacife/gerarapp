@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Res, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Res, Req } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Public } from '../common/decorators';
 import { AuthService } from './auth.service';

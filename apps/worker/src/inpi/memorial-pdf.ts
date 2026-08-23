@@ -6,7 +6,12 @@ const PAGE_SIZE: [number, number] = [595, 842]; // A4 retrato
 const BODY_SIZE = 11;
 const LINE_HEIGHT = 15;
 
-function wrapText(text: string, font: { widthOfTextAtSize(t: string, s: number): number }, size: number, maxWidth: number): string[] {
+function wrapText(
+  text: string,
+  font: { widthOfTextAtSize(t: string, s: number): number },
+  size: number,
+  maxWidth: number,
+): string[] {
   const words = text.split(/\s+/);
   const lines: string[] = [];
   let current = '';

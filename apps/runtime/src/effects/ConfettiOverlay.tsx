@@ -49,25 +49,24 @@ export function ConfettiOverlay({ active }: { active: boolean }) {
   if (!visible || reduced) return null;
 
   return (
-    <div
-      className="pointer-events-none fixed inset-0 z-[999] overflow-hidden"
-      aria-hidden="true"
-    >
+    <div className="pointer-events-none fixed inset-0 z-[999] overflow-hidden" aria-hidden="true">
       {particles.map((p) => (
         <div
           key={p.id}
           className="absolute animate-confetti-fall rounded-sm"
-          style={{
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            width: p.size,
-            height: p.size * 1.6,
-            background: p.color,
-            '--angle': `${p.angle}deg`,
-            '--velocity': p.velocity,
-            animationDuration: `${DURATION_MS}ms`,
-            opacity: 0.9,
-          } as React.CSSProperties}
+          style={
+            {
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              width: p.size,
+              height: p.size * 1.6,
+              background: p.color,
+              '--angle': `${p.angle}deg`,
+              '--velocity': p.velocity,
+              animationDuration: `${DURATION_MS}ms`,
+              opacity: 0.9,
+            } as React.CSSProperties
+          }
         />
       ))}
       <style>{`

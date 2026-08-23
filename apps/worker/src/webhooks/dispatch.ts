@@ -2,10 +2,19 @@ import { Prisma, prisma } from '@eduforge/db';
 import { Queue } from 'bullmq';
 import type { Redis } from 'ioredis';
 import { QUEUES } from '@eduforge/config';
-import { WEBHOOK_MAX_ATTEMPTS, buildWebhookEventPayload, type WebhookEventType } from '@eduforge/schemas';
+import {
+  WEBHOOK_MAX_ATTEMPTS,
+  buildWebhookEventPayload,
+  type WebhookEventType,
+} from '@eduforge/schemas';
 
 export interface WebhookNotifier {
-  dispatch(ownerUserId: string, projectId: string | null, event: WebhookEventType, data: unknown): Promise<void>;
+  dispatch(
+    ownerUserId: string,
+    projectId: string | null,
+    event: WebhookEventType,
+    data: unknown,
+  ): Promise<void>;
   dispatchForProject(projectId: string, event: WebhookEventType, data: unknown): Promise<void>;
 }
 
@@ -67,7 +76,11 @@ export class BullMqWebhookNotifier implements WebhookNotifier {
     }
   }
 
-  async dispatchForProject(projectId: string, event: WebhookEventType, data: unknown): Promise<void> {
+  async dispatchForProject(
+    projectId: string,
+    event: WebhookEventType,
+    data: unknown,
+  ): Promise<void> {
     try {
       const project = await prisma.project.findUnique({
         where: { id: projectId },

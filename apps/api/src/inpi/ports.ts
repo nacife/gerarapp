@@ -60,7 +60,11 @@ export interface InpiJobRepository {
 }
 
 export interface InpiEnqueuer {
-  enqueuePackage(input: { jobId: string; appVersionId: string; requestedById: string }): Promise<void>;
+  enqueuePackage(input: {
+    jobId: string;
+    appVersionId: string;
+    requestedById: string;
+  }): Promise<void>;
 }
 
 export interface InpiStorage {

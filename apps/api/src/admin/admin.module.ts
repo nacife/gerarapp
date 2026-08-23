@@ -74,12 +74,14 @@ import {
     {
       provide: FeatureFlagsService,
       inject: [AuditService],
-      useFactory: (audit: AuditService) => new FeatureFlagsService(new PrismaFeatureFlagRepository(), audit),
+      useFactory: (audit: AuditService) =>
+        new FeatureFlagsService(new PrismaFeatureFlagRepository(), audit),
     },
     {
       provide: AdminApiKeysService,
       inject: [ApiKeysService, AuditService],
-      useFactory: (apiKeys: ApiKeysService, audit: AuditService) => new AdminApiKeysService(apiKeys, audit),
+      useFactory: (apiKeys: ApiKeysService, audit: AuditService) =>
+        new AdminApiKeysService(apiKeys, audit),
     },
     {
       provide: SystemService,

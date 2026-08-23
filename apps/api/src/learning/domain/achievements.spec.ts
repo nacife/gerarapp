@@ -48,7 +48,9 @@ describe('computeAchievements', () => {
   });
 
   it('conclusao com 100%', () => {
-    expect(unlockedKeys({ ...base, doneBlocks: 10, totalBlocks: 10, completed: true })).toContain('conclusao');
+    expect(unlockedKeys({ ...base, doneBlocks: 10, totalBlocks: 10, completed: true })).toContain(
+      'conclusao',
+    );
   });
 
   it('certificado quando emitido', () => {

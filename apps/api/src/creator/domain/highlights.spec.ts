@@ -12,11 +12,15 @@ describe('buildHighlights', () => {
   });
 
   it('menciona certificados emitidos quando houver', () => {
-    const highlights = buildHighlights([{ title: 'X', sessionsThisWeek: 0, certificatesThisWeek: 3 }]);
+    const highlights = buildHighlights([
+      { title: 'X', sessionsThisWeek: 0, certificatesThisWeek: 3 },
+    ]);
     expect(highlights.some((h) => h.includes('3 certificados'))).toBe(true);
   });
 
   it('sem atividade nenhuma: nenhum destaque', () => {
-    expect(buildHighlights([{ title: 'X', sessionsThisWeek: 0, certificatesThisWeek: 0 }])).toEqual([]);
+    expect(buildHighlights([{ title: 'X', sessionsThisWeek: 0, certificatesThisWeek: 0 }])).toEqual(
+      [],
+    );
   });
 });

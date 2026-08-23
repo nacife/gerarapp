@@ -14,7 +14,11 @@ export class CacheService {
   async get<T>(key: string): Promise<T | null> {
     const raw = await this.redis.get(`cache:${key}`);
     if (!raw) return null;
-    try { return JSON.parse(raw) as T; } catch { return null; }
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return null;
+    }
   }
 
   async set(key: string, value: unknown, ttlSeconds = 300): Promise<void> {

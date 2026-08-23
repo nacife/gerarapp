@@ -10,11 +10,11 @@ services:
       POSTGRES_PASSWORD: eduforge
       POSTGRES_DB: eduforge
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U eduforge -d eduforge"]
+      test: ['CMD-SHELL', 'pg_isready -U eduforge -d eduforge']
       interval: 5s
       timeout: 5s
       retries: 12
@@ -23,13 +23,13 @@ services:
     image: redis:7-alpine
     container_name: eduforge_redis
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ['redis-server', '--appendonly', 'yes']
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redisdata:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
       timeout: 5s
       retries: 12
@@ -38,13 +38,13 @@ services:
     image: minio/minio:latest
     container_name: eduforge_minio
     restart: unless-stopped
-    command: ["server", "/data", "--console-address", ":9001"]
+    command: ['server', '/data', '--console-address', ':9001']
     environment:
       MINIO_ROOT_USER: eduforge
       MINIO_ROOT_PASSWORD: eduforge123
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     volumes:
       - miniodata:/data
 

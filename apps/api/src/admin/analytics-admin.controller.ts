@@ -13,9 +13,14 @@ export class AnalyticsAdminController {
     const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const [
-      totalUsers, usersToday, usersThisWeek, usersThisMonth,
-      totalProjects, projectsToday,
-      totalCreditsConsumed, creditsThisMonth,
+      totalUsers,
+      usersToday,
+      usersThisWeek,
+      usersThisMonth,
+      totalProjects,
+      projectsToday,
+      totalCreditsConsumed,
+      creditsThisMonth,
       totalInteractions,
       totalEnrollments,
       topProjects,
@@ -27,19 +32,39 @@ export class AnalyticsAdminController {
       prisma.project.count(),
       prisma.project.count({ where: { createdAt: { gte: dayAgo } } }),
       prisma.aiCreditLedger.aggregate({ where: { delta: { lt: 0 } }, _sum: { delta: true } }),
-      prisma.aiCreditLedger.aggregate({ where: { delta: { lt: 0 }, createdAt: { gte: monthAgo } }, _sum: { delta: true } }),
+      prisma.aiCreditLedger.aggregate({
+        where: { delta: { lt: 0 }, createdAt: { gte: monthAgo } },
+        _sum: { delta: true },
+      }),
       prisma.interaction.count(),
       prisma.enrollment.count(),
-      prisma.project.findMany({ orderBy: { createdAt: 'desc' }, take: 5, select: { id: true, title: true, slug: true, _count: { select: { enrollments: true } } } }),
+      prisma.project.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: { id: true, title: true, slug: true, _count: { select: { enrollments: true } } },
+      }),
     ]);
 
     return {
-      users: { total: totalUsers, today: usersToday, thisWeek: usersThisWeek, thisMonth: usersThisMonth },
+      users: {
+        total: totalUsers,
+        today: usersToday,
+        thisWeek: usersThisWeek,
+        thisMonth: usersThisMonth,
+      },
       projects: { total: totalProjects, today: projectsToday },
-      credits: { consumedTotal: Math.abs(totalCreditsConsumed._sum.delta ?? 0), consumedThisMonth: Math.abs(creditsThisMonth._sum.delta ?? 0) },
+      credits: {
+        consumedTotal: Math.abs(totalCreditsConsumed._sum.delta ?? 0),
+        consumedThisMonth: Math.abs(creditsThisMonth._sum.delta ?? 0),
+      },
       interactions: totalInteractions,
       enrollments: totalEnrollments,
-      topProjects: topProjects.map((p: any) => ({ id: p.id, title: p.title, slug: p.slug, enrollments: p._count.enrollments })),
+      topProjects: topProjects.map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        slug: p.slug,
+        enrollments: p._count.enrollments,
+      })),
     };
   }
 

@@ -26,7 +26,11 @@ export class InMemoryLearnerRepository implements LearnerRepository {
   async findById(id: string): Promise<LearnerRecord | null> {
     return this.rows.find((r) => r.id === id) ?? null;
   }
-  async create(input: { email: string; name: string; passwordHash: string }): Promise<LearnerRecord> {
+  async create(input: {
+    email: string;
+    name: string;
+    passwordHash: string;
+  }): Promise<LearnerRecord> {
     const row: LearnerRecord = { id: randomUUID(), ...input };
     this.rows.push(row);
     return row;
@@ -63,7 +67,7 @@ export class InMemoryEnrollmentRepository implements EnrollmentRepository {
     this.learnerNames.set(learnerId, name);
   }
 
-  async createTimeCapsule(input: { enrollmentId: string; message: string }): Promise<string> {
+  async createTimeCapsule(_input: { enrollmentId: string; message: string }): Promise<string> {
     return Promise.resolve('mock-id');
   }
 
@@ -73,8 +77,13 @@ export class InMemoryEnrollmentRepository implements EnrollmentRepository {
   async isInvited(projectId: string, email: string): Promise<boolean> {
     return this.invites.get(projectId)?.has(email) ?? false;
   }
-  async findByLearnerAndProject(learnerId: string, projectId: string): Promise<EnrollmentRecord | null> {
-    return this.enrollments.find((e) => e.learnerId === learnerId && e.projectId === projectId) ?? null;
+  async findByLearnerAndProject(
+    learnerId: string,
+    projectId: string,
+  ): Promise<EnrollmentRecord | null> {
+    return (
+      this.enrollments.find((e) => e.learnerId === learnerId && e.projectId === projectId) ?? null
+    );
   }
   async create(input: {
     learnerId: string;
@@ -105,11 +114,19 @@ export class InMemoryEnrollmentRepository implements EnrollmentRepository {
     const e = this.enrollments.find((x) => x.id === enrollmentId);
     if (!e) return null;
     const project = [...this.projects.values()].find((p) => p.id === e.projectId);
-    return { learnerName: this.learnerNames.get(e.learnerId) ?? 'Aprendiz', projectTitle: project?.title ?? '' };
+    return {
+      learnerName: this.learnerNames.get(e.learnerId) ?? 'Aprendiz',
+      projectTitle: project?.title ?? '',
+    };
   }
   async updateGamification(
     id: string,
-    patch: { xp?: number; streakDays?: number; lastActivityAt?: string; streakFreezeUsedAt?: string | null },
+    patch: {
+      xp?: number;
+      streakDays?: number;
+      lastActivityAt?: string;
+      streakFreezeUsedAt?: string | null;
+    },
   ): Promise<void> {
     const e = this.enrollments.find((x) => x.id === id);
     if (!e) return;
@@ -171,14 +188,15 @@ export class InMemoryProgressRepository implements ProgressRepository {
   }
   async completedBlockIds(enrollmentId: string): Promise<string[]> {
     // espelha a regra real: evento answer/complete com detail.correct=true por bloco
-    return [...this.completedByEnrollment.get(enrollmentId) ?? []];
+    return [...(this.completedByEnrollment.get(enrollmentId) ?? [])];
   }
   // usado pelo InMemoryEventRepository para simular a junção com learning_events
   completedByEnrollment = new Map<string, Set<string>>();
 }
 
 export class InMemoryEventRepository implements EventRepository {
-  events: { enrollmentId: string; interactionId: string | null; event: string; detail: unknown }[] = [];
+  events: { enrollmentId: string; interactionId: string | null; event: string; detail: unknown }[] =
+    [];
   interactions = new Map<string, InteractionForGrading>();
   constructor(private readonly progress: InMemoryProgressRepository) {}
 
@@ -197,7 +215,8 @@ export class InMemoryEventRepository implements EventRepository {
     if (correct && input.interactionId) {
       const interaction = this.interactions.get(input.interactionId);
       if (interaction?.contentBlockId) {
-        const set = this.progress.completedByEnrollment.get(input.enrollmentId) ?? new Set<string>();
+        const set =
+          this.progress.completedByEnrollment.get(input.enrollmentId) ?? new Set<string>();
         set.add(interaction.contentBlockId);
         this.progress.completedByEnrollment.set(input.enrollmentId, set);
       }

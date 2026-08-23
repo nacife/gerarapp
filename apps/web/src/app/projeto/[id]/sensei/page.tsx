@@ -127,7 +127,10 @@ export default function SenseiPage({ params }: { params: { id: string } }) {
     <div className="mx-auto max-w-2xl space-y-8 px-6 py-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-100">Sensei (Tutor IA)</h1>
-        <Link href={`/projeto/${projectId}/revisar`} className="text-sm text-sky-400 hover:underline">
+        <Link
+          href={`/projeto/${projectId}/revisar`}
+          className="text-sm text-sky-400 hover:underline"
+        >
           ← Voltar
         </Link>
       </div>
@@ -200,8 +203,8 @@ export default function SenseiPage({ params }: { params: { id: string } }) {
       <section className="rounded-xl border border-slate-700 bg-slate-800 p-6 space-y-4">
         <h2 className="text-lg font-semibold text-slate-200">Mídia por capítulo</h2>
         <p className="text-sm text-slate-400">
-          Gere podcasts e ilustrações para cada capítulo do mapa aprovado.
-          Custo: 5 créditos por podcast, 2 créditos por ilustração.
+          Gere podcasts e ilustrações para cada capítulo do mapa aprovado. Custo: 5 créditos por
+          podcast, 2 créditos por ilustração.
         </p>
 
         {chapters.length === 0 && (
@@ -227,7 +230,11 @@ export default function SenseiPage({ params }: { params: { id: string } }) {
                     disabled={generatingPodcast === ch.id}
                     className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-500 disabled:opacity-50"
                   >
-                    {generatingPodcast === ch.id ? 'Enfileirando…' : podcast ? '🎧 Regenerar podcast' : '🎧 Gerar podcast (5 créd.)'}
+                    {generatingPodcast === ch.id
+                      ? 'Enfileirando…'
+                      : podcast
+                        ? '🎧 Regenerar podcast'
+                        : '🎧 Gerar podcast (5 créd.)'}
                   </button>
 
                   <button
@@ -235,7 +242,11 @@ export default function SenseiPage({ params }: { params: { id: string } }) {
                     disabled={generatingIllustration === ch.id}
                     className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-500 disabled:opacity-50"
                   >
-                    {generatingIllustration === ch.id ? 'Gerando…' : illustration ? '🎨 Regenerar ilustração' : '🎨 Gerar ilustração (2 créd.)'}
+                    {generatingIllustration === ch.id
+                      ? 'Gerando…'
+                      : illustration
+                        ? '🎨 Regenerar ilustração'
+                        : '🎨 Gerar ilustração (2 créd.)'}
                   </button>
                 </div>
 

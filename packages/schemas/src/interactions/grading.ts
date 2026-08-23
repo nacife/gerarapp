@@ -84,17 +84,15 @@ export interface ScenarioResult {
  * transição legal do grafo; o resultado inclui o score do outcome final e se
  * todas as escolhas feitas foram "best".
  */
-export function gradeScenarioPath(
-  payload: Scenario,
-  choiceNextIds: string[],
-): ScenarioResult {
+export function gradeScenarioPath(payload: Scenario, choiceNextIds: string[]): ScenarioResult {
   const nodes = new Map(payload.nodes.map((n) => [n.id, n]));
   let current = payload.nodes.find((n) => n.id === payload.start_node_id);
   if (!current) return { valid: false, reachedOutcome: false, outcomeScore: 0, allBest: false };
 
   let allBest = true;
   for (const nextId of choiceNextIds) {
-    if (current.kind !== 'situation') return { valid: false, reachedOutcome: false, outcomeScore: 0, allBest: false };
+    if (current.kind !== 'situation')
+      return { valid: false, reachedOutcome: false, outcomeScore: 0, allBest: false };
     const choice = current.choices?.find((c) => c.next_node_id === nextId);
     if (!choice) return { valid: false, reachedOutcome: false, outcomeScore: 0, allBest: false };
     if (choice.quality !== 'best') allBest = false;

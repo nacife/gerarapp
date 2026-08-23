@@ -105,10 +105,15 @@ export function App() {
     if (!enrollmentId) return;
     setCompletedIds((s) => new Set(s).add(interactionId));
     const prevPercent = progress?.percent ?? 0;
-    const res = await apiFetch<{ certificateIssued: boolean; verifyCode?: string; xpTotal: number; streakDays: number }>(
-      `/public/enrollments/${enrollmentId}/events`,
-      { method: 'POST', body: { event: 'answer', interactionId, detail } },
-    );
+    const res = await apiFetch<{
+      certificateIssued: boolean;
+      verifyCode?: string;
+      xpTotal: number;
+      streakDays: number;
+    }>(`/public/enrollments/${enrollmentId}/events`, {
+      method: 'POST',
+      body: { event: 'answer', interactionId, detail },
+    });
     if (res.ok && res.data?.certificateIssued && res.data.verifyCode) {
       setConfetti(true);
       setVerifyCode(res.data.verifyCode);
@@ -118,7 +123,7 @@ export function App() {
     await loadProgress(enrollmentId);
     // Confetti dispara em marcos significativos: conclusão de capítulo (salto de % > 10pp)
     const newPercent = progress?.percent ?? 0;
-    if (newPercent > prevPercent && (newPercent - prevPercent) >= 10) {
+    if (newPercent > prevPercent && newPercent - prevPercent >= 10) {
       setConfetti(true);
     }
     if (newPercent === 100 && prevPercent < 100) {
@@ -152,7 +157,9 @@ export function App() {
             placeholder="Senha do app"
             className="w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-4 py-2 text-center outline-none"
           />
-          <button className="w-full rounded-lg bg-cyan-gradient px-4 py-2 font-semibold text-gray-950">Entrar</button>
+          <button className="w-full rounded-lg bg-cyan-gradient px-4 py-2 font-semibold text-gray-950">
+            Entrar
+          </button>
         </form>
       </Centered>
     );
@@ -188,7 +195,15 @@ export function App() {
   );
 }
 
-function TimeCapsuleModal({ enrollmentId, theme, onClose }: { enrollmentId: string; theme: RuntimeTheme; onClose: () => void }) {
+function TimeCapsuleModal({
+  enrollmentId,
+  theme,
+  onClose,
+}: {
+  enrollmentId: string;
+  theme: RuntimeTheme;
+  onClose: () => void;
+}) {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -207,22 +222,40 @@ function TimeCapsuleModal({ enrollmentId, theme, onClose }: { enrollmentId: stri
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 px-4 backdrop-blur-sm">
-      <div style={{ background: theme.bg, color: theme.text, borderColor: theme.border }} className="w-full max-w-sm rounded-2xl border p-6 shadow-xl relative">
-        <button onClick={onClose} className="absolute right-4 top-4 text-xl opacity-50 hover:opacity-100">×</button>
-        <h2 className="text-2xl font-bold" style={{ color: theme.primary }}>⏳ Cápsula do Tempo</h2>
-        
+      <div
+        style={{ background: theme.bg, color: theme.text, borderColor: theme.border }}
+        className="w-full max-w-sm rounded-2xl border p-6 shadow-xl relative"
+      >
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 text-xl opacity-50 hover:opacity-100"
+        >
+          ×
+        </button>
+        <h2 className="text-2xl font-bold" style={{ color: theme.primary }}>
+          ⏳ Cápsula do Tempo
+        </h2>
+
         {sent ? (
           <div className="mt-4 text-center">
             <p className="mb-4 text-lg">Sua cápsula foi selada! ✉️</p>
-            <p className="text-sm opacity-80 mb-6">Em breve, um e-mail especial será entregue a você do futuro, lembrando as conquistas de hoje.</p>
-            <button onClick={onClose} className="w-full rounded-lg py-3 font-semibold transition hover:opacity-90" style={{ background: theme.primary, color: theme.bg }}>
+            <p className="text-sm opacity-80 mb-6">
+              Em breve, um e-mail especial será entregue a você do futuro, lembrando as conquistas
+              de hoje.
+            </p>
+            <button
+              onClick={onClose}
+              className="w-full rounded-lg py-3 font-semibold transition hover:opacity-90"
+              style={{ background: theme.primary, color: theme.bg }}
+            >
               Fechar
             </button>
           </div>
         ) : (
           <>
             <p className="mt-2 text-sm opacity-80">
-              Você concluiu 100% desta jornada! Escreva uma mensagem para o seu "eu do futuro" celebrar esse momento.
+              Você concluiu 100% desta jornada! Escreva uma mensagem para o seu "eu do futuro"
+              celebrar esse momento.
             </p>
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <textarea
@@ -232,7 +265,11 @@ function TimeCapsuleModal({ enrollmentId, theme, onClose }: { enrollmentId: stri
                 className="h-32 w-full resize-none rounded-lg border border-white/[0.1] bg-white/[0.03] p-3 outline-none"
                 required
               />
-              <button disabled={sending} className="w-full rounded-lg py-3 font-semibold transition hover:opacity-90 disabled:opacity-50" style={{ background: theme.primary, color: theme.bg }}>
+              <button
+                disabled={sending}
+                className="w-full rounded-lg py-3 font-semibold transition hover:opacity-90 disabled:opacity-50"
+                style={{ background: theme.primary, color: theme.bg }}
+              >
                 {sending ? 'Selando...' : 'Selar Cápsula'}
               </button>
             </form>
@@ -273,36 +310,51 @@ function LearnerExperience({
   const [showBattle, setShowBattle] = useState(false);
 
   const isStoryMode = (manifest.theme as any).presentationMode === 'story';
-  
+
   const regions = progress.chapters.map((ch, i) => ({
     id: ch.id,
     name: ch.title,
     description: '',
     emoji: ['🏰', '⚔️', '🔮', '🗺️', '⛰️'][i % 5] || '🏰',
-    position: { x: 20 + (i * 30) % 60, y: 20 + (i * 20) % 60 },
+    position: { x: 20 + ((i * 30) % 60), y: 20 + ((i * 20) % 60) },
     done: ch.done,
     current: !ch.done && (i === 0 || !!progress.chapters[i - 1]?.done),
   }));
 
   const storyMapData = {
-    title: "Aventura de Conhecimento",
+    title: 'Aventura de Conhecimento',
     regions,
     startRegionId: regions[0]?.id ?? '',
-    finalRegionId: regions[regions.length - 1]?.id ?? ''
+    finalRegionId: regions[regions.length - 1]?.id ?? '',
   };
 
   return (
     <div style={{ background: theme.bg, color: theme.text, minHeight: '100vh' }}>
-      <header style={{ background: theme.surface, borderColor: theme.border }} className="border-b px-6 py-4">
+      <header
+        style={{ background: theme.surface, borderColor: theme.border }}
+        className="border-b px-6 py-4"
+      >
         <div className="mx-auto flex max-w-2xl items-center justify-between">
           <div>
             <h1 className="text-lg font-bold">{manifest.title}</h1>
-            <div className="mt-1 h-1.5 w-40 overflow-hidden rounded-full" style={{ background: theme.border }}>
-              <div style={{ width: `${progress.percent}%`, background: theme.accent }} className="h-full transition-all" />
+            <div
+              className="mt-1 h-1.5 w-40 overflow-hidden rounded-full"
+              style={{ background: theme.border }}
+            >
+              <div
+                style={{ width: `${progress.percent}%`, background: theme.accent }}
+                className="h-full transition-all"
+              />
             </div>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <button onClick={() => setShowBattle(!showBattle)} className="px-2 py-1 rounded text-xs" style={{ background: theme.accent, color: theme.bg }}>⚔️ Batalha</button>
+            <button
+              onClick={() => setShowBattle(!showBattle)}
+              className="px-2 py-1 rounded text-xs"
+              style={{ background: theme.accent, color: theme.bg }}
+            >
+              ⚔️ Batalha
+            </button>
             <span title="streak">🔥 {progress.streakDays}</span>
             <span title="xp">⭐ {progress.xp}</span>
             <span style={{ color: theme.muted }}>{progress.percent}%</span>
@@ -314,21 +366,30 @@ function LearnerExperience({
 
       <main className="mx-auto max-w-2xl space-y-8 px-6 py-8">
         {showBattle ? (
-           <div>
-             <button onClick={() => setShowBattle(false)} className="mb-4 text-sm underline" style={{ color: theme.primary }}>← Voltar para a Lição</button>
-             <BattleLobby enrollmentId={enrollmentId} theme={theme} />
-           </div>
+          <div>
+            <button
+              onClick={() => setShowBattle(false)}
+              className="mb-4 text-sm underline"
+              style={{ color: theme.primary }}
+            >
+              ← Voltar para a Lição
+            </button>
+            <BattleLobby enrollmentId={enrollmentId} theme={theme} />
+          </div>
         ) : isStoryMode && !storyModeChapterId ? (
-          <StoryMap 
-            map={storyMapData} 
-            theme={theme} 
-            onSelect={setStoryModeChapterId} 
-          />
+          <StoryMap map={storyMapData} theme={theme} onSelect={setStoryModeChapterId} />
         ) : (
-          (isStoryMode ? progress.chapters.filter(ch => ch.id === storyModeChapterId) : progress.chapters).map((chapter) => (
+          (isStoryMode
+            ? progress.chapters.filter((ch) => ch.id === storyModeChapterId)
+            : progress.chapters
+          ).map((chapter) => (
             <section key={chapter.id}>
               {isStoryMode && (
-                <button onClick={() => setStoryModeChapterId(null)} className="mb-4 text-sm underline" style={{ color: theme.primary }}>
+                <button
+                  onClick={() => setStoryModeChapterId(null)}
+                  className="mb-4 text-sm underline"
+                  style={{ color: theme.primary }}
+                >
                   ← Voltar ao Mapa
                 </button>
               )}
@@ -349,20 +410,38 @@ function LearnerExperience({
                       </div>
                       {/* Focus Mode Toggle */}
                       {section.blockId && (
-                        <button 
-                          onClick={() => setFocusModeBlockId(focusModeBlockId === section.blockId ? null : (section.blockId ?? null))}
+                        <button
+                          onClick={() =>
+                            setFocusModeBlockId(
+                              focusModeBlockId === section.blockId
+                                ? null
+                                : (section.blockId ?? null),
+                            )
+                          }
                           className="text-xs px-2 py-1 rounded border"
-                          style={{ borderColor: theme.border, color: focusModeBlockId === section.blockId ? theme.accent : theme.muted }}
+                          style={{
+                            borderColor: theme.border,
+                            color:
+                              focusModeBlockId === section.blockId ? theme.accent : theme.muted,
+                          }}
                         >
                           {focusModeBlockId === section.blockId ? 'Sair do Modo Foco' : 'Modo Foco'}
                         </button>
                       )}
                     </div>
                     {focusModeBlockId === section.blockId ? (
-                      <FocusMode contentMd={(section as any).excerpt || section.title || 'Conteúdo não disponível.'} theme={theme} />
+                      <FocusMode
+                        contentMd={
+                          (section as any).excerpt || section.title || 'Conteúdo não disponível.'
+                        }
+                        theme={theme}
+                      />
                     ) : (
                       <div className="space-y-3">
-                        {(section.blockId ? interactionsByBlock.get(section.blockId) : undefined)?.map((it) =>
+                        {(section.blockId
+                          ? interactionsByBlock.get(section.blockId)
+                          : undefined
+                        )?.map((it) =>
                           completedIds.has(it.id) ? (
                             <div
                               key={it.id}
@@ -415,7 +494,11 @@ function Landing() {
 }
 
 function Centered({ children }: { children: ReactNode }) {
-  return <div className="grid min-h-screen place-items-center px-6 text-center text-gray-300">{children}</div>;
+  return (
+    <div className="grid min-h-screen place-items-center px-6 text-center text-gray-300">
+      {children}
+    </div>
+  );
 }
 
 function PreviewMode() {
@@ -435,35 +518,88 @@ function PreviewMode() {
   }, []);
 
   // Simulação de estilos do template
-  const radius = template?.tokens?.radius === 'none' ? '0' : template?.tokens?.radius === 'sm' ? '0.25rem' : template?.tokens?.radius === 'lg' ? '1rem' : template?.tokens?.radius === 'xl' ? '1.5rem' : '0.5rem';
-  const shadow = template?.tokens?.surface === 'soft-shadow' ? '0 4px 20px rgba(0,0,0,0.1)' : 'none';
-  const border = template?.tokens?.surface === 'bordered' ? `2px solid ${theme.border}` : `1px solid ${theme.border}`;
+  const radius =
+    template?.tokens?.radius === 'none'
+      ? '0'
+      : template?.tokens?.radius === 'sm'
+        ? '0.25rem'
+        : template?.tokens?.radius === 'lg'
+          ? '1rem'
+          : template?.tokens?.radius === 'xl'
+            ? '1.5rem'
+            : '0.5rem';
+  const shadow =
+    template?.tokens?.surface === 'soft-shadow' ? '0 4px 20px rgba(0,0,0,0.1)' : 'none';
+  const border =
+    template?.tokens?.surface === 'bordered'
+      ? `2px solid ${theme.border}`
+      : `1px solid ${theme.border}`;
   const fontFamily = template?.tokens?.typography?.body || 'inherit';
   const headingFont = template?.tokens?.typography?.heading || 'inherit';
 
   return (
-    <div style={{ background: theme.bg, color: theme.text, minHeight: '100vh', padding: '2rem', fontFamily }}>
-      <div className="mx-auto max-w-sm" style={{ borderRadius: radius, background: theme.surface, boxShadow: shadow, border, padding: '1.25rem' }}>
+    <div
+      style={{
+        background: theme.bg,
+        color: theme.text,
+        minHeight: '100vh',
+        padding: '2rem',
+        fontFamily,
+      }}
+    >
+      <div
+        className="mx-auto max-w-sm"
+        style={{
+          borderRadius: radius,
+          background: theme.surface,
+          boxShadow: shadow,
+          border,
+          padding: '1.25rem',
+        }}
+      >
         <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center font-black" style={{ background: theme.primary, color: theme.bg, borderRadius: radius === '0' ? '0' : '0.25rem' }}>
+          <span
+            className="grid h-8 w-8 place-items-center font-black"
+            style={{
+              background: theme.primary,
+              color: theme.bg,
+              borderRadius: radius === '0' ? '0' : '0.25rem',
+            }}
+          >
             E
           </span>
           <strong style={{ fontFamily: headingFont }}>Biologia Viva</strong>
         </div>
-        <h3 className="mt-4 text-xl font-bold" style={{ color: theme.primary, fontFamily: headingFont }}>
+        <h3
+          className="mt-4 text-xl font-bold"
+          style={{ color: theme.primary, fontFamily: headingFont }}
+        >
           A Célula
         </h3>
         <p className="mt-1 text-sm" style={{ color: theme.muted }}>
-          A membrana plasmática é uma bicamada lipídica que separa o interior da célula do ambiente externo.
+          A membrana plasmática é uma bicamada lipídica que separa o interior da célula do ambiente
+          externo.
         </p>
-        <button className="mt-4 w-full py-2 font-semibold transition hover:opacity-90" style={{ background: theme.primary, color: theme.bg, borderRadius: radius, border: template?.tokens?.surface === 'bordered' ? `2px solid ${theme.text}` : 'none' }}>
+        <button
+          className="mt-4 w-full py-2 font-semibold transition hover:opacity-90"
+          style={{
+            background: theme.primary,
+            color: theme.bg,
+            borderRadius: radius,
+            border: template?.tokens?.surface === 'bordered' ? `2px solid ${theme.text}` : 'none',
+          }}
+        >
           Começar Quiz
         </button>
       </div>
 
       <div className="mx-auto mt-6 max-w-sm space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-center justify-between p-3" style={{ background: theme.bg, borderRadius: radius, border, boxShadow: shadow }}>
+          <div
+            key={i}
+            className="flex items-center justify-between p-3"
+            style={{ background: theme.bg, borderRadius: radius, border, boxShadow: shadow }}
+          >
             <span style={{ fontFamily: headingFont, fontWeight: 500 }}>Tópico {i}</span>
             <span style={{ color: theme.muted, fontSize: '0.8rem' }}>pendente</span>
           </div>
@@ -472,4 +608,3 @@ function PreviewMode() {
     </div>
   );
 }
-

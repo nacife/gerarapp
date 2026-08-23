@@ -1,13 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import { encryptSecret } from '@eduforge/schemas/crypto';
-import { runWebhookDelivery, type RecordAttemptInput, type WebhookDeliveryPorts, type WebhookEndpointForDelivery, type HttpResponse } from './pipeline';
+import {
+  runWebhookDelivery,
+  type RecordAttemptInput,
+  type WebhookDeliveryPorts,
+  type WebhookEndpointForDelivery,
+  type HttpResponse,
+} from './pipeline';
 
 const ENCRYPTION_KEY = 'a-32-char-or-longer-test-secret!';
 const SEALED = encryptSecret('whsec_test', ENCRYPTION_KEY);
 
 class FakePorts implements WebhookDeliveryPorts {
   encryptionKey = ENCRYPTION_KEY;
-  endpoint: WebhookEndpointForDelivery | null = { url: 'https://example.com/hook', active: true, secretSealed: SEALED };
+  endpoint: WebhookEndpointForDelivery | null = {
+    url: 'https://example.com/hook',
+    active: true,
+    secretSealed: SEALED,
+  };
   attempts: RecordAttemptInput[] = [];
   postResult: HttpResponse | Error = { status: 200, body: 'ok' };
   postCalls: { url: string; body: string; headers: Record<string, string> }[] = [];
@@ -27,7 +37,12 @@ class FakePorts implements WebhookDeliveryPorts {
   }
 }
 
-const JOB_DATA = { deliveryId: 'd1', endpointId: 'e1', eventType: 'app.published', payload: { version: 1 } };
+const JOB_DATA = {
+  deliveryId: 'd1',
+  endpointId: 'e1',
+  eventType: 'app.published',
+  payload: { version: 1 },
+};
 
 describe('runWebhookDelivery', () => {
   it('assina o corpo e envia os headers corretos', async () => {
@@ -46,7 +61,13 @@ describe('runWebhookDelivery', () => {
     const ports = new FakePorts();
     await runWebhookDelivery(JOB_DATA, 0, false, ports);
     expect(ports.attempts).toEqual([
-      { status: 'success', attempts: 1, responseStatus: 200, responseBody: 'ok', lastAttemptAt: expect.any(Date) },
+      {
+        status: 'success',
+        attempts: 1,
+        responseStatus: 200,
+        responseBody: 'ok',
+        lastAttemptAt: expect.any(Date),
+      },
     ]);
   });
 
@@ -61,14 +82,22 @@ describe('runWebhookDelivery', () => {
     const ports = new FakePorts();
     ports.postResult = { status: 503, body: 'unavailable' };
     await expect(runWebhookDelivery(JOB_DATA, 12, true, ports)).rejects.toThrow();
-    expect(ports.attempts[0]).toMatchObject({ status: 'exhausted', attempts: 13, responseStatus: 503 });
+    expect(ports.attempts[0]).toMatchObject({
+      status: 'exhausted',
+      attempts: 13,
+      responseStatus: 503,
+    });
   });
 
   it('erro de rede (sem resposta) ainda registra a tentativa como failed', async () => {
     const ports = new FakePorts();
     ports.postResult = new Error('ECONNREFUSED');
     await expect(runWebhookDelivery(JOB_DATA, 0, false, ports)).rejects.toThrow();
-    expect(ports.attempts[0]).toMatchObject({ status: 'failed', responseStatus: null, responseBody: 'ECONNREFUSED' });
+    expect(ports.attempts[0]).toMatchObject({
+      status: 'failed',
+      responseStatus: null,
+      responseBody: 'ECONNREFUSED',
+    });
   });
 
   it('endpoint removido/inativo marca exhausted sem tentar entregar', async () => {

@@ -147,7 +147,11 @@ export default function InpiPage({ params }: { params: { id: string } }) {
     );
     setBusy(false);
     if (res.ok && res.data) {
-      setMsg(res.data.matched ? 'Íntegro — hash confere com o pacote congelado.' : '⚠ Divergência detectada no hash!');
+      setMsg(
+        res.data.matched
+          ? 'Íntegro — hash confere com o pacote congelado.'
+          : '⚠ Divergência detectada no hash!',
+      );
       await loadDetail(detail.id);
     } else {
       setMsg(res.problem?.detail ?? 'Falha ao verificar.');
@@ -177,7 +181,9 @@ export default function InpiPage({ params }: { params: { id: string } }) {
   }
 
   const activeFiling = detail
-    ? myFilings.find((f) => f.inpiCertificateId === detail.id && !['revoked', 'rejected'].includes(f.status))
+    ? myFilings.find(
+        (f) => f.inpiCertificateId === detail.id && !['revoked', 'rejected'].includes(f.status),
+      )
     : undefined;
 
   if (!loaded) {
@@ -187,7 +193,10 @@ export default function InpiPage({ params }: { params: { id: string } }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-12">
       <div>
-        <Link href={`/projeto/${projectId}/revisar`} className="text-sm text-sky-400 hover:underline">
+        <Link
+          href={`/projeto/${projectId}/revisar`}
+          className="text-sm text-sky-400 hover:underline"
+        >
           ← revisão e publicação
         </Link>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">Registro INPI</h1>
@@ -195,23 +204,29 @@ export default function InpiPage({ params }: { params: { id: string } }) {
 
       <div className="space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-xs text-amber-100">
         <p>
-          ⓘ O INPI recebe apenas o resumo hash — não o código-fonte. A guarda do arquivo ZIP original é
-          responsabilidade do titular (a EduForge mantém uma cópia como redundância, não como
-          substituição), por até 50 anos.
+          ⓘ O INPI recebe apenas o resumo hash — não o código-fonte. A guarda do arquivo ZIP
+          original é responsabilidade do titular (a EduForge mantém uma cópia como redundância, não
+          como substituição), por até 50 anos.
         </p>
         <p>
-          A Declaração de Veracidade e a procuração exigem certificado digital qualificado ICP-Brasil
-          (e-CPF/e-CNPJ) com assinatura PAdES — certificados "avançados" não são aceitos pelo e-Software.
+          A Declaração de Veracidade e a procuração exigem certificado digital qualificado
+          ICP-Brasil (e-CPF/e-CNPJ) com assinatura PAdES — certificados "avançados" não são aceitos
+          pelo e-Software.
         </p>
         <p>
           Uma nova versão com mudanças substanciais pode exigir um novo registro (obra derivada). O
           registro protege a expressão do programa, não a ideia; o título não é protegido por ele.
         </p>
-        <p>Esta tela não presta consultoria jurídica — o pedido no e-Software é de responsabilidade do titular.</p>
+        <p>
+          Esta tela não presta consultoria jurídica — o pedido no e-Software é de responsabilidade
+          do titular.
+        </p>
       </div>
 
       {versions.length === 0 ? (
-        <p className="text-sm text-slate-500">Publique uma versão do app para gerar a certificação INPI.</p>
+        <p className="text-sm text-slate-500">
+          Publique uma versão do app para gerar a certificação INPI.
+        </p>
       ) : (
         <>
           <label className="block text-sm">
@@ -225,7 +240,9 @@ export default function InpiPage({ params }: { params: { id: string } }) {
                 <option key={v.id} value={v.versionNumber}>
                   v{v.versionNumber}
                   {v.active ? ' — ativa' : ''}
-                  {v.publishedAt ? ` — publicada em ${new Date(v.publishedAt).toLocaleDateString('pt-BR')}` : ''}
+                  {v.publishedAt
+                    ? ` — publicada em ${new Date(v.publishedAt).toLocaleDateString('pt-BR')}`
+                    : ''}
                 </option>
               ))}
             </select>
@@ -234,7 +251,9 @@ export default function InpiPage({ params }: { params: { id: string } }) {
           <div className="grid gap-4 sm:grid-cols-2">
             <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
               <h2 className="font-semibold">Autosserviço</h2>
-              <p className="text-xs text-slate-500">Gere o pacote e registre você mesmo no e-Software.</p>
+              <p className="text-xs text-slate-500">
+                Gere o pacote e registre você mesmo no e-Software.
+              </p>
               <ul className="space-y-1 text-xs text-slate-400">
                 <li>• ZIP código-fonte + documentação</li>
                 <li>• Hash SHA-512 + Ficha de Registro</li>
@@ -245,14 +264,19 @@ export default function InpiPage({ params }: { params: { id: string } }) {
                 disabled={busy || !!detail}
                 className="w-full rounded-lg bg-gradient-to-br from-sky-400 to-fuchsia-500 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50"
               >
-                {busy ? (progressLabel ?? 'Processando…') : detail ? 'Já certificado' : 'Gerar pacote'}
+                {busy
+                  ? (progressLabel ?? 'Processando…')
+                  : detail
+                    ? 'Já certificado'
+                    : 'Gerar pacote'}
               </button>
             </section>
 
             <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
               <h2 className="font-semibold">Registro Assistido</h2>
               <p className="text-xs text-slate-500">
-                Tudo do autosserviço + procuração, GRU, protocolo no e-Software e acompanhamento na RPI.
+                Tudo do autosserviço + procuração, GRU, protocolo no e-Software e acompanhamento na
+                RPI.
               </p>
               <ul className="space-y-1 text-xs text-slate-400">
                 <li>• Revisão documental por especialista</li>
@@ -279,7 +303,11 @@ export default function InpiPage({ params }: { params: { id: string } }) {
             </section>
           </div>
 
-          {msg && <p className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-300">{msg}</p>}
+          {msg && (
+            <p className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-300">
+              {msg}
+            </p>
+          )}
 
           {detail && (
             <section className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
@@ -304,8 +332,13 @@ export default function InpiPage({ params }: { params: { id: string } }) {
               <div className="rounded-lg border border-slate-800 bg-slate-950 p-3">
                 <p className="text-xs text-slate-500">SHA-512</p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 truncate text-xs text-slate-300">{detail.bundleHash}</code>
-                  <button onClick={() => copyHash(detail.bundleHash)} className="shrink-0 text-xs text-sky-400 hover:underline">
+                  <code className="flex-1 truncate text-xs text-slate-300">
+                    {detail.bundleHash}
+                  </code>
+                  <button
+                    onClick={() => copyHash(detail.bundleHash)}
+                    className="shrink-0 text-xs text-sky-400 hover:underline"
+                  >
                     copiar
                   </button>
                 </div>
@@ -313,17 +346,26 @@ export default function InpiPage({ params }: { params: { id: string } }) {
 
               <div className="flex flex-wrap gap-2 text-sm">
                 {detail.zipUrl && (
-                  <a href={detail.zipUrl} className="rounded-lg border border-slate-800 px-3 py-2 hover:border-slate-600">
+                  <a
+                    href={detail.zipUrl}
+                    className="rounded-lg border border-slate-800 px-3 py-2 hover:border-slate-600"
+                  >
                     ⬇ ZIP
                   </a>
                 )}
                 {detail.declarationUrl && (
-                  <a href={detail.declarationUrl} className="rounded-lg border border-slate-800 px-3 py-2 hover:border-slate-600">
+                  <a
+                    href={detail.declarationUrl}
+                    className="rounded-lg border border-slate-800 px-3 py-2 hover:border-slate-600"
+                  >
                     ⬇ Declaração
                   </a>
                 )}
                 {detail.tsaUrl && (
-                  <a href={detail.tsaUrl} className="rounded-lg border border-slate-800 px-3 py-2 hover:border-slate-600">
+                  <a
+                    href={detail.tsaUrl}
+                    className="rounded-lg border border-slate-800 px-3 py-2 hover:border-slate-600"
+                  >
                     ⬇ Carimbo .tst
                   </a>
                 )}
@@ -351,7 +393,9 @@ export default function InpiPage({ params }: { params: { id: string } }) {
                 </dl>
                 <div>
                   <p className="text-xs text-slate-500">Derivação autorizada</p>
-                  <p className="mt-1 text-xs text-slate-400">{detail.fichaRegistro.derivationText}</p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    {detail.fichaRegistro.derivationText}
+                  </p>
                 </div>
               </div>
             </section>

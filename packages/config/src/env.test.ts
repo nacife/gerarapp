@@ -23,9 +23,26 @@ describe('loadEnv', () => {
     const env = loadEnv(validEnv);
     expect(env.NODE_ENV).toBe('development');
     expect(env.AI_PROVIDER).toBe('mock');
+    expect(env.S3_REGION).toBe('auto');
+    expect(env.S3_FORCE_PATH_STYLE).toBe(true);
+    expect(env.S3_PUBLIC_URL).toBeUndefined();
     expect(env.API_PORT).toBe(3333);
     expect(env.WORKER_PORT).toBe(3334);
     expect(env.INPI_GRU_FEE_CENTS).toBe(21000);
+  });
+
+  it('aceita configurações específicas do Cloudflare R2', () => {
+    const env = loadEnv({
+      ...validEnv,
+      S3_ENDPOINT: 'https://0123456789abcdef.r2.cloudflarestorage.com',
+      S3_REGION: 'auto',
+      S3_FORCE_PATH_STYLE: 'false',
+      S3_PUBLIC_URL: 'https://cdn.eduforge.app',
+    });
+    expect(env.S3_ENDPOINT).toBe('https://0123456789abcdef.r2.cloudflarestorage.com');
+    expect(env.S3_REGION).toBe('auto');
+    expect(env.S3_FORCE_PATH_STYLE).toBe(false);
+    expect(env.S3_PUBLIC_URL).toBe('https://cdn.eduforge.app');
   });
 
   it('faz coerção de portas numéricas a partir de strings', () => {
@@ -35,9 +52,7 @@ describe('loadEnv', () => {
   });
 
   it('rejeita JWT_SECRET curto', () => {
-    expect(() => loadEnv({ ...validEnv, JWT_SECRET: 'curto' })).toThrowError(
-      /JWT_SECRET/,
-    );
+    expect(() => loadEnv({ ...validEnv, JWT_SECRET: 'curto' })).toThrowError(/JWT_SECRET/);
   });
 
   it('exige ANTHROPIC_API_KEY quando AI_PROVIDER=anthropic', () => {

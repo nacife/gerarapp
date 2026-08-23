@@ -37,13 +37,20 @@ export class PrismaInpiProjectRepository implements InpiProjectRepository {
     }));
   }
 
-  async getPublishedVersion(projectId: string, versionNumber: number): Promise<InpiVersionRow | null> {
+  async getPublishedVersion(
+    projectId: string,
+    versionNumber: number,
+  ): Promise<InpiVersionRow | null> {
     const version = await prisma.appVersion.findFirst({
       where: { projectId, versionNumber, publishedAt: { not: null } },
       select: { id: true, versionNumber: true, publishedAt: true },
     });
     if (!version) return null;
-    return { appVersionId: version.id, versionNumber: version.versionNumber, publishedAt: version.publishedAt! };
+    return {
+      appVersionId: version.id,
+      versionNumber: version.versionNumber,
+      publishedAt: version.publishedAt!,
+    };
   }
 
   async getLatestPublishedVersion(projectId: string): Promise<InpiVersionRow | null> {
@@ -53,7 +60,11 @@ export class PrismaInpiProjectRepository implements InpiProjectRepository {
       select: { id: true, versionNumber: true, publishedAt: true },
     });
     if (!version) return null;
-    return { appVersionId: version.id, versionNumber: version.versionNumber, publishedAt: version.publishedAt! };
+    return {
+      appVersionId: version.id,
+      versionNumber: version.versionNumber,
+      publishedAt: version.publishedAt!,
+    };
   }
 }
 
@@ -70,7 +81,14 @@ function toRow(cert: {
   appVersion: {
     versionNumber: number;
     publishedAt: Date | null;
-    project: { id: string; ownerUserId: string; title: string; slug: string; createdAt: Date; owner: { name: string } };
+    project: {
+      id: string;
+      ownerUserId: string;
+      title: string;
+      slug: string;
+      createdAt: Date;
+      owner: { name: string };
+    };
   };
   verifications: { matched: boolean; verifiedAt: Date }[];
 }): InpiCertificateRow {
@@ -117,7 +135,10 @@ export class PrismaInpiCertificateRepository implements InpiCertificateRepositor
   }
 
   async findByAppVersionId(appVersionId: string): Promise<InpiCertificateRow | null> {
-    const row = await prisma.inpiCertificate.findUnique({ where: { appVersionId }, include: INCLUDE });
+    const row = await prisma.inpiCertificate.findUnique({
+      where: { appVersionId },
+      include: INCLUDE,
+    });
     return row ? toRow(row) : null;
   }
 
@@ -148,8 +169,18 @@ export class PrismaInpiJobRepository implements InpiJobRepository {
           steps: [
             { key: 'memorial', label: 'Gerando memorial descritivo', status: 'pending', pct: 0 },
             { key: 'telas', label: 'Capturando telas do app', status: 'pending', pct: 0 },
-            { key: 'pacote', label: 'Montando pacote e calculando hash', status: 'pending', pct: 0 },
-            { key: 'upload', label: 'Enviando para armazenamento seguro', status: 'pending', pct: 0 },
+            {
+              key: 'pacote',
+              label: 'Montando pacote e calculando hash',
+              status: 'pending',
+              pct: 0,
+            },
+            {
+              key: 'upload',
+              label: 'Enviando para armazenamento seguro',
+              status: 'pending',
+              pct: 0,
+            },
           ],
         },
       },

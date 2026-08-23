@@ -24,7 +24,8 @@ export interface AiProviderConfig {
 
 function createSingle(config: ProviderEntry): AiProvider {
   switch (config.provider) {
-    case 'mock': return new MockAiProvider();
+    case 'mock':
+      return new MockAiProvider();
     case 'anthropic':
       if (!config.apiKey) throw new Error('ANTHROPIC_API_KEY é obrigatória');
       return new AnthropicAiProvider(config.apiKey, config.model ?? 'claude-sonnet-4-6');
@@ -59,7 +60,7 @@ function createSingle(config: ProviderEntry): AiProvider {
 export function createAiProvider(config: AiProviderConfig): AiProvider {
   // Modo multi-provider
   if (config.providers && config.providers.length > 0) {
-    const providers = config.providers.map(p => createSingle(p));
+    const providers = config.providers.map((p) => createSingle(p));
     const mock = config.mockFallback !== false ? new MockAiProvider() : null;
     return new MultiProvider(providers, mock);
   }

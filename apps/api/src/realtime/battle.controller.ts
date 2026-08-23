@@ -1,7 +1,11 @@
 import { Controller, Post, Body, Param, Sse, UseGuards } from '@nestjs/common';
 import { BattleService } from './battle.service';
 import { Public } from '../common/decorators';
-import { LearnerAuthGuard, CurrentLearner, AuthenticatedLearner } from '../learning/learner-auth.guard';
+import {
+  LearnerAuthGuard,
+  CurrentLearner,
+  AuthenticatedLearner,
+} from '../learning/learner-auth.guard';
 import { Observable } from 'rxjs';
 
 @Controller('public/enrollments/:id/battle')
@@ -19,7 +23,7 @@ export class BattleController {
   join(
     @Param('id') id: string,
     @CurrentLearner() learner: AuthenticatedLearner,
-    @Body('name') name: string
+    @Body('name') name: string,
   ) {
     this.battleService.joinLobby(id, { id: learner.id, name: name || 'Jogador' });
     return { success: true };
@@ -29,7 +33,7 @@ export class BattleController {
   score(
     @Param('id') id: string,
     @CurrentLearner() learner: AuthenticatedLearner,
-    @Body('delta') delta: number
+    @Body('delta') delta: number,
   ) {
     this.battleService.submitScore(id, learner.id, delta);
     return { success: true };

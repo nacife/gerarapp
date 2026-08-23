@@ -27,28 +27,28 @@ pnpm dev                # sobe web + admin + api + worker + runtime
 
 ## Serviços em desenvolvimento
 
-| App             | Porta | URL                     |
-| --------------- | ----- | ----------------------- |
-| web (criador)   | 3000  | http://localhost:3000   |
-| admin (console) | 3001  | http://localhost:3001   |
-| api (REST /v1)  | 3333  | http://localhost:3333   |
-| worker (health) | 3334  | http://localhost:3334   |
-| runtime (PWA)   | 5173  | http://localhost:5173   |
-| MinIO console   | 9001  | http://localhost:9001   |
+| App             | Porta | URL                   |
+| --------------- | ----- | --------------------- |
+| web (criador)   | 3000  | http://localhost:3000 |
+| admin (console) | 3001  | http://localhost:3001 |
+| api (REST /v1)  | 3333  | http://localhost:3333 |
+| worker (health) | 3334  | http://localhost:3334 |
+| runtime (PWA)   | 5173  | http://localhost:5173 |
+| MinIO console   | 9001  | http://localhost:9001 |
 
 Healthchecks: `GET http://localhost:3333/health` (api) e `GET http://localhost:3334/health` (worker).
 
 ## Scripts principais
 
-| Comando           | Descrição                                        |
-| ----------------- | ------------------------------------------------ |
-| `pnpm dev`        | Sobe todos os apps em modo desenvolvimento       |
-| `pnpm verify`     | `lint` + `typecheck` + `test` (CI local)         |
-| `pnpm build`      | Build de produção de todos os pacotes/apps       |
-| `pnpm db:reset`   | Recria o banco do zero e roda os seeds           |
-| `pnpm db:seed`    | Executa apenas os seeds                          |
-| `pnpm db:studio`  | Abre o Prisma Studio                             |
-| `pnpm docker:up`  | Sobe a infraestrutura local (Docker)             |
+| Comando          | Descrição                                  |
+| ---------------- | ------------------------------------------ |
+| `pnpm dev`       | Sobe todos os apps em modo desenvolvimento |
+| `pnpm verify`    | `lint` + `typecheck` + `test` (CI local)   |
+| `pnpm build`     | Build de produção de todos os pacotes/apps |
+| `pnpm db:reset`  | Recria o banco do zero e roda os seeds     |
+| `pnpm db:seed`   | Executa apenas os seeds                    |
+| `pnpm db:studio` | Abre o Prisma Studio                       |
+| `pnpm docker:up` | Sobe a infraestrutura local (Docker)       |
 
 ## Estrutura
 

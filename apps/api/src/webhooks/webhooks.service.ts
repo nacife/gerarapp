@@ -32,7 +32,10 @@ export class WebhooksService {
     private readonly encryptionKey: string,
   ) {}
 
-  async create(ownerUserId: string, input: CreateWebhookEndpointRequest): Promise<WebhookEndpointRow> {
+  async create(
+    ownerUserId: string,
+    input: CreateWebhookEndpointRequest,
+  ): Promise<WebhookEndpointRow> {
     if (input.projectId) {
       const project = await this.projects.findByIdForOwner(input.projectId, ownerUserId);
       if (!project) throw Errors.notFound('Projeto');
@@ -50,7 +53,11 @@ export class WebhooksService {
     return this.endpoints.listForOwner(ownerUserId);
   }
 
-  async update(ownerUserId: string, id: string, patch: UpdateWebhookEndpointRequest): Promise<WebhookEndpointRow> {
+  async update(
+    ownerUserId: string,
+    id: string,
+    patch: UpdateWebhookEndpointRequest,
+  ): Promise<WebhookEndpointRow> {
     const endpoint = await this.requireOwned(ownerUserId, id);
     const updated = await this.endpoints.update(endpoint.id, patch);
     if (!updated) throw Errors.notFound('Webhook');
@@ -126,7 +133,11 @@ export class WebhooksService {
   }
 
   /** Mesmo fan-out de {@link dispatch}, mas resolve o dono a partir do projeto (chamado por aprendiz/operador, não pelo dono). */
-  async dispatchForProject(projectId: string, event: WebhookEventType, data: unknown): Promise<void> {
+  async dispatchForProject(
+    projectId: string,
+    event: WebhookEventType,
+    data: unknown,
+  ): Promise<void> {
     try {
       const ownerUserId = await this.projects.findOwnerId(projectId);
       if (!ownerUserId) return;

@@ -1,10 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import {
-  type ArgumentsHost,
-  Catch,
-  type ExceptionFilter,
-  HttpException,
-} from '@nestjs/common';
+import { type ArgumentsHost, Catch, type ExceptionFilter, HttpException } from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 import { AppError } from './errors';
@@ -54,11 +49,18 @@ export class ProblemDetailsFilter implements ExceptionFilter {
         trace_id: traceId,
       };
     } else {
-      body = { type: 'about:blank', title: 'Erro interno do servidor', status: 500, trace_id: traceId };
+      body = {
+        type: 'about:blank',
+        title: 'Erro interno do servidor',
+        status: 500,
+        trace_id: traceId,
+      };
       try {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('./logger').logger.error({ traceId, err: exception }, 'Erro interno');
-      } catch { /* logger indisponível */ }
+      } catch {
+        /* logger indisponível */
+      }
     }
 
     void reply.status(status).header('content-type', 'application/problem+json').send(body);

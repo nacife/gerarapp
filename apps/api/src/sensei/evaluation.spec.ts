@@ -15,8 +15,12 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { createAiProvider } from '@eduforge/ai';
 import type { AiProvider, TutorChunk } from '@eduforge/ai';
-import { SIMILARITY_THRESHOLD, TOP_K, selectContext, enforceCitationGate } from './domain/guardrails';
-import type { SenseiTone } from '@eduforge/ai';
+import {
+  SIMILARITY_THRESHOLD,
+  TOP_K,
+  selectContext,
+  enforceCitationGate,
+} from './domain/guardrails';
 
 // ─────────── Fixture: 10 blocos de Biologia ───────────
 

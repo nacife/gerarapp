@@ -31,31 +31,37 @@ export class PrismaHomeRepository implements HomeRepository {
     const rows: HomeProjectRow[] = [];
 
     for (const p of projects) {
-      const [latestContentMap, latestInteraction, latestTheme, interactionCount, weekEvents, certificatesThisWeek] =
-        await Promise.all([
-          prisma.contentMap.findFirst({
-            where: { projectId: p.id },
-            orderBy: { createdAt: 'desc' },
-            select: { createdAt: true },
-          }),
-          prisma.interaction.findFirst({
-            where: { projectId: p.id },
-            orderBy: { updatedAt: 'desc' },
-            select: { updatedAt: true },
-          }),
-          prisma.theme.findFirst({
-            where: { projectId: p.id },
-            orderBy: { createdAt: 'desc' },
-          }),
-          prisma.interaction.count({ where: { projectId: p.id, appVersionId: null } }),
-          prisma.learningEvent.findMany({
-            where: { occurredAt: { gte: weekAgo }, enrollment: { projectId: p.id } },
-            select: { enrollmentId: true, occurredAt: true },
-          }),
-          prisma.certificate.count({
-            where: { issuedAt: { gte: weekAgo }, enrollment: { projectId: p.id } },
-          }),
-        ]);
+      const [
+        latestContentMap,
+        latestInteraction,
+        latestTheme,
+        interactionCount,
+        weekEvents,
+        certificatesThisWeek,
+      ] = await Promise.all([
+        prisma.contentMap.findFirst({
+          where: { projectId: p.id },
+          orderBy: { createdAt: 'desc' },
+          select: { createdAt: true },
+        }),
+        prisma.interaction.findFirst({
+          where: { projectId: p.id },
+          orderBy: { updatedAt: 'desc' },
+          select: { updatedAt: true },
+        }),
+        prisma.theme.findFirst({
+          where: { projectId: p.id },
+          orderBy: { createdAt: 'desc' },
+        }),
+        prisma.interaction.count({ where: { projectId: p.id, appVersionId: null } }),
+        prisma.learningEvent.findMany({
+          where: { occurredAt: { gte: weekAgo }, enrollment: { projectId: p.id } },
+          select: { enrollmentId: true, occurredAt: true },
+        }),
+        prisma.certificate.count({
+          where: { issuedAt: { gte: weekAgo }, enrollment: { projectId: p.id } },
+        }),
+      ]);
 
       const daySet = new Set(
         weekEvents.map((e) => `${e.enrollmentId}:${e.occurredAt.toISOString().slice(0, 10)}`),

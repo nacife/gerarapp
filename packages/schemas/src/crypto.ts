@@ -32,6 +32,9 @@ export function decryptSecret(sealed: SealedSecret, keySecret: string): string {
   const key = deriveKey(keySecret);
   const decipher = createDecipheriv('aes-256-gcm', key, Buffer.from(sealed.iv, 'base64'));
   decipher.setAuthTag(Buffer.from(sealed.tag, 'base64'));
-  const dec = Buffer.concat([decipher.update(Buffer.from(sealed.data, 'base64')), decipher.final()]);
+  const dec = Buffer.concat([
+    decipher.update(Buffer.from(sealed.data, 'base64')),
+    decipher.final(),
+  ]);
   return dec.toString('utf8');
 }

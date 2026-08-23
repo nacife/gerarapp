@@ -35,7 +35,8 @@ export class LearnerAuthService {
     const existing = await this.learners.findByEmail(email);
     if (existing) {
       const matches =
-        existing.passwordHash != null && (await this.hasher.verify(existing.passwordHash, input.password));
+        existing.passwordHash != null &&
+        (await this.hasher.verify(existing.passwordHash, input.password));
       if (matches) return { learnerId: existing.id, accessToken: this.tokens.sign(existing.id) };
       throw Errors.emailInUse();
     }
@@ -48,7 +49,8 @@ export class LearnerAuthService {
   async login(input: { email: string; password: string }): Promise<LearnerSession> {
     const learner = await this.learners.findByEmail(input.email.toLowerCase());
     const ok =
-      learner?.passwordHash != null && (await this.hasher.verify(learner.passwordHash, input.password));
+      learner?.passwordHash != null &&
+      (await this.hasher.verify(learner.passwordHash, input.password));
     if (!learner || !ok) throw Errors.invalidCredentials();
     return { learnerId: learner.id, accessToken: this.tokens.sign(learner.id) };
   }

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CurrentUser, type AuthenticatedUser } from '../common/decorators';
 import { IdempotencyInterceptor } from '../common/idempotency.interceptor';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
@@ -65,7 +74,12 @@ export class FilingController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(confirmPoaSchema)) dto: ConfirmPoaDto,
   ) {
-    return this.filing.confirmPoa(id, user.id, dto.declaredSignerDocType, dto.declaredSignerDocNumber);
+    return this.filing.confirmPoa(
+      id,
+      user.id,
+      dto.declaredSignerDocType,
+      dto.declaredSignerDocNumber,
+    );
   }
 
   @Post(':id/payment')

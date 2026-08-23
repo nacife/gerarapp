@@ -4,11 +4,7 @@ import { getEnv } from '@eduforge/config';
 import { IdempotencyInterceptor, IDEMPOTENCY_REDIS } from '../common/idempotency.interceptor';
 import { WebhooksModule } from '../webhooks/webhooks.module';
 import { WebhooksService } from '../webhooks/webhooks.service';
-import {
-  CatalogController,
-  PublicAppController,
-  StudioController,
-} from './studio.controller';
+import { CatalogController, PublicAppController, StudioController } from './studio.controller';
 import { StudioService } from './studio.service';
 import { CatalogService } from './catalog.service';
 import { PublicAppService } from './public-app.service';

@@ -55,7 +55,9 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
   const [theme, setTheme] = useState<Theme | null>(null);
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [versions, setVersions] = useState<Version[]>([]);
-  const [publishInfo, setPublishInfo] = useState<{ url: string; bundleSha512: string } | null>(null);
+  const [publishInfo, setPublishInfo] = useState<{ url: string; bundleSha512: string } | null>(
+    null,
+  );
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -97,7 +99,10 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
   }
 
   async function rollback(n: number) {
-    await apiFetch(`/projects/${projectId}/rollback`, { method: 'POST', body: { versionNumber: n } });
+    await apiFetch(`/projects/${projectId}/rollback`, {
+      method: 'POST',
+      body: { versionNumber: n },
+    });
     await loadAll();
   }
 
@@ -115,7 +120,10 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
           ①Upload — ②Mapa — ③Visual — ④Interações — <span className="text-sky-400">⑤Revisão</span>
         </p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">Revisão e publicação</h1>
-        <Link href={`/projeto/${projectId}/interacoes`} className="text-sm text-sky-400 hover:underline">
+        <Link
+          href={`/projeto/${projectId}/interacoes`}
+          className="text-sm text-sky-400 hover:underline"
+        >
           ← interações
         </Link>
       </header>
@@ -126,7 +134,9 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
             <section className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">Resumo</h2>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+                Resumo
+              </h2>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-slate-500">Título</dt>
@@ -142,7 +152,9 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-slate-500">Acesso</dt>
-                  <dd>{project ? (ACCESS_LABEL[project.accessMode] ?? project.accessMode) : '—'}</dd>
+                  <dd>
+                    {project ? (ACCESS_LABEL[project.accessMode] ?? project.accessMode) : '—'}
+                  </dd>
                 </div>
               </dl>
               {interactions.length === 0 && (
@@ -166,7 +178,9 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
 
             {versions.length > 0 && (
               <section className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-                <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">Versões</h2>
+                <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">
+                  Versões
+                </h2>
                 <div className="space-y-2">
                   {versions.map((v) => (
                     <div
@@ -174,7 +188,8 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
                       className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-2 text-sm"
                     >
                       <span>
-                        v{v.versionNumber} {v.active && <span className="text-emerald-400">· ativa</span>}
+                        v{v.versionNumber}{' '}
+                        {v.active && <span className="text-emerald-400">· ativa</span>}
                       </span>
                       {!v.active && (
                         <button
@@ -197,15 +212,17 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
               >
                 <p className="font-semibold">📜 Registro INPI</p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Gere o pacote de código-fonte, o hash SHA-512 e a Declaração de Integridade para o registro
-                  no INPI →
+                  Gere o pacote de código-fonte, o hash SHA-512 e a Declaração de Integridade para o
+                  registro no INPI →
                 </p>
               </Link>
             )}
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Prévia final</h2>
+            <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+              Prévia final
+            </h2>
             {c && (
               <div
                 className="rounded-2xl border p-5"
@@ -236,7 +253,12 @@ export default function RevisarPage({ params }: { params: { id: string } }) {
             {msg && <p className="text-sm text-slate-400">{msg}</p>}
             {publishInfo && (
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm">
-                <a href={publishInfo.url} target="_blank" rel="noreferrer" className="text-sky-300 underline">
+                <a
+                  href={publishInfo.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sky-300 underline"
+                >
                   {publishInfo.url}
                 </a>
                 <p className="mt-1 break-all text-xs text-slate-500">

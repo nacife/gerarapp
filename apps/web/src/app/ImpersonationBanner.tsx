@@ -29,7 +29,10 @@ export default function ImpersonationBanner() {
       <span>
         🔧 Sessão de suporte — acesso iniciado por <strong>{admin.email}</strong>
       </span>
-      <button onClick={endSession} className="rounded bg-amber-950/20 px-2 py-0.5 text-xs hover:bg-amber-950/30">
+      <button
+        onClick={endSession}
+        className="rounded bg-amber-950/20 px-2 py-0.5 text-xs hover:bg-amber-950/30"
+      >
         Encerrar sessão
       </button>
     </div>

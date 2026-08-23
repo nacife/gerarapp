@@ -61,12 +61,19 @@ function mapUserRow(u: {
 }
 
 export class PrismaAdminUserRepository implements AdminUserRepository {
-  async search(query: string | undefined, status: UserStatus | undefined, limit: number): Promise<AdminUserRow[]> {
+  async search(
+    query: string | undefined,
+    status: UserStatus | undefined,
+    limit: number,
+  ): Promise<AdminUserRow[]> {
     const rows = await prisma.user.findMany({
       where: {
         status,
         OR: query
-          ? [{ email: { contains: query, mode: 'insensitive' } }, { name: { contains: query, mode: 'insensitive' } }]
+          ? [
+              { email: { contains: query, mode: 'insensitive' } },
+              { name: { contains: query, mode: 'insensitive' } },
+            ]
           : undefined,
       },
       orderBy: { createdAt: 'desc' },
@@ -105,7 +112,12 @@ export class PrismaAdminUserRepository implements AdminUserRepository {
   }
 }
 
-function mapFlag(f: { id: string; key: string; defaultOn: boolean; rolloutPct: number }): FeatureFlagRow {
+function mapFlag(f: {
+  id: string;
+  key: string;
+  defaultOn: boolean;
+  rolloutPct: number;
+}): FeatureFlagRow {
   return f;
 }
 function mapAssignment(a: {
@@ -127,15 +139,26 @@ export class PrismaFeatureFlagRepository implements FeatureFlagRepository {
     const f = await prisma.featureFlag.findUnique({ where: { key } });
     return f ? mapFlag(f) : null;
   }
-  async create(input: { key: string; defaultOn: boolean; rolloutPct: number }): Promise<FeatureFlagRow> {
+  async create(input: {
+    key: string;
+    defaultOn: boolean;
+    rolloutPct: number;
+  }): Promise<FeatureFlagRow> {
     const f = await prisma.featureFlag.create({ data: input });
     return mapFlag(f);
   }
-  async update(id: string, patch: { defaultOn?: boolean; rolloutPct?: number }): Promise<FeatureFlagRow> {
+  async update(
+    id: string,
+    patch: { defaultOn?: boolean; rolloutPct?: number },
+  ): Promise<FeatureFlagRow> {
     const f = await prisma.featureFlag.update({ where: { id }, data: patch });
     return mapFlag(f);
   }
-  async findAssignment(flagId: string, subjectType: string, subjectId: string): Promise<FlagAssignmentRow | null> {
+  async findAssignment(
+    flagId: string,
+    subjectType: string,
+    subjectId: string,
+  ): Promise<FlagAssignmentRow | null> {
     const a = await prisma.flagAssignment.findFirst({
       where: { flagId, subjectType: subjectType as never, subjectId },
     });

@@ -27,7 +27,11 @@ export class PrismaLearnerRepository implements LearnerRepository {
   async findById(id: string): Promise<LearnerRecord | null> {
     return prisma.learner.findUnique({ where: { id } });
   }
-  async create(input: { email: string; name: string; passwordHash: string }): Promise<LearnerRecord> {
+  async create(input: {
+    email: string;
+    name: string;
+    passwordHash: string;
+  }): Promise<LearnerRecord> {
     return prisma.learner.create({ data: input });
   }
 }
@@ -72,7 +76,9 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       title: project.title,
       accessMode: project.accessMode,
       accessSecret: project.accessSecret,
-      manifest: project.activeAppVersion ? (project.activeAppVersion.manifest as unknown as Manifest) : null,
+      manifest: project.activeAppVersion
+        ? (project.activeAppVersion.manifest as unknown as Manifest)
+        : null,
     };
   }
 
@@ -80,8 +86,13 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     return (await prisma.projectInvite.count({ where: { projectId, email } })) > 0;
   }
 
-  async findByLearnerAndProject(learnerId: string, projectId: string): Promise<EnrollmentRecord | null> {
-    const row = await prisma.enrollment.findUnique({ where: { learnerId_projectId: { learnerId, projectId } } });
+  async findByLearnerAndProject(
+    learnerId: string,
+    projectId: string,
+  ): Promise<EnrollmentRecord | null> {
+    const row = await prisma.enrollment.findUnique({
+      where: { learnerId_projectId: { learnerId, projectId } },
+    });
     return row ? mapEnrollment(row) : null;
   }
 
@@ -91,7 +102,11 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
     pinnedVersionId: string | null;
   }): Promise<EnrollmentRecord> {
     const row = await prisma.enrollment.create({
-      data: { learnerId: input.learnerId, projectId: input.projectId, pinnedVersionId: input.pinnedVersionId },
+      data: {
+        learnerId: input.learnerId,
+        projectId: input.projectId,
+        pinnedVersionId: input.pinnedVersionId,
+      },
     });
     return mapEnrollment(row);
   }
@@ -118,7 +133,12 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
 
   async updateGamification(
     id: string,
-    patch: { xp?: number; streakDays?: number; lastActivityAt?: string; streakFreezeUsedAt?: string | null },
+    patch: {
+      xp?: number;
+      streakDays?: number;
+      lastActivityAt?: string;
+      streakFreezeUsedAt?: string | null;
+    },
   ): Promise<void> {
     await prisma.enrollment.update({
       where: { id },
@@ -141,14 +161,19 @@ export class PrismaEnrollmentRepository implements EnrollmentRepository {
       where: { id: projectId },
       select: { activeAppVersion: { select: { manifest: true } } },
     });
-    return project?.activeAppVersion ? (project.activeAppVersion.manifest as unknown as Manifest) : null;
+    return project?.activeAppVersion
+      ? (project.activeAppVersion.manifest as unknown as Manifest)
+      : null;
   }
 
   async listForProject(projectId: string): Promise<EnrolledLearnerRow[]> {
     const rows = await prisma.enrollment.findMany({
       where: { projectId },
       orderBy: { enrolledAt: 'desc' },
-      include: { learner: { select: { name: true, email: true } }, certificate: { select: { id: true } } },
+      include: {
+        learner: { select: { name: true, email: true } },
+        certificate: { select: { id: true } },
+      },
     });
     return rows.map((r) => ({
       enrollmentId: r.id,

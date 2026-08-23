@@ -69,7 +69,11 @@ export class PrismaInpiRepository {
 
   async saveJob(
     jobId: string,
-    patch: { status?: 'running' | 'succeeded' | 'failed'; progress?: InpiPackageProgress; error?: string },
+    patch: {
+      status?: 'running' | 'succeeded' | 'failed';
+      progress?: InpiPackageProgress;
+      error?: string;
+    },
   ): Promise<void> {
     await prisma.job.update({
       where: { id: jobId },

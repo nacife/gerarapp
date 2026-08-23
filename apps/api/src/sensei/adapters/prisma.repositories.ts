@@ -44,9 +44,7 @@ export class PrismaSenseiProjectRepository implements SenseiProjectRepository {
     return { projectId: row.project.id, ownerUserId: row.project.ownerUserId };
   }
 
-  async getPublicBySlug(
-    slug: string,
-  ): Promise<{ config: SenseiConfig; indexed: boolean } | null> {
+  async getPublicBySlug(slug: string): Promise<{ config: SenseiConfig; indexed: boolean } | null> {
     const p = await prisma.project.findFirst({
       where: { slug, activeAppVersionId: { not: null } },
       select: { senseiConfig: true, id: true },

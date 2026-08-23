@@ -12,7 +12,8 @@ import { PrismaAnalyticsRepository, PrismaHomeRepository } from './adapters/pris
     { provide: HomeService, useFactory: () => new HomeService(new PrismaHomeRepository()) },
     {
       provide: AnalyticsService,
-      useFactory: () => new AnalyticsService(new PrismaProjectRepository(), new PrismaAnalyticsRepository()),
+      useFactory: () =>
+        new AnalyticsService(new PrismaProjectRepository(), new PrismaAnalyticsRepository()),
     },
   ],
 })

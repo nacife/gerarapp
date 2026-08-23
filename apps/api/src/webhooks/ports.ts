@@ -38,7 +38,11 @@ export interface WebhookEndpointRepository {
   delete(id: string): Promise<void>;
   listForOwner(ownerUserId: string): Promise<WebhookEndpointRow[]>;
   /** Endpoints ativos inscritos no evento, escopados à conta e (se houver) ao projeto — usado no dispatch. */
-  listActiveForEvent(ownerUserId: string, projectId: string | null, event: WebhookEventType): Promise<WebhookEndpointWithSecret[]>;
+  listActiveForEvent(
+    ownerUserId: string,
+    projectId: string | null,
+    event: WebhookEventType,
+  ): Promise<WebhookEndpointWithSecret[]>;
 }
 
 export interface WebhookDeliveryRow {

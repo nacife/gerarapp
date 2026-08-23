@@ -40,14 +40,18 @@ export class EventsService {
     const enrollment = await this.enrollments.findByIdForLearner(enrollmentId, learnerId);
     if (!enrollment) throw Errors.notFound('Matrícula');
 
-    const interaction = input.interactionId ? await this.events.findInteraction(input.interactionId) : null;
+    const interaction = input.interactionId
+      ? await this.events.findInteraction(input.interactionId)
+      : null;
     if (input.interactionId && (!interaction || interaction.projectId !== enrollment.projectId)) {
       throw Errors.notFound('Interação');
     }
 
     // Verifica ANTES de inserir o evento atual (senão a checagem sempre acharia o próprio evento).
     const alreadyAwarded =
-      interaction && input.interactionId ? await this.events.hasAwardedXp(enrollmentId, input.interactionId) : false;
+      interaction && input.interactionId
+        ? await this.events.hasAwardedXp(enrollmentId, input.interactionId)
+        : false;
 
     await this.events.create({
       enrollmentId,
@@ -108,9 +112,13 @@ export class EventsService {
       xp: xpAwarded ? xpTotal : undefined,
       streakDays: nextStreak.streakDays !== previousStreakDays ? nextStreak.streakDays : undefined,
       lastActivityAt:
-        nextStreak.lastActivityAt !== enrollment.lastActivityAt ? (nextStreak.lastActivityAt ?? undefined) : undefined,
+        nextStreak.lastActivityAt !== enrollment.lastActivityAt
+          ? (nextStreak.lastActivityAt ?? undefined)
+          : undefined,
       streakFreezeUsedAt:
-        nextStreak.streakFreezeUsedAt !== enrollment.streakFreezeUsedAt ? nextStreak.streakFreezeUsedAt : undefined,
+        nextStreak.streakFreezeUsedAt !== enrollment.streakFreezeUsedAt
+          ? nextStreak.streakFreezeUsedAt
+          : undefined,
     });
 
     if (nextStreak.streakDays > previousStreakDays) {

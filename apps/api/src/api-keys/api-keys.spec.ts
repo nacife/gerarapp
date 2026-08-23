@@ -30,7 +30,12 @@ describe('ApiKeysService.create', () => {
     const { service, projects } = buildService();
     projects.ownedProjectIds.set('proj-1', OTHER_OWNER);
     await expect(
-      service.create(OWNER, { name: 'x', environment: 'live', projectId: 'proj-1', scopes: ['content:read'] }),
+      service.create(OWNER, {
+        name: 'x',
+        environment: 'live',
+        projectId: 'proj-1',
+        scopes: ['content:read'],
+      }),
     ).rejects.toThrow();
   });
 
@@ -67,14 +72,22 @@ describe('ApiKeysService.authenticate', () => {
 
   it('rejeita chave revogada', async () => {
     const { service } = buildService();
-    const { key, fullKey } = await service.create(OWNER, { name: 'x', environment: 'live', scopes: ['publish'] });
+    const { key, fullKey } = await service.create(OWNER, {
+      name: 'x',
+      environment: 'live',
+      scopes: ['publish'],
+    });
     await service.revoke(OWNER, key.id);
     expect(await service.authenticate(fullKey)).toBeNull();
   });
 
   it('marca lastUsedAt no repositório após autenticar', async () => {
     const { service, repo } = buildService();
-    const { key, fullKey } = await service.create(OWNER, { name: 'x', environment: 'live', scopes: ['publish'] });
+    const { key, fullKey } = await service.create(OWNER, {
+      name: 'x',
+      environment: 'live',
+      scopes: ['publish'],
+    });
     expect((await repo.findById(key.id))?.lastUsedAt).toBeNull();
     await service.authenticate(fullKey);
     expect((await repo.findById(key.id))?.lastUsedAt).not.toBeNull();
@@ -84,20 +97,32 @@ describe('ApiKeysService.authenticate', () => {
 describe('ApiKeysService.revoke', () => {
   it('dono consegue revogar a própria chave', async () => {
     const { service } = buildService();
-    const { key } = await service.create(OWNER, { name: 'x', environment: 'live', scopes: ['publish'] });
+    const { key } = await service.create(OWNER, {
+      name: 'x',
+      environment: 'live',
+      scopes: ['publish'],
+    });
     const revoked = await service.revoke(OWNER, key.id);
     expect(revoked.revokedAt).not.toBeNull();
   });
 
   it('não deixa revogar chave de outro dono', async () => {
     const { service } = buildService();
-    const { key } = await service.create(OTHER_OWNER, { name: 'x', environment: 'live', scopes: ['publish'] });
+    const { key } = await service.create(OTHER_OWNER, {
+      name: 'x',
+      environment: 'live',
+      scopes: ['publish'],
+    });
     await expect(service.revoke(OWNER, key.id)).rejects.toThrow();
   });
 
   it('revogar já-revogada é idempotente', async () => {
     const { service } = buildService();
-    const { key } = await service.create(OWNER, { name: 'x', environment: 'live', scopes: ['publish'] });
+    const { key } = await service.create(OWNER, {
+      name: 'x',
+      environment: 'live',
+      scopes: ['publish'],
+    });
     await service.revoke(OWNER, key.id);
     const second = await service.revoke(OWNER, key.id);
     expect(second.revokedAt).not.toBeNull();
@@ -107,7 +132,11 @@ describe('ApiKeysService.revoke', () => {
 describe('ApiKeysService.adminRevoke', () => {
   it('revoga independentemente do dono', async () => {
     const { service } = buildService();
-    const { key } = await service.create(OWNER, { name: 'x', environment: 'live', scopes: ['publish'] });
+    const { key } = await service.create(OWNER, {
+      name: 'x',
+      environment: 'live',
+      scopes: ['publish'],
+    });
     const revoked = await service.adminRevoke(key.id);
     expect(revoked.revokedAt).not.toBeNull();
   });

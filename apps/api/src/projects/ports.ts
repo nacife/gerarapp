@@ -37,9 +37,7 @@ export interface SourceFileRepository {
     sizeBytes: number;
     sha256: string;
   }): Promise<SourceFileRecord>;
-  findByIdWithOwner(
-    id: string,
-  ): Promise<(SourceFileRecord & { ownerUserId: string }) | null>;
+  findByIdWithOwner(id: string): Promise<(SourceFileRecord & { ownerUserId: string }) | null>;
 }
 
 export interface JobStep {

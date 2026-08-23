@@ -32,7 +32,11 @@ describe('buildOpenApiDocument', () => {
 
   it('request bodies vêm dos Zod DTOs (ex.: POST /projects exige title)', () => {
     const body = doc.paths['/projects']!.post!.requestBody as {
-      content: { 'application/json': { schema: { properties: Record<string, unknown>; required?: string[] } } };
+      content: {
+        'application/json': {
+          schema: { properties: Record<string, unknown>; required?: string[] };
+        };
+      };
     };
     const schema = body.content['application/json'].schema;
     expect(schema.properties.title).toBeDefined();
@@ -64,7 +68,9 @@ describe('buildOpenApiDocument', () => {
     expect(slug?.schema.format).toBeUndefined();
 
     const idOp = doc.paths['/projects/{id}']!.get!;
-    const idParam = (idOp.parameters as { name: string; schema: { format?: string } }[]).find((p) => p.name === 'id');
+    const idParam = (idOp.parameters as { name: string; schema: { format?: string } }[]).find(
+      (p) => p.name === 'id',
+    );
     expect(idParam?.schema.format).toBe('uuid');
   });
 

@@ -149,7 +149,12 @@ export class PrismaMediaCreditsRepository implements MediaCreditsRepository {
 
   async debit(userId: string, amount: number, reason: string, refId: string): Promise<void> {
     await prisma.aiCreditLedger.create({
-      data: { userId, delta: -Math.abs(amount), reason: reason as 'image' | 'tts' | 'tutor', refId },
+      data: {
+        userId,
+        delta: -Math.abs(amount),
+        reason: reason as 'image' | 'tts' | 'tutor',
+        refId,
+      },
     });
   }
 }

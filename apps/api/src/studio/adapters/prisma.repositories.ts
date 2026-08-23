@@ -1,5 +1,6 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { getEnv } from '@eduforge/config';
+import { createS3Client } from '../../common/s3.client';
 import { Prisma, prisma } from '@eduforge/db';
 import type { ContentMapTree } from '@eduforge/schemas';
 import type { ManifestInteraction, ThemeData } from '../domain/manifest';
@@ -198,14 +199,8 @@ export class S3ManifestStorage implements ManifestStorage {
   private readonly client: S3Client;
   private readonly bucket: string;
   constructor() {
-    const env = getEnv();
-    this.client = new S3Client({
-      endpoint: env.S3_ENDPOINT,
-      region: 'us-east-1',
-      forcePathStyle: true,
-      credentials: { accessKeyId: env.S3_ACCESS_KEY, secretAccessKey: env.S3_SECRET_KEY },
-    });
-    this.bucket = env.S3_BUCKET_APPS;
+    this.client = createS3Client();
+    this.bucket = getEnv().S3_BUCKET_APPS;
   }
   async put(key: string, json: string): Promise<void> {
     await this.client.send(

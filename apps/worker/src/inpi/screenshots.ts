@@ -30,17 +30,25 @@ export interface CaptureScreenshotsInput {
  * ver o conteúdo (mesmo em apps públicos), cria uma conta de aprendiz descartável
  * só para esta prévia — nunca é exposta ao titular nem usada fora da geração do pacote.
  */
-export async function captureRuntimeScreenshots(input: CaptureScreenshotsInput): Promise<PackageFile[]> {
+export async function captureRuntimeScreenshots(
+  input: CaptureScreenshotsInput,
+): Promise<PackageFile[]> {
   const browser = await chromium.launch();
   try {
     const context = await browser.newContext();
 
     const previewEmail = `inpi-preview+${randomUUID()}@internal.eduforge.local`;
     const signup = await context.request.post(`${input.apiBaseUrl}/v1/learner/signup`, {
-      data: { email: previewEmail, name: 'EduForge — Prévia INPI (sistema)', password: randomUUID() },
+      data: {
+        email: previewEmail,
+        name: 'EduForge — Prévia INPI (sistema)',
+        password: randomUUID(),
+      },
     });
     if (!signup.ok()) {
-      throw new Error(`falha ao criar aprendiz de prévia para captura de telas: ${signup.status()}`);
+      throw new Error(
+        `falha ao criar aprendiz de prévia para captura de telas: ${signup.status()}`,
+      );
     }
     const enroll = await context.request.post(
       `${input.apiBaseUrl}/v1/public/apps/${encodeURIComponent(input.slug)}/enroll`,

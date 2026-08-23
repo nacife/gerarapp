@@ -4,7 +4,12 @@ import { CurrentLearner, LearnerAuthGuard } from '../learning/learner-auth.guard
 import type { AuthenticatedLearner } from '../learning/learner-auth.guard';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { SenseiService } from './sensei.service';
-import { askSenseiSchema, senseiConfigSchema, type AskSenseiDto, type SenseiConfigDto } from './dto/schemas';
+import {
+  askSenseiSchema,
+  senseiConfigSchema,
+  type AskSenseiDto,
+  type SenseiConfigDto,
+} from './dto/schemas';
 
 /** Rotas do criador (autenticadas por sessão/API key). */
 @Controller()

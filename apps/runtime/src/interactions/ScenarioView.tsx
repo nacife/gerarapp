@@ -24,7 +24,11 @@ export function ScenarioView({
     if (next?.kind === 'outcome') {
       const result = gradeScenarioPath(payload, nextPath);
       setFinished(true);
-      onComplete({ correct: result.reachedOutcome, outcomeScore: result.outcomeScore, allBest: result.allBest });
+      onComplete({
+        correct: result.reachedOutcome,
+        outcomeScore: result.outcomeScore,
+        allBest: result.allBest,
+      });
     }
   }
 

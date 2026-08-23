@@ -1,5 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import type { ActiveApiKeyAuth, ApiKeyProjectRepository, ApiKeyRepository, ApiKeyRow, CreateApiKeyInput } from '../ports';
+import type {
+  ActiveApiKeyAuth,
+  ApiKeyProjectRepository,
+  ApiKeyRepository,
+  ApiKeyRow,
+  CreateApiKeyInput,
+} from '../ports';
 
 interface StoredKey extends ApiKeyRow {
   keyHash: string;

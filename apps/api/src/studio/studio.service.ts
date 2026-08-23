@@ -3,11 +3,7 @@ import { canonicalize } from '@eduforge/schemas';
 import { buildPaletteFromBrand } from '@eduforge/ui';
 import { Errors } from '../common/errors';
 import type { WebhooksService } from '../webhooks/webhooks.service';
-import {
-  DEFAULT_THEME,
-  buildManifest,
-  type ThemeData,
-} from './domain/manifest';
+import { DEFAULT_THEME, buildManifest, type ThemeData } from './domain/manifest';
 import type {
   ManifestStorage,
   SecretHasher,
@@ -52,8 +48,7 @@ export class StudioService {
     password?: string,
   ): Promise<void> {
     await this.owned(projectId, ownerUserId);
-    const secret =
-      mode === 'password' && password ? await this.hasher.hash(password) : null;
+    const secret = mode === 'password' && password ? await this.hasher.hash(password) : null;
     await this.repo.setAccess(projectId, mode, secret);
   }
 

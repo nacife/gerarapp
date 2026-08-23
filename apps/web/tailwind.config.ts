@@ -11,8 +11,8 @@ const config: Config = {
       },
       animation: {
         'glow-pulse': 'glowPulse 3s ease-in-out infinite',
-        'float': 'float 6s ease-in-out infinite',
-        'shimmer': 'shimmer 2.5s linear infinite',
+        float: 'float 6s ease-in-out infinite',
+        shimmer: 'shimmer 2.5s linear infinite',
       },
       keyframes: {
         glowPulse: {
@@ -31,7 +31,8 @@ const config: Config = {
       backgroundImage: {
         'cyan-gradient': 'linear-gradient(135deg, #06b6d4 0%, #22d3ee 50%, #0891b2 100%)',
         'cyan-text': 'linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #67e8f9 100%)',
-        'cyan-radial': 'radial-gradient(circle at center, rgba(6,182,212,0.15) 0%, transparent 70%)',
+        'cyan-radial':
+          'radial-gradient(circle at center, rgba(6,182,212,0.15) 0%, transparent 70%)',
       },
     },
   },

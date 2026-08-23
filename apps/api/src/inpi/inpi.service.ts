@@ -107,7 +107,10 @@ export class InpiService {
     return { matched, verifiedAt, recomputedHash };
   }
 
-  private async requireOwnedCertificate(id: string, ownerUserId: string): Promise<InpiCertificateRow> {
+  private async requireOwnedCertificate(
+    id: string,
+    ownerUserId: string,
+  ): Promise<InpiCertificateRow> {
     const cert = await this.certificates.findById(id);
     if (!cert || cert.ownerUserId !== ownerUserId) throw Errors.notFound('Certificado');
     return cert;

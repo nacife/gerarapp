@@ -26,12 +26,16 @@ export function LearnerAuth({
     const body = mode === 'signup' ? { email, name, password } : { email, password };
     const res = await apiFetch(path, { method: 'POST', body });
     setLoading(false);
-    if (!res.ok) return setError(res.problem?.detail ?? res.problem?.title ?? 'Não foi possível continuar.');
+    if (!res.ok)
+      return setError(res.problem?.detail ?? res.problem?.title ?? 'Não foi possível continuar.');
     onAuthenticated();
   }
 
   return (
-    <div style={{ background: theme.bg, color: theme.text }} className="grid min-h-screen place-items-center px-6">
+    <div
+      style={{ background: theme.bg, color: theme.text }}
+      className="grid min-h-screen place-items-center px-6"
+    >
       <form onSubmit={submit} className="w-full max-w-sm space-y-4">
         <div className="text-center">
           <p style={{ color: theme.muted }} className="text-xs uppercase tracking-wider">

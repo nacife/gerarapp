@@ -1,6 +1,7 @@
 import { Prisma, prisma } from '@eduforge/db';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { getEnv } from '@eduforge/config';
+import { createS3Client } from '../../common/s3.client';
 import type { PodcastRepository, PodcastStorage } from './pipeline';
 
 /** Extrai o título da primeira linha de um bloco markdown (ex.: "# Título" → "Título"). */
@@ -83,19 +84,18 @@ export class S3MediaStorage implements PodcastStorage {
   private readonly bucket: string;
 
   constructor() {
-    const env = getEnv();
-    this.client = new S3Client({
-      endpoint: env.S3_ENDPOINT,
-      region: 'us-east-1',
-      forcePathStyle: true,
-      credentials: { accessKeyId: env.S3_ACCESS_KEY, secretAccessKey: env.S3_SECRET_KEY },
-    });
-    this.bucket = env.S3_BUCKET_APPS;
+    this.client = createS3Client();
+    this.bucket = getEnv().S3_BUCKET_APPS;
   }
 
   async put(key: string, bytes: Buffer, contentType: string): Promise<void> {
     await this.client.send(
-      new PutObjectCommand({ Bucket: this.bucket, Key: key, Body: bytes, ContentType: contentType }),
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: bytes,
+        ContentType: contentType,
+      }),
     );
   }
 }

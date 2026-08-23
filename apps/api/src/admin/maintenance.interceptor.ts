@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { Redis } from 'ioredis';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { SHARED_REDIS } from '../common/redis.module';
 
 const MAINTENANCE_KEY = 'maintenance:mode';

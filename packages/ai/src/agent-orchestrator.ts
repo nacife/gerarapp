@@ -21,7 +21,14 @@ export interface OrchestrationResult {
   feedback: string;
 }
 
-const AGENTS = ['structurer', 'quiz_generator', 'flashcard_generator', 'cloze_generator', 'scenario_writer', 'reviewer'] as const;
+const AGENTS = [
+  'structurer',
+  'quiz_generator',
+  'flashcard_generator',
+  'cloze_generator',
+  'scenario_writer',
+  'reviewer',
+] as const;
 
 /**
  * Orquestra múltiplos agentes para gerar e revisar interações.
@@ -37,7 +44,13 @@ export async function orchestrateGeneration(
 
   // Fase 1: Estruturar conteúdo
   const structure = await ai.structureContent({ rawText: contentMd, filename: 'content.md' });
-  tasks.push({ agent: 'structurer', input: { size: contentMd.length }, output: { chapters: structure.tree.length }, confidence: structure.tree.length > 0 ? 0.9 : 0.3, retries: 0 });
+  tasks.push({
+    agent: 'structurer',
+    input: { size: contentMd.length },
+    output: { chapters: structure.tree.length },
+    confidence: structure.tree.length > 0 ? 0.9 : 0.3,
+    retries: 0,
+  });
 
   // Fase 2: Gerar interações (agentes em paralelo conceitual — execução sequencial no mock)
   for (const type of types) {
@@ -58,7 +71,9 @@ export async function orchestrateGeneration(
         output = { count: validCount };
         retries = attempt;
         if (confidence >= 0.7) break;
-      } catch { retries = attempt + 1; }
+      } catch {
+        retries = attempt + 1;
+      }
     }
     tasks.push({ agent: `${type}_generator`, input: { type }, output, confidence, retries });
     totalRetries += retries;
@@ -71,7 +86,13 @@ export async function orchestrateGeneration(
     ? `Geração concluída com confiança média de ${(avgConfidence * 100).toFixed(0)}%. ${totalRetries} retentativas.`
     : `Qualidade abaixo do esperado (${(avgConfidence * 100).toFixed(0)}%). Considere revisar o conteúdo fonte.`;
 
-  tasks.push({ agent: 'reviewer', input: { taskCount: tasks.length }, output: { accepted, avgConfidence }, confidence: 1, retries: 0 });
+  tasks.push({
+    agent: 'reviewer',
+    input: { taskCount: tasks.length },
+    output: { accepted, avgConfidence },
+    confidence: 1,
+    retries: 0,
+  });
 
   return { tasks, totalRetries, accepted, feedback };
 }

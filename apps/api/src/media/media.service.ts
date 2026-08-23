@@ -1,7 +1,12 @@
 import type { AiProvider } from '@eduforge/ai';
 import { AI_CREDITS } from '@eduforge/config';
 import { Errors } from '../common/errors';
-import type { MediaCreditsRepository, MediaJobEnqueuer, MediaRepository, MediaStorage } from './ports';
+import type {
+  MediaCreditsRepository,
+  MediaJobEnqueuer,
+  MediaRepository,
+  MediaStorage,
+} from './ports';
 
 export interface MediaItem {
   id: string;
@@ -57,7 +62,10 @@ export class MediaService {
     const chapterTitle = titleMatch ? titleMatch[1].trim() : 'Capítulo';
 
     // Seed text = primeiras linhas do conteúdo do capítulo (sem heading).
-    const seedText = chapter.contentMd.replace(/^#{1,3}\s+.+$/gm, '').trim().slice(0, 500);
+    const seedText = chapter.contentMd
+      .replace(/^#{1,3}\s+.+$/gm, '')
+      .trim()
+      .slice(0, 500);
 
     // Gera ilustração.
     const illustration = await this.ai.generateIllustration({
@@ -97,7 +105,9 @@ export class MediaService {
     if (!project) throw Errors.notFound('Projeto');
 
     const rows = await this.repo.listByProject(projectId);
-    return Promise.all(rows.map(async (r) => ({ ...r, url: await this.storage.presignGet(r.s3Key) })));
+    return Promise.all(
+      rows.map(async (r) => ({ ...r, url: await this.storage.presignGet(r.s3Key) })),
+    );
   }
 
   /** Lista mídia pública (app publicado). */
@@ -107,6 +117,8 @@ export class MediaService {
       const exists = await this.repo.isPublished(slug);
       if (!exists) throw Errors.notFound('App');
     }
-    return Promise.all(rows.map(async (r) => ({ ...r, url: await this.storage.presignGet(r.s3Key) })));
+    return Promise.all(
+      rows.map(async (r) => ({ ...r, url: await this.storage.presignGet(r.s3Key) })),
+    );
   }
 }

@@ -10,20 +10,20 @@ Monorepo TypeScript com 5 apps e 6 pacotes.
 
 ## Stack (decidida — PRD §0.2, não reabrir)
 
-| Camada | Escolha |
-| --- | --- |
-| Linguagem | TypeScript estrito |
-| Monorepo | pnpm workspaces + Turborepo |
-| Painéis | Next.js 14 (App Router) — `apps/web`, `apps/admin` |
-| API | NestJS 10 + Fastify — `apps/api`, REST `/v1` |
-| Runtime | Vite 5 + React 18 PWA — `apps/runtime` |
-| Jobs | BullMQ + Redis — `apps/worker` |
-| Banco | PostgreSQL 16 + pgvector + Prisma 5 |
-| Arquivos | S3 (MinIO local) |
-| Validação | Zod nas bordas |
-| Build de pacotes | tsup (CJS+ESM+dts) |
-| Testes | Vitest (Supertest/Playwright nas próximas milestones) |
-| UI | Tailwind CSS |
+| Camada           | Escolha                                               |
+| ---------------- | ----------------------------------------------------- |
+| Linguagem        | TypeScript estrito                                    |
+| Monorepo         | pnpm workspaces + Turborepo                           |
+| Painéis          | Next.js 14 (App Router) — `apps/web`, `apps/admin`    |
+| API              | NestJS 10 + Fastify — `apps/api`, REST `/v1`          |
+| Runtime          | Vite 5 + React 18 PWA — `apps/runtime`                |
+| Jobs             | BullMQ + Redis — `apps/worker`                        |
+| Banco            | PostgreSQL 16 + pgvector + Prisma 5                   |
+| Arquivos         | S3 (MinIO local)                                      |
+| Validação        | Zod nas bordas                                        |
+| Build de pacotes | tsup (CJS+ESM+dts)                                    |
+| Testes           | Vitest (Supertest/Playwright nas próximas milestones) |
+| UI               | Tailwind CSS                                          |
 
 ## Estrutura
 
@@ -46,18 +46,18 @@ docs/DECISIONS.md
 
 ## Comandos
 
-| Comando | O quê |
-| --- | --- |
-| `pnpm install` | instala o workspace |
-| `pnpm docker:up` / `docker:down` / `docker:reset` | infra local (Postgres, Redis, MinIO) |
-| `pnpm dev` | sobe todos os apps (Turbo) |
-| `pnpm verify` | lint + typecheck + test (CI local) |
-| `pnpm build` | build de tudo |
-| `pnpm db:reset` | recria o banco do zero + seed |
-| `pnpm db:migrate` | cria/aplica migração (dev) |
-| `pnpm db:seed` / `db:studio` | seed / Prisma Studio |
-| `pnpm test:e2e` | Playwright (aprendiz no runtime) — exige stack no ar |
-| `pnpm test:api` | coleção Supertest do fluxo B.3 via API key — exige api+worker+docker |
+| Comando                                           | O quê                                                                |
+| ------------------------------------------------- | -------------------------------------------------------------------- |
+| `pnpm install`                                    | instala o workspace                                                  |
+| `pnpm docker:up` / `docker:down` / `docker:reset` | infra local (Postgres, Redis, MinIO)                                 |
+| `pnpm dev`                                        | sobe todos os apps (Turbo)                                           |
+| `pnpm verify`                                     | lint + typecheck + test (CI local)                                   |
+| `pnpm build`                                      | build de tudo                                                        |
+| `pnpm db:reset`                                   | recria o banco do zero + seed                                        |
+| `pnpm db:migrate`                                 | cria/aplica migração (dev)                                           |
+| `pnpm db:seed` / `db:studio`                      | seed / Prisma Studio                                                 |
+| `pnpm test:e2e`                                   | Playwright (aprendiz no runtime) — exige stack no ar                 |
+| `pnpm test:api`                                   | coleção Supertest do fluxo B.3 via API key — exige api+worker+docker |
 
 Requer Docker Desktop rodando antes de `docker:up`/`db:reset`.
 
@@ -90,7 +90,7 @@ Requer Docker Desktop rodando antes de `docker:up`/`db:reset`.
       painel + admin login/gate de MFA, ambos com next-intl (pt-BR). **10 cenários Gherkin
       do Épico 5 como testes + 19 checks de smoke ao vivo + gate de MFA validado no browser.**
       Rotas: `POST /v1/auth/{signup,verify-email,login,login/mfa,refresh,logout,logout-all,
-      password/forgot,password/reset}`, `GET /v1/auth/me`, `/v1/auth/mfa/{setup,enable,disable}`,
+    password/forgot,password/reset}`, `GET /v1/auth/me`, `/v1/auth/mfa/{setup,enable,disable}`,
       `/v1/account/{export,delete}`.
 - [x] **M2 — Projetos e ingestão (RF-01).** Upload via URL pré-assinada (MinIO), fila `ingest`
       (extração `unpdf`/`mammoth` → estruturação `AiProvider` → classificação) com progresso
@@ -144,10 +144,10 @@ Requer Docker Desktop rodando antes de `docker:up`/`db:reset`.
       por hash + fixação por usuário/org/plano — ADR-0044); CreatorModule (home
       agregada, analytics de aprendizagem: sessões, usuários ativos, conclusão por
       capítulo, funil de abandono, mapa de dificuldade + CSV). Rotas: `GET|POST
-      /v1/admin/users[/:id/{suspend,reactivate,force-password-reset,revoke-sessions,
-      credits,impersonate,audit-logs}]`, `GET|POST|PUT /v1/admin/feature-flags[/:key
-      [/pin]]`, `POST /v1/auth/impersonate/consume`, `GET /v1/me/home`, `GET
-      /v1/projects/:id/analytics/{summary,heatmap,heatmap.csv}`. Frontend: wizard
+    /v1/admin/users[/:id/{suspend,reactivate,force-password-reset,revoke-sessions,
+    credits,impersonate,audit-logs}]`, `GET|POST|PUT /v1/admin/feature-flags[/:key
+    [/pin]]`, `POST /v1/auth/impersonate/consume`, `GET /v1/me/home`, `GET
+    /v1/projects/:id/analytics/{summary,heatmap,heatmap.csv}`. Frontend: wizard
       reordenado para bater com RF-09 (upload→mapa→visual→interações→
       **revisão e publicação**, novo passo 5 — ADR-0045); home do criador redesenhada
       (miniatura por cor do tema, status incl. "atualização pendente", uso do plano,
@@ -156,8 +156,7 @@ Requer Docker Desktop rodando antes de `docker:up`/`db:reset`.
       360º, ações, trilha de auditoria) e `/flags` (CRUD + slider de rollout + fixar
       por sujeito); banner de "sessão de suporte" global no app web durante
       impersonação (ADR-0046, com ressalva de cookie compartilhado documentada).
-      **42 testes novos (admin + creator, incl. verificação estatística de rollout)
-      + monorepo completo verde (38/38 tasks) + fluxo ponta a ponta validado no
+      **42 testes novos (admin + creator, incl. verificação estatística de rollout) + monorepo completo verde (38/38 tasks) + fluxo ponta a ponta validado no
       browser: suspender c/ trilha, conceder créditos, impersonar com banner e
       encerrar sessão, feature flag com slider, MFA na página de configurações,
       wizard completo dos 5 passos, analytics com dados reais.**
@@ -176,7 +175,7 @@ Requer Docker Desktop rodando antes de `docker:up`/`db:reset`.
       (`inpi_certificate_verifications`, ADR-0053). `Idempotency-Key`
       obrigatória nas rotas novas via `IdempotencyInterceptor` (Redis,
       ADR-0052). Rotas: `POST /v1/projects/:id/inpi/package`, `GET
-      /v1/projects/:id/inpi/certificates`, `GET /v1/inpi/certificates/:id`,
+    /v1/projects/:id/inpi/certificates`, `GET /v1/inpi/certificates/:id`,
       `POST /v1/inpi/certificates/:id/verify`. Frontend web:
       `/projeto/:id/inpi` (tela C.4 — versão, gerar pacote, hash com copiar,
       downloads, Ficha de Registro, verificar integridade, avisos RF-16.5,
@@ -199,12 +198,11 @@ Requer Docker Desktop rodando antes de `docker:up`/`db:reset`.
       `AuditService` do M6 (ADR-0058). Máquina de estados como predicados
       puros (ADR-0054); upload de PDFs via URL pré-assinada, mesmo padrão do
       M2 (ADR-0056). Rotas: `GET /v1/inpi/filings/pricing`, `GET|POST
-      /v1/inpi/filings[/:id]`, `PATCH .../data`, `POST .../poa/{upload-url,
-      confirm}`, `POST .../payment`, `POST .../revoke`; admin: `GET
-      /v1/admin/inpi/filings[/:id]`, `POST .../claim`, `PATCH .../checklist`,
+    /v1/inpi/filings[/:id]`, `PATCH .../data`, `POST .../poa/{upload-url,
+    confirm}`, `POST .../payment`, `POST .../revoke`; admin: `GET
+    /v1/admin/inpi/filings[/:id]`, `POST .../claim`, `PATCH .../checklist`,
       `POST .../{protocol,rpi-event,certificate/upload-url,grant,reject}`.
-      Frontend: web `/projeto/:id/inpi` (card "Registro Assistido" habilitado)
-      + `/projeto/:id/inpi/assistido/:filingId` (formulário guiado → upload de
+      Frontend: web `/projeto/:id/inpi` (card "Registro Assistido" habilitado) + `/projeto/:id/inpi/assistido/:filingId` (formulário guiado → upload de
       procuração → pagamento → linha do tempo C.5 com dossiê); admin `/inpi`
       (fila C.6 com alerta de SLA) + `/inpi/:filingId` (checklist, protocolo,
       RPI, concessão). **~35 testes novos cobrindo os 6 cenários Gherkin da
@@ -293,7 +291,7 @@ Requer Docker Desktop rodando antes de `docker:up`/`db:reset`.
   App demo seed: `biologia-viva-demo` (já publicado, marina é a dona, os 9 tipos de interação).
 - **E2E Playwright:** `pnpm test:e2e` (usa `playwright.config.ts` + `e2e/`). Sobe api (:3333,
   reaproveita se já estiver rodando) e um runtime dedicado em :5180. Rode `pnpm --filter
-  @eduforge/db db:reset` antes se o app demo não existir ainda.
+@eduforge/db db:reset` antes se o app demo não existir ainda.
 - **M6/wizard (web):** rotas na ordem do RF-09 — `/novo` (①) → `/projeto/:id/mapa` (②) →
   `/projeto/:id/visual` (③, sem publish) → `/projeto/:id/interacoes` (④) →
   `/projeto/:id/revisar` (⑤, resumo + publicar + versões/rollback). Home (`/painel`) e

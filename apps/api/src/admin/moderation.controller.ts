@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { Roles } from '../common/decorators';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { z } from 'zod';
-import { prisma, Prisma } from '@eduforge/db';
+import { prisma } from '@eduforge/db';
 
 const createCaseSchema = z.object({
   projectId: z.string().uuid(),
@@ -24,7 +24,10 @@ export class ModerationController {
     return prisma.moderationCase.findMany({
       orderBy: { createdAt: 'desc' },
       take: 100,
-      include: { project: { select: { id: true, title: true, slug: true } }, assignee: { select: { id: true, name: true, email: true } } },
+      include: {
+        project: { select: { id: true, title: true, slug: true } },
+        assignee: { select: { id: true, name: true, email: true } },
+      },
     });
   }
 
@@ -33,7 +36,10 @@ export class ModerationController {
   async getCase(@Param('id') id: string) {
     return prisma.moderationCase.findUnique({
       where: { id },
-      include: { project: { select: { id: true, title: true, slug: true } }, assignee: { select: { id: true, name: true } } },
+      include: {
+        project: { select: { id: true, title: true, slug: true } },
+        assignee: { select: { id: true, name: true } },
+      },
     });
   }
 
@@ -45,7 +51,10 @@ export class ModerationController {
 
   @Patch('cases/:id')
   @Roles('admin', 'super_admin')
-  async updateCase(@Param('id') id: string, @Body(new ZodValidationPipe(updateCaseSchema)) dto: UpdateCaseDto) {
+  async updateCase(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateCaseSchema)) dto: UpdateCaseDto,
+  ) {
     return prisma.moderationCase.update({
       where: { id },
       data: {
@@ -58,6 +67,9 @@ export class ModerationController {
   @Post('cases/:id/claim')
   @Roles('admin', 'super_admin', 'support')
   async claimCase(@Param('id') id: string, @Body() body: { assigneeId: string }) {
-    return prisma.moderationCase.update({ where: { id }, data: { assigneeId: body.assigneeId, status: 'reviewing' } });
+    return prisma.moderationCase.update({
+      where: { id },
+      data: { assigneeId: body.assigneeId, status: 'reviewing' },
+    });
   }
 }

@@ -239,7 +239,7 @@ exigida aqui.
 
 `LearnerProgress` (chave `enrollment_id + content_block_id`) ganhou `ease_factor`,
 `interval_days`, `repetitions` para o SM-2. Como o schema do PRD não modela
-progresso por *card* individual de flashcard (só por bloco), o SM-2 avalia o
+progresso por _card_ individual de flashcard (só por bloco), o SM-2 avalia o
 **bloco** como unidade de revisão — uma aproximação deliberada; SM-2 por card
 exigiria uma tabela nova, fora do escopo desta milestone.
 
@@ -559,12 +559,11 @@ limiar por usuário fica para quando existir a configuração (constante
 montado por `buildOpenApiDocument()` a partir de um registro DECLARATIVO
 (`openapi/registry.ts`) cujos request bodies são os MESMOS Zod DTOs que
 validam as bordas, convertidos com `zod-to-json-schema` ($refStrategy
-none, `$schema` removido — 3.1 aceita JSON Schema puro). Retrofitar
-`@nestjs/swagger` com decorators em 8+ módulos duplicaria a fonte da
+none, `$schema`removido — 3.1 aceita JSON Schema puro). Retrofitar`@nestjs/swagger`com decorators em 8+ módulos duplicaria a fonte da
 verdade que o PRD fixa no Zod. Limitações aceitas: respostas documentadas
 como objeto genérico + Problem Details (as respostas não têm Zod hoje), e
-a árvore recursiva do Mapa de Conteúdo degrada para `any` no nível mais
-interno. Escopo B.2 vai como extensão `x-required-scope`.
+a árvore recursiva do Mapa de Conteúdo degrada para`any`no nível mais
+interno. Escopo B.2 vai como extensão`x-required-scope`.
 
 ## ADR-0064 — Coleção Supertest B.3 contra a API real, fora do verify (M9)
 
@@ -635,3 +634,18 @@ PRD linha 985-996): RF-06.2 (DNA de Aprendizagem), RF-06.3 (Modo História),
 RF-06.4 (Batalha de Quiz em tempo real), RF-06.6 (Modo Foco Neuro-adaptativo),
 RF-06.8 (Time Capsule). O RF-06.6 não aparece em nenhuma tabela de custo
 do PRD; fica como candidato a descarte ou Fase 3 tardia.
+
+## ADR-0070 — Suporte a Cloudflare R2 e Factory S3 Unificada
+
+Para viabilizar a transição para produção sem custos de transferência de dados
+(egress fees zero), o monorepo suporta Cloudflare R2 de forma transparente através
+de uma factory compartilhada `createS3Client()`.
+1. **Configurações adicionadas:** `S3_REGION` (default `'auto'`), `S3_FORCE_PATH_STYLE`
+   (booleano, default `true` para MinIO, `false` para R2/AWS) e `S3_PUBLIC_URL`
+   (opcional, para entrega via CDN Cloudflare).
+2. **Unificação dos 9 adaptadores:** Todos os módulos de API (`projects`, `learning`,
+   `studio`, `media`, `inpi-filing`, `inpi`) e Worker (`ingest`, `podcast`, `inpi`)
+   instanciam clientes via `createS3Client()`, garantindo que uma mudança de ambiente
+   (MinIO -> Cloudflare R2 -> AWS S3) ocorra 100% via variáveis de ambiente sem alteração
+   de código.
+

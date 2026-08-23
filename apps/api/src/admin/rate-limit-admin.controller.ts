@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Roles } from '../common/decorators';
-import IORedis, { type Redis } from 'ioredis';
+import { Redis } from 'ioredis';
 import { Inject } from '@nestjs/common';
 import { SHARED_REDIS } from '../common/redis.module';
 
@@ -12,8 +12,8 @@ export class RateLimitAdminController {
   @Roles('admin', 'super_admin')
   async getConfig() {
     const [max, windowSec, blocklistSize] = await Promise.all([
-      this.redis.get('ratelimit:max').then(v => v ? Number(v) : 60),
-      this.redis.get('ratelimit:window').then(v => v ? Number(v) : 60),
+      this.redis.get('ratelimit:max').then((v) => (v ? Number(v) : 60)),
+      this.redis.get('ratelimit:window').then((v) => (v ? Number(v) : 60)),
       this.redis.llen('ratelimit:blocklist'),
     ]);
     return { maxRequestsPerMinute: max, windowSeconds: windowSec, blocklistSize };
@@ -22,11 +22,12 @@ export class RateLimitAdminController {
   @Post('config')
   @Roles('admin', 'super_admin')
   async setConfig(@Body() body: { maxRequestsPerMinute?: number; windowSeconds?: number }) {
-    if (body.maxRequestsPerMinute) await this.redis.set('ratelimit:max', String(body.maxRequestsPerMinute));
+    if (body.maxRequestsPerMinute)
+      await this.redis.set('ratelimit:max', String(body.maxRequestsPerMinute));
     if (body.windowSeconds) await this.redis.set('ratelimit:window', String(body.windowSeconds));
     const [max, windowSec] = await Promise.all([
-      this.redis.get('ratelimit:max').then(v => v ? Number(v) : 60),
-      this.redis.get('ratelimit:window').then(v => v ? Number(v) : 60),
+      this.redis.get('ratelimit:max').then((v) => (v ? Number(v) : 60)),
+      this.redis.get('ratelimit:window').then((v) => (v ? Number(v) : 60)),
     ]);
     return { maxRequestsPerMinute: max, windowSeconds: windowSec };
   }

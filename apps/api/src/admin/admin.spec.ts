@@ -62,8 +62,18 @@ describe('AdminUsersService.suspend (US-ADM-01)', () => {
   });
 
   it('suspende, revoga sessões e grava audit_log com antes/depois', async () => {
-    await kit.sessions.create({ userId: target.id, refreshTokenHash: 'h1', expiresAt: new Date(Date.now() + 999999), device: null });
-    await kit.sessions.create({ userId: target.id, refreshTokenHash: 'h2', expiresAt: new Date(Date.now() + 999999), device: null });
+    await kit.sessions.create({
+      userId: target.id,
+      refreshTokenHash: 'h1',
+      expiresAt: new Date(Date.now() + 999999),
+      device: null,
+    });
+    await kit.sessions.create({
+      userId: target.id,
+      refreshTokenHash: 'h2',
+      expiresAt: new Date(Date.now() + 999999),
+      device: null,
+    });
 
     await kit.service.suspend(ADMIN, target.id, 'chargeback');
 
@@ -75,7 +85,11 @@ describe('AdminUsersService.suspend (US-ADM-01)', () => {
     expect(logs).toHaveLength(1);
     expect(logs[0]!.action).toBe('user.suspend');
     expect(logs[0]!.actorId).toBe(ADMIN.id);
-    const detail = logs[0]!.beforeAfter as { before: { status: string }; after: { status: string }; reason: string };
+    const detail = logs[0]!.beforeAfter as {
+      before: { status: string };
+      after: { status: string };
+      reason: string;
+    };
     expect(detail.before.status).toBe('active');
     expect(detail.after.status).toBe('suspended');
     expect(detail.reason).toBe('chargeback');
@@ -106,7 +120,12 @@ describe('AdminUsersService — sessões, senha, créditos', () => {
   });
 
   it('revokeSessions encerra e retorna a contagem, com auditoria', async () => {
-    await kit.sessions.create({ userId: target.id, refreshTokenHash: 'a', expiresAt: new Date(Date.now() + 999999), device: null });
+    await kit.sessions.create({
+      userId: target.id,
+      refreshTokenHash: 'a',
+      expiresAt: new Date(Date.now() + 999999),
+      device: null,
+    });
     const res = await kit.service.revokeSessions(ADMIN, target.id);
     expect(res.revoked).toBe(1);
     expect(await kit.auditRepo.listForTarget('user', target.id, 10)).toHaveLength(1);
@@ -143,7 +162,11 @@ describe('AdminUsersService.impersonate (US-ADM-01)', () => {
 
   it('não permite impersonar admin/support (só criadores)', async () => {
     const kit = build();
-    const otherAdmin = kit.users.seed({ email: 'outro-admin@eduforge.app', name: 'Outro', role: 'admin' });
+    const otherAdmin = kit.users.seed({
+      email: 'outro-admin@eduforge.app',
+      name: 'Outro',
+      role: 'admin',
+    });
     const err = await expectError(() => kit.service.impersonate(ADMIN, otherAdmin.id));
     expect(err.slug).toBe('conflict');
   });
@@ -180,7 +203,9 @@ describe('FeatureFlagsService (US-ADM-01 rollout parcial)', () => {
   it('criar flag duplicada é rejeitado', async () => {
     const { service } = buildFlags();
     await service.create(ADMIN, { key: 'x', defaultOn: false, rolloutPct: 0 });
-    const err = await expectError(() => service.create(ADMIN, { key: 'x', defaultOn: false, rolloutPct: 0 }));
+    const err = await expectError(() =>
+      service.create(ADMIN, { key: 'x', defaultOn: false, rolloutPct: 0 }),
+    );
     expect(err.slug).toBe('conflict');
   });
 });

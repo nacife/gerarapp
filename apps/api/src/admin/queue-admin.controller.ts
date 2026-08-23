@@ -13,7 +13,14 @@ export class QueueAdminController {
   @Roles('admin', 'super_admin')
   async list() {
     const redis = this.getRedis();
-    const queues = ['ingest', 'generate', 'tts', 'inpi-package', 'sensei-embed', 'webhook-delivery'];
+    const queues = [
+      'ingest',
+      'generate',
+      'tts',
+      'inpi-package',
+      'sensei-embed',
+      'webhook-delivery',
+    ];
     const result: Record<string, unknown> = {};
 
     for (const q of queues) {
@@ -38,7 +45,11 @@ export class QueueAdminController {
     const count = await redis.llen(`bull:${name}:failed`);
     const items = await redis.lrange(`bull:${name}:failed`, 0, 49);
     for (const item of items) {
-      try { jobs.push(JSON.parse(item)); } catch { jobs.push({ raw: item }); }
+      try {
+        jobs.push(JSON.parse(item));
+      } catch {
+        jobs.push({ raw: item });
+      }
     }
     redis.disconnect();
     return { queue: name, totalFailed: count, jobs };
@@ -52,11 +63,13 @@ export class QueueAdminController {
     const items = await redis.lrange(`bull:${name}:failed`, 0, -1);
     for (const item of items) {
       try {
-        const job = JSON.parse(item);
+        JSON.parse(item); // apenas para validar o formato
         await redis.lpush(`bull:${name}:wait`, item);
         count++;
         // Job data is serialized; BullMQ will pick it up
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
     await redis.del(`bull:${name}:failed`);
     redis.disconnect();

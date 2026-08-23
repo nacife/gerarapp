@@ -30,7 +30,11 @@ interface Filing {
   inpiProcessNumber: string | null;
   feeCentsService: number | null;
   feeCentsGru: number | null;
-  operatorChecklist: { dvSigned?: boolean; doubleChecked?: boolean; doubleCheckedBy?: string } | null;
+  operatorChecklist: {
+    dvSigned?: boolean;
+    doubleChecked?: boolean;
+    doubleCheckedBy?: string;
+  } | null;
   projectTitle: string;
   projectSlug: string;
   versionNumber: number;
@@ -82,7 +86,10 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
     setBusy(true);
     const body: Record<string, unknown> = { [key]: value };
     if (key === 'doubleChecked' && value && doubleCheckedBy) body.doubleCheckedBy = doubleCheckedBy;
-    const res = await apiFetch(`/admin/inpi/filings/${filingId}/checklist`, { method: 'PATCH', body });
+    const res = await apiFetch(`/admin/inpi/filings/${filingId}/checklist`, {
+      method: 'PATCH',
+      body,
+    });
     setBusy(false);
     if (res.ok) await load();
     else setMsg(res.problem?.detail ?? 'Falha ao atualizar o checklist.');
@@ -115,7 +122,10 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
   async function recordRpi(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const res = await apiFetch(`/admin/inpi/filings/${filingId}/rpi-event`, { method: 'POST', body: { note: rpiNote } });
+    const res = await apiFetch(`/admin/inpi/filings/${filingId}/rpi-event`, {
+      method: 'POST',
+      body: { note: rpiNote },
+    });
     setBusy(false);
     if (res.ok) {
       setRpiNote('');
@@ -129,9 +139,12 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
     if (!certificateFile) return;
     setBusy(true);
     setMsg(null);
-    const urlRes = await apiFetch<{ uploadUrl: string }>(`/admin/inpi/filings/${filingId}/certificate/upload-url`, {
-      method: 'POST',
-    });
+    const urlRes = await apiFetch<{ uploadUrl: string }>(
+      `/admin/inpi/filings/${filingId}/certificate/upload-url`,
+      {
+        method: 'POST',
+      },
+    );
     if (!urlRes.ok || !urlRes.data) {
       setBusy(false);
       return setMsg('Falha ao preparar o envio do certificado.');
@@ -155,7 +168,10 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
     if (!rejectReason.trim()) return setMsg('Informe o motivo da rejeição.');
     if (!window.confirm('Rejeitar este pedido? Esta ação é registrada em auditoria.')) return;
     setBusy(true);
-    const res = await apiFetch(`/admin/inpi/filings/${filingId}/reject`, { method: 'POST', body: { reason: rejectReason } });
+    const res = await apiFetch(`/admin/inpi/filings/${filingId}/reject`, {
+      method: 'POST',
+      body: { reason: rejectReason },
+    });
     setBusy(false);
     if (res.ok) await load();
     else setMsg(res.problem?.detail ?? 'Falha ao rejeitar.');
@@ -174,7 +190,13 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
     dvSigned: filing.operatorChecklist?.dvSigned ?? false,
     doubleChecked: filing.operatorChecklist?.doubleChecked ?? false,
   };
-  const readyToProtocol = checklist.zipOk && checklist.fichaOk && checklist.poaOk && checklist.gruOk && checklist.dvSigned && checklist.doubleChecked;
+  const readyToProtocol =
+    checklist.zipOk &&
+    checklist.fichaOk &&
+    checklist.poaOk &&
+    checklist.gruOk &&
+    checklist.dvSigned &&
+    checklist.doubleChecked;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-12">
@@ -187,17 +209,28 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
             {filing.projectTitle} v{filing.versionNumber}
           </h1>
           <p className="text-sm text-zinc-500">
-            {filing.customerName} · {filing.customerEmail} · {filing.holder?.type === 'pj' ? 'PJ' : 'PF'}
+            {filing.customerName} · {filing.customerEmail} ·{' '}
+            {filing.holder?.type === 'pj' ? 'PJ' : 'PF'}
           </p>
         </div>
         {detail.slaAtRisk && (
-          <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs text-amber-300">SLA em risco ⚠</span>
+          <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs text-amber-300">
+            SLA em risco ⚠
+          </span>
         )}
       </div>
 
-      {msg && <p className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300">{msg}</p>}
+      {msg && (
+        <p className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300">
+          {msg}
+        </p>
+      )}
 
-      <button onClick={claim} disabled={busy} className="w-fit rounded-lg border border-zinc-800 px-3 py-1.5 text-xs hover:border-zinc-600">
+      <button
+        onClick={claim}
+        disabled={busy}
+        className="w-fit rounded-lg border border-zinc-800 px-3 py-1.5 text-xs hover:border-zinc-600"
+      >
         Assumir este pedido
       </button>
 
@@ -238,7 +271,9 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
           </ul>
 
           <form onSubmit={protocol} className="space-y-2 border-t border-zinc-800 pt-3">
-            <p className="text-xs text-zinc-500">Protocolar no e-Software (execução manual pelo operador):</p>
+            <p className="text-xs text-zinc-500">
+              Protocolar no e-Software (execução manual pelo operador):
+            </p>
             <input
               value={gruNumber}
               onChange={(e) => setGruNumber(e.target.value)}
@@ -262,7 +297,11 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
             </button>
           </form>
 
-          <button onClick={reject} disabled={busy} className="text-xs text-rose-400 hover:underline">
+          <button
+            onClick={reject}
+            disabled={busy}
+            className="text-xs text-rose-400 hover:underline"
+          >
             Rejeitar pedido
           </button>
           <input
@@ -284,7 +323,9 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
             </div>
           </dl>
           <form onSubmit={recordRpi} className="space-y-2">
-            <p className="text-xs text-zinc-500">Registrar despacho da RPI (monitoramento manual):</p>
+            <p className="text-xs text-zinc-500">
+              Registrar despacho da RPI (monitoramento manual):
+            </p>
             <textarea
               value={rpiNote}
               onChange={(e) => setRpiNote(e.target.value)}
@@ -292,13 +333,18 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
               required
               className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm"
             />
-            <button disabled={busy} className="rounded-lg border border-zinc-800 px-4 py-2 text-sm hover:border-zinc-600">
+            <button
+              disabled={busy}
+              className="rounded-lg border border-zinc-800 px-4 py-2 text-sm hover:border-zinc-600"
+            >
               Registrar evento
             </button>
           </form>
 
           <div className="space-y-2 border-t border-zinc-800 pt-3">
-            <p className="text-xs text-zinc-500">Entregar Certificado de Registro (baixado do INPI):</p>
+            <p className="text-xs text-zinc-500">
+              Entregar Certificado de Registro (baixado do INPI):
+            </p>
             <input
               type="file"
               accept="application/pdf"
@@ -317,13 +363,20 @@ export default function InpiFilingDetailPage({ params }: { params: { filingId: s
       )}
 
       <section>
-        <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-zinc-500">Linha do tempo</h2>
+        <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-zinc-500">
+          Linha do tempo
+        </h2>
         <div className="space-y-2">
           {events.map((e) => (
-            <div key={e.id} className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-3 text-sm">
+            <div
+              key={e.id}
+              className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-3 text-sm"
+            >
               <div className="flex items-center justify-between">
                 <span className="font-medium">{e.kind}</span>
-                <span className="text-xs text-zinc-500">{new Date(e.occurredAt).toLocaleString('pt-BR')}</span>
+                <span className="text-xs text-zinc-500">
+                  {new Date(e.occurredAt).toLocaleString('pt-BR')}
+                </span>
               </div>
               {e.detail != null && (
                 <pre className="mt-1 overflow-x-auto rounded bg-zinc-950 p-2 text-xs text-zinc-400">

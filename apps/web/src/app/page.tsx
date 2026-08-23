@@ -2,13 +2,35 @@ import Link from 'next/link';
 import { Badge, Button, Card, Logo, SectionHeading } from '../components/ui';
 
 const templates = [
-  { name: 'Moderno', hint: 'Cards • sombras suaves • bordas generosas', color: 'from-cyan-400 to-cyan-600' },
-  { name: 'Contemporâneo', hint: 'Editorial • serifada • clean', color: 'from-cyan-500 to-teal-500' },
-  { name: 'Futurista', hint: 'Dark • glassmorphism • imersivo', color: 'from-cyan-300 to-blue-500' },
-  { name: 'Minimalista', hint: 'Foco no texto • sem distrações', color: 'from-gray-400 to-gray-600' },
+  {
+    name: 'Moderno',
+    hint: 'Cards • sombras suaves • bordas generosas',
+    color: 'from-cyan-400 to-cyan-600',
+  },
+  {
+    name: 'Contemporâneo',
+    hint: 'Editorial • serifada • clean',
+    color: 'from-cyan-500 to-teal-500',
+  },
+  {
+    name: 'Futurista',
+    hint: 'Dark • glassmorphism • imersivo',
+    color: 'from-cyan-300 to-blue-500',
+  },
+  {
+    name: 'Minimalista',
+    hint: 'Foco no texto • sem distrações',
+    color: 'from-gray-400 to-gray-600',
+  },
 ];
 
-const steps = ['Upload do PDF', 'Mapa de Conteúdo', 'Estúdio Visual', 'Interações IA', 'Revisão & Publicação'];
+const steps = [
+  'Upload do PDF',
+  'Mapa de Conteúdo',
+  'Estúdio Visual',
+  'Interações IA',
+  'Revisão & Publicação',
+];
 
 export default function HomePage() {
   return (
@@ -24,7 +46,9 @@ export default function HomePage() {
             Entrar
           </Link>
           <Link href="/cadastro">
-            <Button variant="primary" size="sm">Criar conta</Button>
+            <Button variant="primary" size="sm">
+              Criar conta
+            </Button>
           </Link>
         </nav>
       </header>
@@ -41,8 +65,8 @@ export default function HomePage() {
         </h1>
         <p className="max-w-2xl text-lg text-gray-400 leading-relaxed">
           Pipeline de IA que transforma documentos em experiências interativas: extração,
-          estruturação, 9 tipos de interações, estúdio visual e publicação PWA —
-          com qualidade de design instrucional profissional.
+          estruturação, 9 tipos de interações, estúdio visual e publicação PWA — com qualidade de
+          design instrucional profissional.
         </p>
         <div className="flex gap-3">
           <Link href="/cadastro">
@@ -51,7 +75,9 @@ export default function HomePage() {
             </Button>
           </Link>
           <Link href="/entrar">
-            <Button variant="secondary" size="lg">Já tenho conta</Button>
+            <Button variant="secondary" size="lg">
+              Já tenho conta
+            </Button>
           </Link>
         </div>
       </section>
@@ -95,12 +121,22 @@ export default function HomePage() {
       <section className="animate-in stagger-4">
         <div className="grid gap-4 sm:grid-cols-3">
           {[
-            { value: '9', label: 'Tipos de interação', sub: 'Quiz, flashcards, cloze, drag & drop, etc.' },
+            {
+              value: '9',
+              label: 'Tipos de interação',
+              sub: 'Quiz, flashcards, cloze, drag & drop, etc.',
+            },
             { value: '15', label: 'Paletas de cores', sub: 'Verificação WCAG AA automática' },
-            { value: '<30min', label: 'Do upload à publicação', sub: 'Pipeline de IA ponta a ponta' },
+            {
+              value: '<30min',
+              label: 'Do upload à publicação',
+              sub: 'Pipeline de IA ponta a ponta',
+            },
           ].map((s) => (
             <Card key={s.label}>
-              <p className="text-3xl font-bold bg-cyan-text bg-clip-text text-transparent">{s.value}</p>
+              <p className="text-3xl font-bold bg-cyan-text bg-clip-text text-transparent">
+                {s.value}
+              </p>
               <p className="mt-1 font-semibold text-gray-200">{s.label}</p>
               <p className="mt-1 text-sm text-gray-500">{s.sub}</p>
             </Card>
@@ -117,7 +153,9 @@ export default function HomePage() {
           </p>
           <div className="mt-6">
             <Link href="/cadastro">
-              <Button variant="primary" size="lg">Começar gratuitamente</Button>
+              <Button variant="primary" size="lg">
+                Começar gratuitamente
+              </Button>
             </Link>
           </div>
         </Card>

@@ -9,7 +9,11 @@ export class PrismaWebhookDeliveryRepository {
       select: { url: true, active: true, secretSealed: true },
     });
     if (!found) return null;
-    return { url: found.url, active: found.active, secretSealed: found.secretSealed as unknown as SealedSecret };
+    return {
+      url: found.url,
+      active: found.active,
+      secretSealed: found.secretSealed as unknown as SealedSecret,
+    };
   }
 
   async recordAttempt(deliveryId: string, patch: RecordAttemptInput): Promise<void> {

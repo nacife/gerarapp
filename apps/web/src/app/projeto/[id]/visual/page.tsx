@@ -38,22 +38,28 @@ export default function VisualPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     if (!iframeRef.current || !palette || !template) return;
     const tpl = templates.find((t) => t.key === template);
-    iframeRef.current.contentWindow?.postMessage({
-      type: 'UPDATE_THEME',
-      theme: dark ? palette.dark : palette.light,
-      templateConfig: tpl
-    }, '*');
+    iframeRef.current.contentWindow?.postMessage(
+      {
+        type: 'UPDATE_THEME',
+        theme: dark ? palette.dark : palette.light,
+        templateConfig: tpl,
+      },
+      '*',
+    );
   }, [palette, dark, template, templates]);
 
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
       if (e.data?.type === 'PREVIEW_READY' && palette) {
         const tpl = templates.find((t) => t.key === template);
-        iframeRef.current?.contentWindow?.postMessage({
-          type: 'UPDATE_THEME',
-          theme: dark ? palette.dark : palette.light,
-          templateConfig: tpl
-        }, '*');
+        iframeRef.current?.contentWindow?.postMessage(
+          {
+            type: 'UPDATE_THEME',
+            theme: dark ? palette.dark : palette.light,
+            templateConfig: tpl,
+          },
+          '*',
+        );
       }
     };
     window.addEventListener('message', handleMessage);
@@ -138,7 +144,9 @@ export default function VisualPage({ params }: { params: { id: string } }) {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-6">
           <section>
-            <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">Template</h2>
+            <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Template
+            </h2>
             <div className="grid grid-cols-2 gap-2">
               {templates.map((t) => (
                 <button
@@ -198,7 +206,9 @@ export default function VisualPage({ params }: { params: { id: string } }) {
           </section>
 
           <section>
-            <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">Acesso</h2>
+            <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Acesso
+            </h2>
             <select
               value={access}
               onChange={(e) => setAccess(e.target.value)}
@@ -227,22 +237,31 @@ export default function VisualPage({ params }: { params: { id: string } }) {
                 <button
                   onClick={() => setDevice('mobile')}
                   className={`px-2 py-1 text-xs rounded ${device === 'mobile' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}
-                >📱</button>
+                >
+                  📱
+                </button>
                 <button
                   onClick={() => setDevice('tablet')}
                   className={`px-2 py-1 text-xs rounded ${device === 'tablet' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}
-                >💻</button>
+                >
+                  💻
+                </button>
                 <button
                   onClick={() => setDevice('desktop')}
                   className={`px-2 py-1 text-xs rounded ${device === 'desktop' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}
-                >🖥️</button>
+                >
+                  🖥️
+                </button>
               </div>
-              <button onClick={() => setDark((d) => !d)} className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-300 hover:text-white">
+              <button
+                onClick={() => setDark((d) => !d)}
+                className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-300 hover:text-white"
+              >
                 {dark ? '🌙 escuro' : '☀️ claro'}
               </button>
             </div>
           </div>
-          
+
           <div className="flex justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-4">
             <div
               className="overflow-hidden rounded-xl border border-slate-700 shadow-2xl transition-all duration-300"

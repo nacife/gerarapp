@@ -17,7 +17,9 @@ import type {
 const INCLUDE = {
   customer: { select: { name: true, email: true } },
   inpiCertificate: {
-    include: { appVersion: { include: { project: { select: { id: true, title: true, slug: true } } } } },
+    include: {
+      appVersion: { include: { project: { select: { id: true, title: true, slug: true } } } },
+    },
   },
 };
 
@@ -126,12 +128,20 @@ export class PrismaFilingEventRepository implements FilingEventRepository {
       where: { filingId },
       orderBy: { occurredAt: 'asc' },
     });
-    return rows.map((r) => ({ id: r.id, kind: r.kind as FilingEventKind, detail: r.detail, occurredAt: r.occurredAt }));
+    return rows.map((r) => ({
+      id: r.id,
+      kind: r.kind as FilingEventKind,
+      detail: r.detail,
+      occurredAt: r.occurredAt,
+    }));
   }
 }
 
 export class PrismaFilingCertificateRepository implements FilingCertificateRepository {
-  async getForOwner(certificateId: string, ownerUserId: string): Promise<FilingCertificateInfo | null> {
+  async getForOwner(
+    certificateId: string,
+    ownerUserId: string,
+  ): Promise<FilingCertificateInfo | null> {
     const cert = await this.getById(certificateId);
     return cert && cert.ownerUserId === ownerUserId ? cert : null;
   }

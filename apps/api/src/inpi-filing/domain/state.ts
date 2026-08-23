@@ -65,7 +65,10 @@ export interface PoaValidationResult {
  */
 export function validatePoaSignature(input: PoaValidationInput): PoaValidationResult {
   if (!input.hasPadesMarkers) {
-    return { valid: false, reason: 'O PDF enviado não contém uma assinatura digital no padrão PAdES.' };
+    return {
+      valid: false,
+      reason: 'O PDF enviado não contém uma assinatura digital no padrão PAdES.',
+    };
   }
   if (input.holderType === 'pj' && input.signerDocType !== 'e-cnpj') {
     return {

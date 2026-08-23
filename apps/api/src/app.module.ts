@@ -39,8 +39,6 @@ import { RealtimeModule } from './realtime/realtime.module';
     OpenApiModule,
     RealtimeModule,
   ],
-  providers: [
-    { provide: APP_GUARD, useClass: GlobalRateLimitGuard },
-  ],
+  providers: [{ provide: APP_GUARD, useClass: GlobalRateLimitGuard }],
 })
 export class AppModule {}

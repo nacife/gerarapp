@@ -30,7 +30,13 @@ export function MindmapView({
   const width = 480;
   const height = 300;
   const positions = useMemo(
-    () => radialLayout(payload.nodes.map((n) => n.id), payload.root_id, width, height),
+    () =>
+      radialLayout(
+        payload.nodes.map((n) => n.id),
+        payload.root_id,
+        width,
+        height,
+      ),
     [payload],
   );
   const [active, setActive] = useState<string | null>(payload.root_id);
@@ -57,7 +63,17 @@ export function MindmapView({
           const a = positions.get(e.from);
           const b = positions.get(e.to);
           if (!a || !b) return null;
-          return <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={theme.border} strokeWidth={1.5} />;
+          return (
+            <line
+              key={i}
+              x1={a.x}
+              y1={a.y}
+              x2={b.x}
+              y2={b.y}
+              stroke={theme.border}
+              strokeWidth={1.5}
+            />
+          );
         })}
         {payload.nodes.map((n) => {
           const p = positions.get(n.id)!;

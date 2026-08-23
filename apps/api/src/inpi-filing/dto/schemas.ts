@@ -53,7 +53,16 @@ export type RejectDto = z.infer<typeof rejectSchema>;
 
 export const listQueueSchema = z.object({
   status: z
-    .enum(['draft', 'awaiting_poa', 'awaiting_payment', 'in_review', 'filed', 'granted', 'rejected', 'revoked'])
+    .enum([
+      'draft',
+      'awaiting_poa',
+      'awaiting_payment',
+      'in_review',
+      'filed',
+      'granted',
+      'rejected',
+      'revoked',
+    ])
     .optional(),
 });
 export type ListQueueDto = z.infer<typeof listQueueSchema>;

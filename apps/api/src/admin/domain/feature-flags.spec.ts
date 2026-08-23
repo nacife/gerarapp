@@ -5,7 +5,9 @@ import { evaluateFlag, rolloutBucket } from './feature-flags';
 describe('evaluateFlag (RF-13)', () => {
   it('rollout de 10%: aproximadamente 10% dos sujeitos veem a flag', () => {
     const ids = Array.from({ length: 5000 }, () => randomUUID());
-    const on = ids.filter((id) => evaluateFlag({ defaultOn: false, rolloutPct: 10 }, null, id, 'modo_historia'));
+    const on = ids.filter((id) =>
+      evaluateFlag({ defaultOn: false, rolloutPct: 10 }, null, id, 'modo_historia'),
+    );
     const pct = (on.length / ids.length) * 100;
     expect(pct).toBeGreaterThan(7);
     expect(pct).toBeLessThan(13);
@@ -21,9 +23,13 @@ describe('evaluateFlag (RF-13)', () => {
   it('atribuição explícita fixa vence o rollout (usuário de teste)', () => {
     const id = randomUUID();
     // Mesmo com rollout 0% (ninguém deveria ver), a atribuição força enabled=true.
-    expect(evaluateFlag({ defaultOn: false, rolloutPct: 0 }, { enabled: true }, id, 'x')).toBe(true);
+    expect(evaluateFlag({ defaultOn: false, rolloutPct: 0 }, { enabled: true }, id, 'x')).toBe(
+      true,
+    );
     // E o inverso: rollout 100% mas atribuição força false.
-    expect(evaluateFlag({ defaultOn: false, rolloutPct: 100 }, { enabled: false }, id, 'x')).toBe(false);
+    expect(evaluateFlag({ defaultOn: false, rolloutPct: 100 }, { enabled: false }, id, 'x')).toBe(
+      false,
+    );
   });
 
   it('sem rollout nem atribuição, usa o default da flag', () => {

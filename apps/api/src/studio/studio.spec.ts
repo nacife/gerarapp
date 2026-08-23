@@ -35,7 +35,14 @@ const tree: ContentMapTree = {
 class FakeStudioRepo implements StudioRepository {
   theme: ThemeData | null = null;
   interactions: ManifestInteraction[] = [
-    { id: 'int-1', contentBlockId: 'b1', type: 'quiz', payload: { q: 1 }, difficulty: 'easy', position: 0 },
+    {
+      id: 'int-1',
+      contentBlockId: 'b1',
+      type: 'quiz',
+      payload: { q: 1 },
+      difficulty: 'easy',
+      position: 0,
+    },
   ];
   versions: {
     id: string;

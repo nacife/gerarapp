@@ -12,22 +12,30 @@ export const envSchema = z
     DATABASE_URL: z.string().url(),
     REDIS_URL: z.string().url(),
 
-    // Armazenamento de objetos (S3 / MinIO)
+    // Armazenamento de objetos (S3 / MinIO / Cloudflare R2)
     S3_ENDPOINT: z.string().url(),
+    S3_REGION: z.string().default('auto'),
     S3_ACCESS_KEY: z.string().min(1),
     S3_SECRET_KEY: z.string().min(1),
     S3_BUCKET_UPLOADS: z.string().min(1),
     S3_BUCKET_APPS: z.string().min(1),
-    S3_BUCKET_WORM: z.string().min(1),
+    S3_FORCE_PATH_STYLE: z
+      .preprocess((val) => {
+        if (typeof val === 'string') {
+          if (val.toLowerCase() === 'false' || val === '0') return false;
+          if (val.toLowerCase() === 'true' || val === '1') return true;
+        }
+        return val;
+      }, z.boolean())
+      .default(true),
+    S3_PUBLIC_URL: z.string().url().optional(),
 
     // Autenticação
     JWT_SECRET: z.string().min(32, 'JWT_SECRET deve ter ao menos 32 caracteres'),
     REFRESH_TOKEN_PEPPER: z
       .string()
       .min(16, 'REFRESH_TOKEN_PEPPER deve ter ao menos 16 caracteres'),
-    AUTH_ENCRYPTION_KEY: z
-      .string()
-      .min(32, 'AUTH_ENCRYPTION_KEY deve ter ao menos 32 caracteres'),
+    AUTH_ENCRYPTION_KEY: z.string().min(32, 'AUTH_ENCRYPTION_KEY deve ter ao menos 32 caracteres'),
 
     // IA
     AI_PROVIDER: z.enum(['mock', 'anthropic']).default('mock'),

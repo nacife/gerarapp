@@ -32,7 +32,11 @@ export interface GenerateRepository {
   debitCredits(userId: string, amount: number, jobId: string): Promise<void>;
   saveJob(
     jobId: string,
-    patch: { status?: 'running' | 'succeeded' | 'failed'; progress?: GenerateProgress; error?: string },
+    patch: {
+      status?: 'running' | 'succeeded' | 'failed';
+      progress?: GenerateProgress;
+      error?: string;
+    },
   ): Promise<void>;
 }
 
@@ -117,7 +121,11 @@ export async function runGeneration(
   }
 
   if (generated > 0) {
-    await repo.debitCredits(data.ownerUserId, generated * AI_CREDITS.costPerInteraction, data.jobId);
+    await repo.debitCredits(
+      data.ownerUserId,
+      generated * AI_CREDITS.costPerInteraction,
+      data.jobId,
+    );
   }
 
   progress.steps[0].status = 'done';

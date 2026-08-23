@@ -94,7 +94,10 @@ export class PrismaWebhookEndpointRepository implements WebhookEndpointRepositor
         OR: projectId === null ? [{ projectId: null }] : [{ projectId: null }, { projectId }],
       },
     });
-    return rows.map((r) => ({ ...toRow(r), secretSealed: r.secretSealed as unknown as SealedSecret }));
+    return rows.map((r) => ({
+      ...toRow(r),
+      secretSealed: r.secretSealed as unknown as SealedSecret,
+    }));
   }
 }
 
@@ -171,7 +174,10 @@ export class PrismaWebhookProjectRepository implements WebhookProjectRepository 
   }
 
   async findOwnerId(projectId: string): Promise<string | null> {
-    const found = await prisma.project.findUnique({ where: { id: projectId }, select: { ownerUserId: true } });
+    const found = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { ownerUserId: true },
+    });
     return found?.ownerUserId ?? null;
   }
 }

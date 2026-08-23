@@ -66,8 +66,7 @@ export function DragDropView({
   }
 
   function submit() {
-    const submission =
-      payload.variant === 'ordering' ? { order } : { mapping };
+    const submission = payload.variant === 'ordering' ? { order } : { mapping };
     const ok = gradeDragdrop(payload, submission);
     setCorrect(ok);
     setSubmitted(true);

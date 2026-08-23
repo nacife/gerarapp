@@ -10,7 +10,7 @@ export class EmailTemplatesController {
   @Roles('admin', 'super_admin')
   async list() {
     const records = await prisma.emailTemplate.findMany();
-    const map = new Map(records.map(r => [r.key, r]));
+    const map = new Map(records.map((r) => [r.key, r]));
 
     const templates: Record<string, { subject: string; body: string }> = {};
     for (const key of TEMPLATE_KEYS) {
@@ -38,11 +38,26 @@ export class EmailTemplatesController {
 
 function getDefault(key: string): { subject: string; body: string } {
   const defaults: Record<string, { subject: string; body: string }> = {
-    welcome: { subject: 'Bem-vindo(a) ao EduForge!', body: 'Olá {{name}}, sua conta foi criada com sucesso.' },
-    'verify-email': { subject: 'Confirme seu e-mail — EduForge', body: 'Olá {{name}}, clique no link para verificar seu e-mail: {{link}}' },
-    'password-reset': { subject: 'Redefinição de senha — EduForge', body: 'Olá {{name}}, use este link para redefinir sua senha: {{link}}' },
-    certificate: { subject: 'Certificado de conclusão — EduForge', body: 'Parabéns {{name}}! Você concluiu {{projectTitle}}. Seu certificado: {{link}}' },
-    invite: { subject: 'Convite para {{projectTitle}} — EduForge', body: 'Olá! Você foi convidado(a) para acessar {{projectTitle}}. Acesse: {{link}}' },
+    welcome: {
+      subject: 'Bem-vindo(a) ao EduForge!',
+      body: 'Olá {{name}}, sua conta foi criada com sucesso.',
+    },
+    'verify-email': {
+      subject: 'Confirme seu e-mail — EduForge',
+      body: 'Olá {{name}}, clique no link para verificar seu e-mail: {{link}}',
+    },
+    'password-reset': {
+      subject: 'Redefinição de senha — EduForge',
+      body: 'Olá {{name}}, use este link para redefinir sua senha: {{link}}',
+    },
+    certificate: {
+      subject: 'Certificado de conclusão — EduForge',
+      body: 'Parabéns {{name}}! Você concluiu {{projectTitle}}. Seu certificado: {{link}}',
+    },
+    invite: {
+      subject: 'Convite para {{projectTitle}} — EduForge',
+      body: 'Olá! Você foi convidado(a) para acessar {{projectTitle}}. Acesse: {{link}}',
+    },
   };
   return defaults[key] ?? { subject: '', body: '' };
 }

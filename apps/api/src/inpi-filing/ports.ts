@@ -71,7 +71,8 @@ export interface FilingRepository {
   listForQueue(status?: FilingStatus): Promise<FilingRow[]>;
 }
 
-export type FilingEventKind = 'created' | 'poa_signed' | 'gru_paid' | 'filed' | 'rpi_dispatch' | 'granted' | 'note';
+export type FilingEventKind =
+  'created' | 'poa_signed' | 'gru_paid' | 'filed' | 'rpi_dispatch' | 'granted' | 'note';
 
 export interface FilingEventRow {
   id: string;

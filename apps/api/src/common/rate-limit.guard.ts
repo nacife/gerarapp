@@ -14,7 +14,8 @@ export interface RateLimitOptions {
   windowSec?: number;
 }
 
-export const RateLimit = (opts?: RateLimitOptions): MethodDecorator =>
+export const RateLimit =
+  (opts?: RateLimitOptions): MethodDecorator =>
   (_target, _propertyKey, descriptor) => {
     Reflect.defineMetadata(RATE_LIMIT_KEY, opts ?? {}, descriptor.value!);
   };
@@ -44,7 +45,9 @@ export class GlobalRateLimitGuard implements CanActivate {
     ]);
     if (skip) return true;
 
-    const req = ctx.switchToHttp().getRequest<FastifyRequest & { user?: { id: string }; apiKeyId?: string }>();
+    const req = ctx
+      .switchToHttp()
+      .getRequest<FastifyRequest & { user?: { id: string }; apiKeyId?: string }>();
     const override = this.reflector.getAllAndOverride<RateLimitOptions>(RATE_LIMIT_KEY, [
       ctx.getHandler(),
       ctx.getClass(),

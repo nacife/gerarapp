@@ -1,8 +1,20 @@
 import type { AuditService } from '../admin/audit.service';
 import { Errors } from '../common/errors';
 import type { WebhooksService } from '../webhooks/webhooks.service';
-import { canGrant, canProtocol, canReject, canRecordRpiEvent, canRunChecklist } from './domain/state';
-import type { FilingEventRepository, FilingRepository, FilingRow, FilingStatus, FilingStorage } from './ports';
+import {
+  canGrant,
+  canProtocol,
+  canReject,
+  canRecordRpiEvent,
+  canRunChecklist,
+} from './domain/state';
+import type {
+  FilingEventRepository,
+  FilingRepository,
+  FilingRow,
+  FilingStatus,
+  FilingStorage,
+} from './ports';
 
 export interface OperatorActor {
   id: string;
@@ -20,7 +32,8 @@ function computeSla(filing: FilingRow): { slaDueAt: Date | null; slaAtRisk: bool
   // SLA interno (§3.3): protocolo em até 5 dias úteis após procuração válida + pagamento
   // (aproximado como dias corridos aqui — a distinção "dias úteis" fica para uma
   // implementação futura com calendário de feriados; a métrica de risco já é útil sem ela).
-  if (filing.status !== 'in_review' || !filing.updatedAt) return { slaDueAt: null, slaAtRisk: false };
+  if (filing.status !== 'in_review' || !filing.updatedAt)
+    return { slaDueAt: null, slaAtRisk: false };
   const dueAt = new Date(filing.updatedAt.getTime() + SLA_DAYS * 24 * 60 * 60 * 1000);
   return { slaDueAt: dueAt, slaAtRisk: dueAt.getTime() - Date.now() < 2 * 24 * 60 * 60 * 1000 };
 }
@@ -35,12 +48,20 @@ export class OperatorService {
     private readonly webhooks: WebhooksService,
   ) {}
 
-  private async notifyStatusChanged(filing: FilingRow, extra: Record<string, unknown> = {}): Promise<void> {
-    await this.webhooks.dispatch(filing.customerUserId, filing.projectId, 'inpi.filing.status_changed', {
-      filingId: filing.id,
-      status: filing.status,
-      ...extra,
-    });
+  private async notifyStatusChanged(
+    filing: FilingRow,
+    extra: Record<string, unknown> = {},
+  ): Promise<void> {
+    await this.webhooks.dispatch(
+      filing.customerUserId,
+      filing.projectId,
+      'inpi.filing.status_changed',
+      {
+        filingId: filing.id,
+        status: filing.status,
+        ...extra,
+      },
+    );
   }
 
   async listQueue(status?: FilingStatus): Promise<QueueRow[]> {
@@ -67,7 +88,10 @@ export class OperatorService {
       action: 'inpi_filing.claim',
       targetType: 'inpi_filing',
       targetId: filingId,
-      beforeAfter: { before: { assignedOperator: filing.assignedOperator }, after: { assignedOperator: actor.id } },
+      beforeAfter: {
+        before: { assignedOperator: filing.assignedOperator },
+        after: { assignedOperator: actor.id },
+      },
     });
     return updated;
   }
@@ -108,7 +132,9 @@ export class OperatorService {
     }
     const checklist = filing.operatorChecklist;
     if (!checklist?.dvSigned || !checklist?.doubleChecked) {
-      throw Errors.conflict('Complete o checklist (DV assinada e dupla conferência) antes de protocolar.');
+      throw Errors.conflict(
+        'Complete o checklist (DV assinada e dupla conferência) antes de protocolar.',
+      );
     }
 
     const filedAt = new Date();
@@ -118,7 +144,10 @@ export class OperatorService {
       inpiProcessNumber: input.inpiProcessNumber,
       filedAt,
     });
-    await this.events.record(filingId, 'filed', { gruNumber: input.gruNumber, inpiProcessNumber: input.inpiProcessNumber });
+    await this.events.record(filingId, 'filed', {
+      gruNumber: input.gruNumber,
+      inpiProcessNumber: input.inpiProcessNumber,
+    });
     await this.audit.record({
       actorId: actor.id,
       actorRole: actor.role,
@@ -168,7 +197,11 @@ export class OperatorService {
     }
     const key = `inpi-filings/${filingId}/certificado-registro.pdf`;
     const grantedAt = new Date();
-    const updated = await this.filings.update(filingId, { status: 'granted', certificateS3Key: key, grantedAt });
+    const updated = await this.filings.update(filingId, {
+      status: 'granted',
+      certificateS3Key: key,
+      grantedAt,
+    });
     await this.events.record(filingId, 'granted', {});
     await this.audit.record({
       actorId: actor.id,

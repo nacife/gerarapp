@@ -30,6 +30,8 @@ describe('validateUpload (US-ING-01)', () => {
 
   it('deduz o formato pelo content-type quando a extensão falta', () => {
     expect(detectMime('arquivo-sem-extensao', 'application/pdf')).toBe('pdf');
-    expect(detectMime('doc', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')).toBe('docx');
+    expect(
+      detectMime('doc', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+    ).toBe('docx');
   });
 });

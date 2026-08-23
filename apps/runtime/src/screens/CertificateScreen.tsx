@@ -9,7 +9,13 @@ interface VerifyResult {
   issuedAt: string;
 }
 
-export function CertificateScreen({ theme, verifyCode }: { theme: RuntimeTheme; verifyCode: string }) {
+export function CertificateScreen({
+  theme,
+  verifyCode,
+}: {
+  theme: RuntimeTheme;
+  verifyCode: string;
+}) {
   const [info, setInfo] = useState<VerifyResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
@@ -28,14 +34,23 @@ export function CertificateScreen({ theme, verifyCode }: { theme: RuntimeTheme; 
   }
 
   return (
-    <div style={{ background: theme.bg, color: theme.text }} className="grid min-h-screen place-items-center px-6 py-12">
+    <div
+      style={{ background: theme.bg, color: theme.text }}
+      className="grid min-h-screen place-items-center px-6 py-12"
+    >
       <div className="w-full max-w-md text-center">
-        <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full text-3xl" style={{ background: theme.accent }}>
+        <div
+          className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full text-3xl"
+          style={{ background: theme.accent }}
+        >
           🏆
         </div>
         <h1 className="text-2xl font-bold">Parabéns, curso concluído!</h1>
         {info ? (
-          <div className="mt-4 rounded-xl border p-5" style={{ borderColor: theme.border, background: theme.surface }}>
+          <div
+            className="mt-4 rounded-xl border p-5"
+            style={{ borderColor: theme.border, background: theme.surface }}
+          >
             <p style={{ color: theme.muted }} className="text-sm">
               Certificado de conclusão
             </p>

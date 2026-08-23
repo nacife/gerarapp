@@ -34,7 +34,10 @@ export class FilingService {
   }
 
   /** Contratação (§3.2 passo 1): abre o pedido a partir de uma certificação RF-16 existente. */
-  async contract(certificateId: string, customerUserId: string): Promise<{ filing: FilingRow; pricing: PricingBreakdown }> {
+  async contract(
+    certificateId: string,
+    customerUserId: string,
+  ): Promise<{ filing: FilingRow; pricing: PricingBreakdown }> {
     const cert = await this.certificates.getForOwner(certificateId, customerUserId);
     if (!cert) throw Errors.notFound('Certificação INPI');
 
@@ -49,7 +52,10 @@ export class FilingService {
     }
 
     const filing = await this.filings.create({ inpiCertificateId: certificateId, customerUserId });
-    await this.events.record(filing.id, 'created', { certificateId, versionNumber: cert.versionNumber });
+    await this.events.record(filing.id, 'created', {
+      certificateId,
+      versionNumber: cert.versionNumber,
+    });
 
     return { filing, pricing: this.pricing() };
   }
@@ -62,13 +68,22 @@ export class FilingService {
   ): Promise<FilingRow> {
     const filing = await this.requireOwned(filingId, customerUserId);
     if (filing.status !== 'draft') {
-      throw Errors.conflict('Os dados de titularidade só podem ser editados enquanto o pedido está em rascunho.');
+      throw Errors.conflict(
+        'Os dados de titularidade só podem ser editados enquanto o pedido está em rascunho.',
+      );
     }
-    return this.filings.update(filingId, { holder: input.holder, authors: input.authors, status: 'awaiting_poa' });
+    return this.filings.update(filingId, {
+      holder: input.holder,
+      authors: input.authors,
+      status: 'awaiting_poa',
+    });
   }
 
   /** URL pré-assinada para o cliente enviar a procuração direto ao objeto (mesmo padrão do M2). */
-  async poaUploadUrl(filingId: string, customerUserId: string): Promise<{ uploadUrl: string; key: string }> {
+  async poaUploadUrl(
+    filingId: string,
+    customerUserId: string,
+  ): Promise<{ uploadUrl: string; key: string }> {
     const filing = await this.requireOwned(filingId, customerUserId);
     if (!canUploadPoa(filing.status)) {
       throw Errors.conflict('Este pedido não está aguardando o envio da procuração.');
@@ -93,22 +108,33 @@ export class FilingService {
     if (!canUploadPoa(filing.status)) {
       throw Errors.conflict('Este pedido não está aguardando o envio da procuração.');
     }
-    if (!filing.holder) throw Errors.conflict('Preencha os dados de titularidade antes de enviar a procuração.');
+    if (!filing.holder)
+      throw Errors.conflict('Preencha os dados de titularidade antes de enviar a procuração.');
 
     const key = `inpi-filings/${filingId}/procuracao.pdf`;
     const pdfBytes = await this.storage.download(key);
-    const sig = await this.signatures.check({ pdfBytes, declaredSignerDocType, declaredSignerDocNumber });
+    const sig = await this.signatures.check({
+      pdfBytes,
+      declaredSignerDocType,
+      declaredSignerDocNumber,
+    });
     const validation = validatePoaSignature({
       holderType: filing.holder.type,
       signerDocType: sig.signerDocType,
       hasPadesMarkers: sig.hasPadesMarkers,
     });
     if (!validation.valid) {
-      await this.events.record(filingId, 'note', { action: 'poa_rejected', reason: validation.reason });
+      await this.events.record(filingId, 'note', {
+        action: 'poa_rejected',
+        reason: validation.reason,
+      });
       throw Errors.conflict(validation.reason!);
     }
 
-    const updated = await this.filings.update(filingId, { poaPdfS3Key: key, status: 'awaiting_payment' });
+    const updated = await this.filings.update(filingId, {
+      poaPdfS3Key: key,
+      status: 'awaiting_payment',
+    });
     await this.events.record(filingId, 'poa_signed', { signerDocType: sig.signerDocType });
     return updated;
   }
@@ -137,11 +163,16 @@ export class FilingService {
     }
     const updated = await this.filings.update(filingId, { status: 'revoked' });
     await this.events.record(filingId, 'note', { action: 'revoked' });
-    await this.webhooks.dispatch(updated.customerUserId, updated.projectId, 'inpi.filing.status_changed', {
-      filingId: updated.id,
-      status: updated.status,
-      kind: 'revoked',
-    });
+    await this.webhooks.dispatch(
+      updated.customerUserId,
+      updated.projectId,
+      'inpi.filing.status_changed',
+      {
+        filingId: updated.id,
+        status: updated.status,
+        kind: 'revoked',
+      },
+    );
     return updated;
   }
 
@@ -161,7 +192,8 @@ export class FilingService {
 
   private async requireOwned(filingId: string, customerUserId: string): Promise<FilingRow> {
     const filing = await this.filings.findById(filingId);
-    if (!filing || filing.customerUserId !== customerUserId) throw Errors.notFound('Pedido de registro');
+    if (!filing || filing.customerUserId !== customerUserId)
+      throw Errors.notFound('Pedido de registro');
     return filing;
   }
 }

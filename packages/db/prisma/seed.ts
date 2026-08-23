@@ -43,7 +43,13 @@ async function seedPalettes() {
     await prisma.palette.upsert({
       where: { key: pal.key },
       update: { name: pal.name, colors: pal.colors, minPlanTier: pal.minPlanTier || 0 },
-      create: { key: pal.key, name: pal.name, colors: pal.colors, wcagAa: true, minPlanTier: pal.minPlanTier || 0 },
+      create: {
+        key: pal.key,
+        name: pal.name,
+        colors: pal.colors,
+        wcagAa: true,
+        minPlanTier: pal.minPlanTier || 0,
+      },
     });
   }
   console.log(`  ✓ ${PALETTES.length} paletas`);

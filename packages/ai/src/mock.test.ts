@@ -3,7 +3,11 @@ import { validateInteraction } from '@eduforge/schemas';
 import { MockAiProvider } from './mock';
 import { createAiProvider } from './factory';
 
-const BLOCK = { id: '11111111-1111-1111-1111-111111111111', kind: 'concept', contentMd: 'A célula.' };
+const BLOCK = {
+  id: '11111111-1111-1111-1111-111111111111',
+  kind: 'concept',
+  contentMd: 'A célula.',
+};
 
 describe('MockAiProvider.generateInteractions', () => {
   const provider = new MockAiProvider();
@@ -81,7 +85,10 @@ describe('MockAiProvider.embedTexts (M10 — RAG do Sensei)', () => {
   const provider = new MockAiProvider();
 
   it('emite vetores de 1536 dims L2-normalizados e determinísticos', async () => {
-    const [a, b] = await provider.embedTexts(['A fotossíntese converte luz em energia.', 'A fotossíntese converte luz em energia.']);
+    const [a, b] = await provider.embedTexts([
+      'A fotossíntese converte luz em energia.',
+      'A fotossíntese converte luz em energia.',
+    ]);
     expect(a).toHaveLength(1536);
     expect(a).toEqual(b);
     const norm = Math.sqrt(a!.reduce((s, v) => s + v * v, 0));
@@ -108,12 +115,28 @@ describe('MockAiProvider.embedTexts (M10 — RAG do Sensei)', () => {
 describe('MockAiProvider.tutorAnswer (M10 — RF-06.1)', () => {
   const provider = new MockAiProvider();
   const chunks = [
-    { blockId: 'b1', contentMd: '## Fase clara\nA fase clara acontece nos tilacoides e produz ATP.', sourceRef: { page: 12 }, similarity: 0.8 },
-    { blockId: 'b2', contentMd: 'O ciclo de Calvin fixa carbono no estroma.', sourceRef: { page: 14 }, similarity: 0.6 },
+    {
+      blockId: 'b1',
+      contentMd: '## Fase clara\nA fase clara acontece nos tilacoides e produz ATP.',
+      sourceRef: { page: 12 },
+      similarity: 0.8,
+    },
+    {
+      blockId: 'b2',
+      contentMd: 'O ciclo de Calvin fixa carbono no estroma.',
+      sourceRef: { page: 14 },
+      similarity: 0.6,
+    },
   ];
 
   it('responde com citações dos chunks usados', async () => {
-    const out = await provider.tutorAnswer({ question: 'Onde acontece a fase clara?', mode: 'default', tone: 'formal', tutorName: 'Sensei', chunks });
+    const out = await provider.tutorAnswer({
+      question: 'Onde acontece a fase clara?',
+      mode: 'default',
+      tone: 'formal',
+      tutorName: 'Sensei',
+      chunks,
+    });
     expect(out.refused).toBe(false);
     expect(out.citations.length).toBeGreaterThanOrEqual(1);
     expect(out.citations[0]?.blockId).toBe('b1');
@@ -121,14 +144,32 @@ describe('MockAiProvider.tutorAnswer (M10 — RF-06.1)', () => {
   });
 
   it('sem contexto recuperado → recusa (fora de escopo), sem citações', async () => {
-    const out = await provider.tutorAnswer({ question: 'Qual a capital da Mongólia?', mode: 'default', tone: 'descontraido', tutorName: 'Sensei', chunks: [] });
+    const out = await provider.tutorAnswer({
+      question: 'Qual a capital da Mongólia?',
+      mode: 'default',
+      tone: 'descontraido',
+      tutorName: 'Sensei',
+      chunks: [],
+    });
     expect(out.refused).toBe(true);
     expect(out.citations).toHaveLength(0);
   });
 
   it('modos variam a forma: test_me pergunta, socratic devolve perguntas-guia', async () => {
-    const teste = await provider.tutorAnswer({ question: 'x', mode: 'test_me', tone: 'formal', tutorName: 'S', chunks });
-    const socratico = await provider.tutorAnswer({ question: 'x', mode: 'socratic', tone: 'formal', tutorName: 'S', chunks });
+    const teste = await provider.tutorAnswer({
+      question: 'x',
+      mode: 'test_me',
+      tone: 'formal',
+      tutorName: 'S',
+      chunks,
+    });
+    const socratico = await provider.tutorAnswer({
+      question: 'x',
+      mode: 'socratic',
+      tone: 'formal',
+      tutorName: 'S',
+      chunks,
+    });
     expect(teste.answer).toContain('Pergunta 1');
     expect(socratico.answer).toContain('?');
     expect(teste.answer).not.toEqual(socratico.answer);
@@ -155,7 +196,9 @@ describe('MockAiProvider.generatePodcastScript / synthesizeSpeech (M10 — RF-06
   });
 
   it('síntese produz WAV válido e tocável com duração > 0', async () => {
-    const out = await provider.synthesizeSpeech({ lines: [{ speaker: 'A', text: 'Olá, bem-vindos ao episódio de hoje!' }] });
+    const out = await provider.synthesizeSpeech({
+      lines: [{ speaker: 'A', text: 'Olá, bem-vindos ao episódio de hoje!' }],
+    });
     expect(out.mimeType).toBe('audio/wav');
     expect(out.audio.subarray(0, 4).toString()).toBe('RIFF');
     expect(out.audio.subarray(8, 12).toString()).toBe('WAVE');

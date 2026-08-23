@@ -121,7 +121,10 @@ const REFUSALS: Record<string, string> = {
 };
 
 function titleFromFilename(filename: string): string {
-  const base = filename.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+  const base = filename
+    .replace(/\.[^.]+$/, '')
+    .replace(/[_-]+/g, ' ')
+    .trim();
   if (!base) return 'Documento';
   return base.charAt(0).toUpperCase() + base.slice(1);
 }
@@ -188,9 +191,7 @@ export class MockAiProvider implements AiProvider {
   }
 
   async generateMemorial(input: MemorialInput): Promise<MemorialOutput> {
-    const interactionNames = input.interactionTypes
-      .map((t) => TYPE_LABEL_PT[t] ?? t)
-      .join(', ');
+    const interactionNames = input.interactionTypes.map((t) => TYPE_LABEL_PT[t] ?? t).join(', ');
     const chapterList = input.chapterTitles.map((t) => `“${t}”`).join(', ');
 
     const functionalDescription =
@@ -234,7 +235,11 @@ export class MockAiProvider implements AiProvider {
     const base = top.map((c) => leadSentences(c.contentMd)).join(' ');
     const citations = top.map((c) => ({ blockId: c.blockId }));
     const opener =
-      input.tone === 'descontraido' ? 'Então, olha só:' : input.tone === 'motivador' ? 'Ótima pergunta — vamos nessa!' : 'Com base no material:';
+      input.tone === 'descontraido'
+        ? 'Então, olha só:'
+        : input.tone === 'motivador'
+          ? 'Ótima pergunta — vamos nessa!'
+          : 'Com base no material:';
 
     let answer: string;
     switch (input.mode) {
@@ -263,8 +268,14 @@ export class MockAiProvider implements AiProvider {
 
   async generatePodcastScript(input: PodcastScriptInput): Promise<PodcastScriptOutput> {
     const lines: PodcastScriptOutput['lines'] = [
-      { speaker: 'A', text: `Bem-vindos ao podcast de "${input.appTitle}"! Hoje o papo é sobre "${input.chapterTitle}".` },
-      { speaker: 'B', text: 'E olha, esse capítulo tem mais coisa do que parece — vamos por partes.' },
+      {
+        speaker: 'A',
+        text: `Bem-vindos ao podcast de "${input.appTitle}"! Hoje o papo é sobre "${input.chapterTitle}".`,
+      },
+      {
+        speaker: 'B',
+        text: 'E olha, esse capítulo tem mais coisa do que parece — vamos por partes.',
+      },
     ];
     for (const [i, section] of input.sections.entries()) {
       const gist = leadSentences(section.contentMd, 200);
@@ -276,7 +287,10 @@ export class MockAiProvider implements AiProvider {
         });
       }
     }
-    lines.push({ speaker: 'A', text: 'Recapitulando o essencial de hoje: revise as seções e teste-se nas interações do app.' });
+    lines.push({
+      speaker: 'A',
+      text: 'Recapitulando o essencial de hoje: revise as seções e teste-se nas interações do app.',
+    });
     lines.push({ speaker: 'B', text: 'É isso! Até o próximo capítulo.' });
     return { title: `Episódio — ${input.chapterTitle}`, lines };
   }
@@ -287,7 +301,10 @@ export class MockAiProvider implements AiProvider {
     const sampleRate = 8000;
     const segments = input.lines.map((line) => ({
       freq: line.speaker === 'A' ? 220 : 330,
-      samples: Math.min(Math.max(Math.round(line.text.length * 0.03 * sampleRate), sampleRate / 4), sampleRate * 6),
+      samples: Math.min(
+        Math.max(Math.round(line.text.length * 0.03 * sampleRate), sampleRate / 4),
+        sampleRate * 6,
+      ),
     }));
     const gapSamples = Math.round(sampleRate * 0.15);
     const totalSamples = segments.reduce((acc, s) => acc + s.samples + gapSamples, 0);
@@ -312,14 +329,20 @@ export class MockAiProvider implements AiProvider {
     for (const segment of segments) {
       for (let i = 0; i < segment.samples; i++) {
         const fade = Math.min(1, i / 200, (segment.samples - i) / 200);
-        const value = Math.round(Math.sin((2 * Math.PI * segment.freq * i) / sampleRate) * 6000 * fade);
+        const value = Math.round(
+          Math.sin((2 * Math.PI * segment.freq * i) / sampleRate) * 6000 * fade,
+        );
         buffer.writeInt16LE(value, offset);
         offset += 2;
       }
       offset += gapSamples * 2; // silêncio entre falas (Buffer.alloc já zera)
     }
 
-    return { audio: buffer, mimeType: 'audio/wav', durationSec: Math.round(totalSamples / sampleRate) };
+    return {
+      audio: buffer,
+      mimeType: 'audio/wav',
+      durationSec: Math.round(totalSamples / sampleRate),
+    };
   }
 
   async generateIllustration(input: IllustrationInput): Promise<IllustrationOutput> {

@@ -9,10 +9,7 @@ async function bootstrap() {
   loadRootEnv();
   const env = getEnv();
 
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
   await app.register(fastifyCookie);
 

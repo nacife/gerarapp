@@ -5,10 +5,35 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '../../lib/api';
 
-interface RateLimitConfig { maxRequestsPerMinute: number; windowSeconds: number; description: string }
-interface AiCreditsConfig { costPerInteraction: number; costTutorQuestion: number; costPodcast: number; costIllustration: number; lowBalanceThreshold: number; description: string }
-interface EnvironmentConfig { nodeEnv: string; aiProvider: string; mailer: string; appBaseUrl: string; adminBaseUrl: string; runtimeBaseUrl: string; corsOrigins: string[]; inpiGruFeeCents: number; inpiServiceFeeCents: number }
-interface RoutesConfig { scopes: string[]; queues: string[]; totalEndpoints: string }
+interface RateLimitConfig {
+  maxRequestsPerMinute: number;
+  windowSeconds: number;
+  description: string;
+}
+interface AiCreditsConfig {
+  costPerInteraction: number;
+  costTutorQuestion: number;
+  costPodcast: number;
+  costIllustration: number;
+  lowBalanceThreshold: number;
+  description: string;
+}
+interface EnvironmentConfig {
+  nodeEnv: string;
+  aiProvider: string;
+  mailer: string;
+  appBaseUrl: string;
+  adminBaseUrl: string;
+  runtimeBaseUrl: string;
+  corsOrigins: string[];
+  inpiGruFeeCents: number;
+  inpiServiceFeeCents: number;
+}
+interface RoutesConfig {
+  scopes: string[];
+  queues: string[];
+  totalEndpoints: string;
+}
 
 export default function ConfigPage() {
   const router = useRouter();
@@ -34,13 +59,16 @@ export default function ConfigPage() {
     });
   }, [router]);
 
-  if (loading) return <main className="grid min-h-screen place-items-center text-gray-400">Carregando…</main>;
+  if (loading)
+    return <main className="grid min-h-screen place-items-center text-gray-400">Carregando…</main>;
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-6 py-12">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-100">Configuração de APIs</h1>
-        <Link href="/" className="text-sm text-cyan-400 hover:underline">← Voltar</Link>
+        <Link href="/" className="text-sm text-cyan-400 hover:underline">
+          ← Voltar
+        </Link>
       </div>
 
       {/* Rate Limit */}
@@ -59,7 +87,10 @@ export default function ConfigPage() {
           <ConfigRow label="Tutor Sensei" value={`${aiCredits.costTutorQuestion} créd.`} />
           <ConfigRow label="Podcast" value={`${aiCredits.costPodcast} créd.`} />
           <ConfigRow label="Ilustração" value={`${aiCredits.costIllustration} créd.`} />
-          <ConfigRow label="Alerta saldo baixo" value={`< ${aiCredits.lowBalanceThreshold} créd.`} />
+          <ConfigRow
+            label="Alerta saldo baixo"
+            value={`< ${aiCredits.lowBalanceThreshold} créd.`}
+          />
         </ConfigSection>
       )}
 
@@ -73,8 +104,14 @@ export default function ConfigPage() {
           <ConfigRow label="Admin URL" value={env.adminBaseUrl} />
           <ConfigRow label="Runtime URL" value={env.runtimeBaseUrl} />
           <ConfigRow label="CORS Origins" value={env.corsOrigins.join(', ')} />
-          <ConfigRow label="INPI GRU (cents)" value={`R$ ${(env.inpiGruFeeCents / 100).toFixed(2)}`} />
-          <ConfigRow label="INPI Serviço (cents)" value={`R$ ${(env.inpiServiceFeeCents / 100).toFixed(2)}`} />
+          <ConfigRow
+            label="INPI GRU (cents)"
+            value={`R$ ${(env.inpiGruFeeCents / 100).toFixed(2)}`}
+          />
+          <ConfigRow
+            label="INPI Serviço (cents)"
+            value={`R$ ${(env.inpiServiceFeeCents / 100).toFixed(2)}`}
+          />
         </ConfigSection>
       )}
 
@@ -86,7 +123,9 @@ export default function ConfigPage() {
             <p className="mb-1 text-xs text-gray-500">Escopos disponíveis:</p>
             <div className="flex flex-wrap gap-1">
               {routes.scopes.map((s) => (
-                <span key={s} className="rounded bg-cyan-500/10 px-2 py-0.5 text-xs text-cyan-300">{s}</span>
+                <span key={s} className="rounded bg-cyan-500/10 px-2 py-0.5 text-xs text-cyan-300">
+                  {s}
+                </span>
               ))}
             </div>
           </div>
@@ -94,7 +133,9 @@ export default function ConfigPage() {
             <p className="mb-1 text-xs text-gray-500">Filas BullMQ:</p>
             <div className="flex flex-wrap gap-1">
               {routes.queues.map((q) => (
-                <span key={q} className="rounded bg-white/[0.04] px-2 py-0.5 text-xs text-gray-400">{q}</span>
+                <span key={q} className="rounded bg-white/[0.04] px-2 py-0.5 text-xs text-gray-400">
+                  {q}
+                </span>
               ))}
             </div>
           </div>

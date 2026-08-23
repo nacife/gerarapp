@@ -211,7 +211,10 @@ describe('Cenário: Execução e protocolo pela equipe', () => {
     const filingId = await bringToInReview(kit);
 
     const err = await expectError(() =>
-      kit.operatorService.protocol(OPERATOR, filingId, { gruNumber: 'GRU-1', inpiProcessNumber: 'BR512026001' }),
+      kit.operatorService.protocol(OPERATOR, filingId, {
+        gruNumber: 'GRU-1',
+        inpiProcessNumber: 'BR512026001',
+      }),
     );
     expect(err.slug).toBe('conflict');
   });
@@ -219,7 +222,11 @@ describe('Cenário: Execução e protocolo pela equipe', () => {
   it('com checklist completo, protocola e grava nosso número + processo', async () => {
     const kit = build();
     const filingId = await bringToInReview(kit);
-    await kit.operatorService.updateChecklist(OPERATOR, filingId, { dvSigned: true, doubleChecked: true, doubleCheckedBy: 'op-2' });
+    await kit.operatorService.updateChecklist(OPERATOR, filingId, {
+      dvSigned: true,
+      doubleChecked: true,
+      doubleCheckedBy: 'op-2',
+    });
     await kit.webhookEndpoints.create({
       ownerUserId: CUSTOMER,
       projectId: null,
@@ -256,10 +263,20 @@ describe('Cenário: Acompanhamento da RPI e entrega do certificado', () => {
     });
     await uploadPoa(kit, filing.id, PADES_PDF, 'e-cpf', '123.456.789-00');
     await kit.filingService.confirmPayment(filing.id, CUSTOMER);
-    await kit.operatorService.updateChecklist(OPERATOR, filing.id, { dvSigned: true, doubleChecked: true });
-    await kit.operatorService.protocol(OPERATOR, filing.id, { gruNumber: 'GRU-1', inpiProcessNumber: 'BR512026001' });
+    await kit.operatorService.updateChecklist(OPERATOR, filing.id, {
+      dvSigned: true,
+      doubleChecked: true,
+    });
+    await kit.operatorService.protocol(OPERATOR, filing.id, {
+      gruNumber: 'GRU-1',
+      inpiProcessNumber: 'BR512026001',
+    });
 
-    await kit.operatorService.recordRpiEvent(OPERATOR, filing.id, 'Despacho de exigência formal — nenhuma pendência.');
+    await kit.operatorService.recordRpiEvent(
+      OPERATOR,
+      filing.id,
+      'Despacho de exigência formal — nenhuma pendência.',
+    );
     const granted = await grant(kit, filing.id, Buffer.from('%PDF certificado'));
 
     expect(granted.status).toBe('granted');
@@ -267,7 +284,14 @@ describe('Cenário: Acompanhamento da RPI e entrega do certificado', () => {
 
     const timeline = await kit.filingService.getTimeline(filing.id, CUSTOMER);
     expect(timeline.events.map((e) => e.kind)).toEqual(
-      expect.arrayContaining(['created', 'poa_signed', 'gru_paid', 'filed', 'rpi_dispatch', 'granted']),
+      expect.arrayContaining([
+        'created',
+        'poa_signed',
+        'gru_paid',
+        'filed',
+        'rpi_dispatch',
+        'granted',
+      ]),
     );
     expect(timeline.poaUrl).toBeTruthy();
     expect(timeline.certificateUrl).toBeTruthy();
@@ -297,8 +321,14 @@ describe('Cenário: Revogação da procuração', () => {
     });
     await uploadPoa(kit, filing.id, PADES_PDF, 'e-cpf', '123.456.789-00');
     await kit.filingService.confirmPayment(filing.id, CUSTOMER);
-    await kit.operatorService.updateChecklist(OPERATOR, filing.id, { dvSigned: true, doubleChecked: true });
-    await kit.operatorService.protocol(OPERATOR, filing.id, { gruNumber: 'GRU-1', inpiProcessNumber: 'BR1' });
+    await kit.operatorService.updateChecklist(OPERATOR, filing.id, {
+      dvSigned: true,
+      doubleChecked: true,
+    });
+    await kit.operatorService.protocol(OPERATOR, filing.id, {
+      gruNumber: 'GRU-1',
+      inpiProcessNumber: 'BR1',
+    });
     await grant(kit, filing.id, Buffer.from('cert'));
 
     const err = await expectError(() => kit.filingService.revoke(filing.id, CUSTOMER));

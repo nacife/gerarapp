@@ -37,7 +37,12 @@ describe('WebhooksService.create', () => {
     const { service, projects } = buildService();
     projects.ownedProjectIds.set('proj-1', OTHER_OWNER);
     await expect(
-      service.create(OWNER, { url: 'https://x.com', events: ['app.published'], secret: '0123456789abcdef', projectId: 'proj-1' }),
+      service.create(OWNER, {
+        url: 'https://x.com',
+        events: ['app.published'],
+        secret: '0123456789abcdef',
+        projectId: 'proj-1',
+      }),
     ).rejects.toThrow();
   });
 });
@@ -52,7 +57,11 @@ describe('WebhooksService.dispatch', () => {
 
   it('cria entrega + enfileira para endpoint de conta inteira', async () => {
     const { service, deliveries, enqueuer } = buildService();
-    await service.create(OWNER, { url: 'https://a.com', events: ['app.published'], secret: '0123456789abcdef' });
+    await service.create(OWNER, {
+      url: 'https://a.com',
+      events: ['app.published'],
+      secret: '0123456789abcdef',
+    });
 
     await service.dispatch(OWNER, 'proj-1', 'app.published', { version: 2 });
 
@@ -110,7 +119,11 @@ describe('WebhooksService.dispatch', () => {
 
   it('endpoint sem o evento na lista não recebe entrega', async () => {
     const { service, deliveries } = buildService();
-    await service.create(OWNER, { url: 'https://a.com', events: ['ingest.completed'], secret: '0123456789abcdef' });
+    await service.create(OWNER, {
+      url: 'https://a.com',
+      events: ['ingest.completed'],
+      secret: '0123456789abcdef',
+    });
 
     await service.dispatch(OWNER, null, 'app.published', {});
     expect(deliveries.rows).toHaveLength(0);
@@ -118,11 +131,20 @@ describe('WebhooksService.dispatch', () => {
 
   it('o payload enfileirado usa o envelope padrão { id, event, occurred_at, data }', async () => {
     const { service, enqueuer } = buildService();
-    await service.create(OWNER, { url: 'https://a.com', events: ['app.published'], secret: '0123456789abcdef' });
+    await service.create(OWNER, {
+      url: 'https://a.com',
+      events: ['app.published'],
+      secret: '0123456789abcdef',
+    });
 
     await service.dispatch(OWNER, null, 'app.published', { versionNumber: 3 });
 
-    const sent = enqueuer.calls[0]?.payload as { id: string; event: string; occurred_at: string; data: unknown };
+    const sent = enqueuer.calls[0]?.payload as {
+      id: string;
+      event: string;
+      occurred_at: string;
+      data: unknown;
+    };
     expect(sent.id.startsWith('evt_')).toBe(true);
     expect(sent.event).toBe('app.published');
     expect(sent.data).toEqual({ versionNumber: 3 });
@@ -130,7 +152,11 @@ describe('WebhooksService.dispatch', () => {
 
   it('nunca lança mesmo se o repositório falhar (best-effort)', async () => {
     const { service, endpoints } = buildService();
-    await service.create(OWNER, { url: 'https://a.com', events: ['app.published'], secret: '0123456789abcdef' });
+    await service.create(OWNER, {
+      url: 'https://a.com',
+      events: ['app.published'],
+      secret: '0123456789abcdef',
+    });
     endpoints.listActiveForEvent = async () => {
       throw new Error('db indisponível');
     };
@@ -143,7 +169,11 @@ describe('WebhooksService.dispatchForProject', () => {
   it('resolve o dono a partir do projeto e despacha', async () => {
     const { service, projects, deliveries } = buildService();
     projects.ownedProjectIds.set('proj-1', OWNER);
-    await service.create(OWNER, { url: 'https://a.com', events: ['learner.enrolled'], secret: '0123456789abcdef' });
+    await service.create(OWNER, {
+      url: 'https://a.com',
+      events: ['learner.enrolled'],
+      secret: '0123456789abcdef',
+    });
 
     await service.dispatchForProject('proj-1', 'learner.enrolled', { learnerId: 'l1' });
 
@@ -152,7 +182,9 @@ describe('WebhooksService.dispatchForProject', () => {
 
   it('projeto desconhecido não lança, apenas não despacha', async () => {
     const { service, deliveries } = buildService();
-    await expect(service.dispatchForProject('proj-inexistente', 'learner.enrolled', {})).resolves.toBeUndefined();
+    await expect(
+      service.dispatchForProject('proj-inexistente', 'learner.enrolled', {}),
+    ).resolves.toBeUndefined();
     expect(deliveries.rows).toHaveLength(0);
   });
 });
@@ -160,20 +192,32 @@ describe('WebhooksService.dispatchForProject', () => {
 describe('WebhooksService.update/remove', () => {
   it('dono consegue desativar o próprio endpoint', async () => {
     const { service } = buildService();
-    const created = await service.create(OWNER, { url: 'https://a.com', events: ['app.published'], secret: '0123456789abcdef' });
+    const created = await service.create(OWNER, {
+      url: 'https://a.com',
+      events: ['app.published'],
+      secret: '0123456789abcdef',
+    });
     const updated = await service.update(OWNER, created.id, { active: false });
     expect(updated.active).toBe(false);
   });
 
   it('não deixa atualizar endpoint de outro dono', async () => {
     const { service } = buildService();
-    const created = await service.create(OTHER_OWNER, { url: 'https://a.com', events: ['app.published'], secret: '0123456789abcdef' });
+    const created = await service.create(OTHER_OWNER, {
+      url: 'https://a.com',
+      events: ['app.published'],
+      secret: '0123456789abcdef',
+    });
     await expect(service.update(OWNER, created.id, { active: false })).rejects.toThrow();
   });
 
   it('remove o endpoint do dono', async () => {
     const { service, endpoints } = buildService();
-    const created = await service.create(OWNER, { url: 'https://a.com', events: ['app.published'], secret: '0123456789abcdef' });
+    const created = await service.create(OWNER, {
+      url: 'https://a.com',
+      events: ['app.published'],
+      secret: '0123456789abcdef',
+    });
     await service.remove(OWNER, created.id);
     expect(await endpoints.findById(created.id)).toBeNull();
   });
@@ -182,7 +226,11 @@ describe('WebhooksService.update/remove', () => {
 describe('WebhooksService.redeliver', () => {
   it('reenfileira o mesmo payload como uma nova entrega', async () => {
     const { service, enqueuer, deliveries } = buildService();
-    await service.create(OWNER, { url: 'https://a.com', events: ['app.published'], secret: '0123456789abcdef' });
+    await service.create(OWNER, {
+      url: 'https://a.com',
+      events: ['app.published'],
+      secret: '0123456789abcdef',
+    });
     await service.dispatch(OWNER, null, 'app.published', { versionNumber: 1 });
     const original = deliveries.rows[0]!;
 
@@ -195,7 +243,11 @@ describe('WebhooksService.redeliver', () => {
 
   it('não deixa reentregar payload de endpoint de outro dono', async () => {
     const { service, deliveries } = buildService();
-    await service.create(OTHER_OWNER, { url: 'https://a.com', events: ['app.published'], secret: '0123456789abcdef' });
+    await service.create(OTHER_OWNER, {
+      url: 'https://a.com',
+      events: ['app.published'],
+      secret: '0123456789abcdef',
+    });
     await service.dispatch(OTHER_OWNER, null, 'app.published', {});
     const original = deliveries.rows[0]!;
 

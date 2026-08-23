@@ -29,7 +29,8 @@ export class InMemoryAuditLogRepository implements AuditLogRepository {
 }
 
 export class InMemoryAdminUserRepository implements AdminUserRepository {
-  rows: (AdminUserRow & { creditBalance: number; projectCount: number; planKey: string | null })[] = [];
+  rows: (AdminUserRow & { creditBalance: number; projectCount: number; planKey: string | null })[] =
+    [];
 
   seed(input: { email: string; name: string; role: Role }): AdminUserRow {
     const row = {
@@ -90,17 +91,28 @@ export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
   async findByKey(key: string): Promise<FeatureFlagRow | null> {
     return this.flags.find((f) => f.key === key) ?? null;
   }
-  async create(input: { key: string; defaultOn: boolean; rolloutPct: number }): Promise<FeatureFlagRow> {
+  async create(input: {
+    key: string;
+    defaultOn: boolean;
+    rolloutPct: number;
+  }): Promise<FeatureFlagRow> {
     const row = { id: randomUUID(), ...input };
     this.flags.push(row);
     return row;
   }
-  async update(id: string, patch: { defaultOn?: boolean; rolloutPct?: number }): Promise<FeatureFlagRow> {
+  async update(
+    id: string,
+    patch: { defaultOn?: boolean; rolloutPct?: number },
+  ): Promise<FeatureFlagRow> {
     const f = this.flags.find((x) => x.id === id)!;
     Object.assign(f, patch);
     return f;
   }
-  async findAssignment(flagId: string, subjectType: string, subjectId: string): Promise<FlagAssignmentRow | null> {
+  async findAssignment(
+    flagId: string,
+    subjectType: string,
+    subjectId: string,
+  ): Promise<FlagAssignmentRow | null> {
     return (
       this.assignments.find(
         (a) => a.flagId === flagId && a.subjectType === subjectType && a.subjectId === subjectId,
@@ -114,7 +126,10 @@ export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
     enabled: boolean;
   }): Promise<FlagAssignmentRow> {
     const existing = this.assignments.find(
-      (a) => a.flagId === input.flagId && a.subjectType === input.subjectType && a.subjectId === input.subjectId,
+      (a) =>
+        a.flagId === input.flagId &&
+        a.subjectType === input.subjectType &&
+        a.subjectId === input.subjectId,
     );
     if (existing) {
       existing.enabled = input.enabled;

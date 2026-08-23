@@ -62,7 +62,9 @@ export class ProjectsController {
   ): Promise<Paginated<ReturnType<typeof projectView>>> {
     const all = await this.projects.list(user.id);
     const total = all.length;
-    const items = all.slice(pagination.offset, pagination.offset + pagination.limit).map(projectView);
+    const items = all
+      .slice(pagination.offset, pagination.offset + pagination.limit)
+      .map(projectView);
     return { items, total, offset: pagination.offset, limit: pagination.limit };
   }
 

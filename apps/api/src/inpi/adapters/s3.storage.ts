@@ -1,6 +1,7 @@
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getEnv } from '@eduforge/config';
+import { createS3Client } from '../../common/s3.client';
 import type { InpiStorage } from '../ports';
 
 export class S3InpiStorage implements InpiStorage {
@@ -8,14 +9,8 @@ export class S3InpiStorage implements InpiStorage {
   private readonly bucket: string;
 
   constructor() {
-    const env = getEnv();
-    this.client = new S3Client({
-      endpoint: env.S3_ENDPOINT,
-      region: 'us-east-1',
-      forcePathStyle: true,
-      credentials: { accessKeyId: env.S3_ACCESS_KEY, secretAccessKey: env.S3_SECRET_KEY },
-    });
-    this.bucket = env.S3_BUCKET_WORM;
+    this.client = createS3Client();
+    this.bucket = getEnv().S3_BUCKET_WORM;
   }
 
   async presignGet(key: string): Promise<string> {

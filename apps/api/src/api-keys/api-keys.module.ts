@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { getEnv } from '@eduforge/config';
 import { ApiKeysController } from './api-keys.controller';
 import { ApiKeysService } from './api-keys.service';
-import { PrismaApiKeyProjectRepository, PrismaApiKeyRepository } from './adapters/prisma.repositories';
+import {
+  PrismaApiKeyProjectRepository,
+  PrismaApiKeyRepository,
+} from './adapters/prisma.repositories';
 
 @Module({
   controllers: [ApiKeysController],

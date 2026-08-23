@@ -64,7 +64,12 @@ export default function NovoPage() {
       `/projects/${pid}/source-files`,
       {
         method: 'POST',
-        body: { filename: file.name, contentType: file.type || undefined, sizeBytes: file.size, sha256: sha },
+        body: {
+          filename: file.name,
+          contentType: file.type || undefined,
+          sizeBytes: file.size,
+          sha256: sha,
+        },
       },
     );
     if (!init.ok || !init.data) return fail(init.problem?.detail);

@@ -55,7 +55,11 @@ export class ApiKeyAuthGuard implements CanActivate {
       const auth = await this.apiKeys.authenticate(token);
       if (!auth) throw Errors.unauthorized();
 
-      req.user = { id: auth.ownerUserId, role: auth.ownerRole as AuthenticatedUser['role'], mfa: true };
+      req.user = {
+        id: auth.ownerUserId,
+        role: auth.ownerRole as AuthenticatedUser['role'],
+        mfa: true,
+      };
       req.apiKey = {
         id: auth.id,
         scopes: auth.scopes,
@@ -83,7 +87,10 @@ export class ApiKeyAuthGuard implements CanActivate {
     reply.header('X-RateLimit-Reset', String(Math.floor(decision.resetAt.getTime() / 1000)));
 
     if (!decision.allowed) {
-      const retryAfterSec = Math.max(1, Math.ceil((decision.resetAt.getTime() - Date.now()) / 1000));
+      const retryAfterSec = Math.max(
+        1,
+        Math.ceil((decision.resetAt.getTime() - Date.now()) / 1000),
+      );
       reply.header('Retry-After', String(retryAfterSec));
       throw Errors.rateLimitExceeded(retryAfterSec);
     }

@@ -57,7 +57,12 @@ describe('AuthService — cadastro e verificação', () => {
     expect(weak.slug).toBe('weak-password');
 
     const breached = await captureError(() =>
-      kit.service.signup({ email: 'a@b.com', password: 'password1', name: 'X', consentVersion: 'v' }),
+      kit.service.signup({
+        email: 'a@b.com',
+        password: 'password1',
+        name: 'X',
+        consentVersion: 'v',
+      }),
     );
     expect(breached.slug).toBe('weak-password');
   });
@@ -84,7 +89,11 @@ describe('AuthService — login e MFA (US-AUTH-01)', () => {
 
   it('login sem MFA emite sessão com refresh token', async () => {
     await signupVerified(kit);
-    const result = await kit.service.login({ email: 'marina@exemplo.com', password: PASSWORD, device });
+    const result = await kit.service.login({
+      email: 'marina@exemplo.com',
+      password: PASSWORD,
+      device,
+    });
     expect(result.status).toBe('authenticated');
     if (result.status !== 'authenticated') return;
     expect(result.session.accessToken).toBeTruthy();
@@ -96,7 +105,11 @@ describe('AuthService — login e MFA (US-AUTH-01)', () => {
     await kit.mfaService.setup(userId);
     const { backupCodes } = await kit.mfaService.enable(userId, '123456');
 
-    const first = await kit.service.login({ email: 'marina@exemplo.com', password: PASSWORD, device });
+    const first = await kit.service.login({
+      email: 'marina@exemplo.com',
+      password: PASSWORD,
+      device,
+    });
     expect(first.status).toBe('mfa_required');
     if (first.status !== 'mfa_required') return;
 
@@ -108,14 +121,22 @@ describe('AuthService — login e MFA (US-AUTH-01)', () => {
     expect(session.accessToken).toBeTruthy();
 
     // Código de backup também autentica e é de uso único.
-    const second = await kit.service.login({ email: 'marina@exemplo.com', password: PASSWORD, device });
+    const second = await kit.service.login({
+      email: 'marina@exemplo.com',
+      password: PASSWORD,
+      device,
+    });
     if (second.status !== 'mfa_required') throw new Error('esperava mfa_required');
     await kit.service.loginMfa({
       challengeToken: second.challengeToken,
       code: backupCodes[0]!,
       device,
     });
-    const third = await kit.service.login({ email: 'marina@exemplo.com', password: PASSWORD, device });
+    const third = await kit.service.login({
+      email: 'marina@exemplo.com',
+      password: PASSWORD,
+      device,
+    });
     if (third.status !== 'mfa_required') throw new Error('esperava mfa_required');
     const reuse = await captureError(() =>
       kit.service.loginMfa({ challengeToken: third.challengeToken, code: backupCodes[0]!, device }),
@@ -155,7 +176,11 @@ describe('AuthService — sessões e refresh', () => {
     const userId = await signupVerified(kit);
     const tokens: string[] = [];
     for (let i = 0; i < 3; i++) {
-      const r = await kit.service.login({ email: 'marina@exemplo.com', password: PASSWORD, device });
+      const r = await kit.service.login({
+        email: 'marina@exemplo.com',
+        password: PASSWORD,
+        device,
+      });
       if (r.status === 'authenticated') tokens.push(r.session.refreshToken);
     }
     expect(kit.sessions.countActive(userId)).toBe(3);
@@ -168,7 +193,11 @@ describe('AuthService — sessões e refresh', () => {
 
   it('refresh rotaciona o token e invalida o antigo', async () => {
     await signupVerified(kit);
-    const login = await kit.service.login({ email: 'marina@exemplo.com', password: PASSWORD, device });
+    const login = await kit.service.login({
+      email: 'marina@exemplo.com',
+      password: PASSWORD,
+      device,
+    });
     if (login.status !== 'authenticated') throw new Error('esperava sessão');
     const old = login.session.refreshToken;
 

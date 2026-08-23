@@ -13,7 +13,8 @@ export function Button({
   variant?: BtnVariant;
   size?: 'sm' | 'md' | 'lg';
 }) {
-  const base = 'inline-flex items-center justify-center font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed outline-none';
+  const base =
+    'inline-flex items-center justify-center font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed outline-none';
 
   const sizes: Record<string, string> = {
     sm: 'px-3 py-1.5 text-xs rounded-lg gap-1.5',
@@ -26,8 +27,7 @@ export function Button({
       'bg-cyan-gradient text-gray-950 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/35 hover:brightness-110 active:scale-[0.98]',
     secondary:
       'bg-white/[0.04] border border-white/[0.08] text-gray-200 hover:bg-white/[0.08] hover:border-cyan-500/30',
-    ghost:
-      'text-gray-400 hover:text-gray-200 hover:bg-white/[0.04]',
+    ghost: 'text-gray-400 hover:text-gray-200 hover:bg-white/[0.04]',
     danger:
       'bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500/25 hover:border-red-500/50',
   };
@@ -52,7 +52,9 @@ export function Card({
   return (
     <div
       className={`glass rounded-2xl p-6 transition-all duration-300 ${
-        hover ? 'hover:-translate-y-1 hover:border-cyan-500/20 hover:shadow-lg hover:shadow-cyan-500/5' : ''
+        hover
+          ? 'hover:-translate-y-1 hover:border-cyan-500/20 hover:shadow-lg hover:shadow-cyan-500/5'
+          : ''
       } ${className}`}
     >
       {children}
@@ -90,10 +92,7 @@ export function Badge({
 }
 
 /* ─────── Input ─────── */
-export function Input({
-  className = '',
-  ...props
-}: InputHTMLAttributes<HTMLInputElement>) {
+export function Input({ className = '', ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       className={`w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-gray-200 placeholder-gray-500 outline-none backdrop-blur transition-all duration-200 focus:border-cyan-500/50 focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(6,182,212,0.08)] disabled:opacity-40 ${className}`}

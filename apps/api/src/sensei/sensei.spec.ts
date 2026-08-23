@@ -22,10 +22,30 @@ async function setup() {
 
   const retrieval = new FakeSenseiRetrievalRepository(ai);
   await retrieval.setBlocks('p1', [
-    { blockId: 'b1', contentMd: 'A fotossíntese converte luz solar em energia química nos cloroplastos das células vegetais.', sourceRef: { page: 42 } },
-    { blockId: 'b2', contentMd: 'A fase clara ocorre na membrana dos tilacoides e produz ATP e NADPH utilizando a energia luminosa.', sourceRef: { page: 43 } },
-    { blockId: 'b3', contentMd: 'O ciclo de Calvin ocorre no estroma do cloroplasto e fixa o dióxido de carbono em glicose.', sourceRef: { page: 44 } },
-    { blockId: 'b4', contentMd: 'A membrana plasmática controla a entrada e saída de substâncias da célula por transporte ativo e passivo.', sourceRef: { page: 15 } },
+    {
+      blockId: 'b1',
+      contentMd:
+        'A fotossíntese converte luz solar em energia química nos cloroplastos das células vegetais.',
+      sourceRef: { page: 42 },
+    },
+    {
+      blockId: 'b2',
+      contentMd:
+        'A fase clara ocorre na membrana dos tilacoides e produz ATP e NADPH utilizando a energia luminosa.',
+      sourceRef: { page: 43 },
+    },
+    {
+      blockId: 'b3',
+      contentMd:
+        'O ciclo de Calvin ocorre no estroma do cloroplasto e fixa o dióxido de carbono em glicose.',
+      sourceRef: { page: 44 },
+    },
+    {
+      blockId: 'b4',
+      contentMd:
+        'A membrana plasmática controla a entrada e saída de substâncias da célula por transporte ativo e passivo.',
+      sourceRef: { page: 15 },
+    },
   ]);
 
   const credits = new FakeSenseiCreditsRepository();
@@ -138,7 +158,11 @@ describe('SenseiService — ask (RF-06.1)', () => {
     projects.setOwnedProject('p2', 'owner2');
     projects.setEnrollment('enr2', 'learner2', 'p2');
     await retrieval.setBlocks('p2', [
-      { blockId: 'bx', contentMd: 'Conteúdo sobre Python e programação funcional.', sourceRef: { page: 1 } },
+      {
+        blockId: 'bx',
+        contentMd: 'Conteúdo sobre Python e programação funcional.',
+        sourceRef: { page: 1 },
+      },
     ]);
 
     await expect(

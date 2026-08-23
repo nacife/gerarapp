@@ -7,7 +7,9 @@ function fakePdf(extra: string): Buffer {
 
 describe('scanForPadesMarkers', () => {
   it('detecta assinatura PAdES (ETSI.CAdES.detached) quando presente', () => {
-    const pdf = fakePdf('<< /ByteRange [0 100 200 300] /SubFilter /ETSI.CAdES.detached /Contents <deadbeef> >>');
+    const pdf = fakePdf(
+      '<< /ByteRange [0 100 200 300] /SubFilter /ETSI.CAdES.detached /Contents <deadbeef> >>',
+    );
     const res = scanForPadesMarkers(pdf);
     expect(res.hasPadesMarkers).toBe(true);
     expect(res.subFilter).toBe('ETSI.CAdES.detached');

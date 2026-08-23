@@ -8,7 +8,11 @@ export interface RateLimitWindow {
 const WINDOW_MS = 60_000;
 
 /** Janela fixa de 1 min por chave (Parte 6.B.1: 120 req/min). Puro — o INCR/EXPIRE fica no adapter Redis. */
-export function computeRateLimitWindow(apiKeyId: string, limit: number, now: Date): RateLimitWindow {
+export function computeRateLimitWindow(
+  apiKeyId: string,
+  limit: number,
+  now: Date,
+): RateLimitWindow {
   const windowStartMs = Math.floor(now.getTime() / WINDOW_MS) * WINDOW_MS;
   return {
     windowKey: `ratelimit:${apiKeyId}:${windowStartMs}`,

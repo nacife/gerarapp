@@ -27,10 +27,7 @@ export function sm2(prev: Sm2State, quality: number, now: Date = new Date()): Sm
     else intervalDays = Math.round(prev.intervalDays * prev.easeFactor);
   }
 
-  const easeFactor = Math.max(
-    1.3,
-    prev.easeFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)),
-  );
+  const easeFactor = Math.max(1.3, prev.easeFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
 
   const nextReviewAt = new Date(now.getTime() + intervalDays * 24 * 60 * 60 * 1000);
   return { easeFactor, intervalDays, repetitions, nextReviewAt };

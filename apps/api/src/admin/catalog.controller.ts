@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, HttpCode, Put } from '@nestjs/common';
 import { Roles } from '../common/decorators';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { z } from 'zod';
@@ -44,8 +44,20 @@ export class AdminCatalogController {
   @HttpCode(201)
   @Roles('admin', 'super_admin')
   async createPalette(@Body(new ZodValidationPipe(paletteSchema)) dto: PaletteDto) {
-    const neutrosLight = { bg: '#ffffff', surface: '#f4f6f8', text: '#0f172a', muted: '#5b6472', border: '#e2e8f0' };
-    const neutrosDark = { bg: '#0b1120', surface: '#141b2d', text: '#f8fafc', muted: '#94a3b8', border: '#1f2937' };
+    const neutrosLight = {
+      bg: '#ffffff',
+      surface: '#f4f6f8',
+      text: '#0f172a',
+      muted: '#5b6472',
+      border: '#e2e8f0',
+    };
+    const neutrosDark = {
+      bg: '#0b1120',
+      surface: '#141b2d',
+      text: '#f8fafc',
+      muted: '#94a3b8',
+      border: '#1f2937',
+    };
     return prisma.palette.create({
       data: {
         key: dto.key,
@@ -63,9 +75,24 @@ export class AdminCatalogController {
   /** Atualizar paleta */
   @Put('palettes/:id')
   @Roles('admin', 'super_admin')
-  async updatePalette(@Param('id') id: string, @Body(new ZodValidationPipe(paletteSchema)) dto: PaletteDto) {
-    const neutrosLight = { bg: '#ffffff', surface: '#f4f6f8', text: '#0f172a', muted: '#5b6472', border: '#e2e8f0' };
-    const neutrosDark = { bg: '#0b1120', surface: '#141b2d', text: '#f8fafc', muted: '#94a3b8', border: '#1f2937' };
+  async updatePalette(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(paletteSchema)) dto: PaletteDto,
+  ) {
+    const neutrosLight = {
+      bg: '#ffffff',
+      surface: '#f4f6f8',
+      text: '#0f172a',
+      muted: '#5b6472',
+      border: '#e2e8f0',
+    };
+    const neutrosDark = {
+      bg: '#0b1120',
+      surface: '#141b2d',
+      text: '#f8fafc',
+      muted: '#94a3b8',
+      border: '#1f2937',
+    };
     return prisma.palette.update({
       where: { id },
       data: {
@@ -112,7 +139,10 @@ export class AdminCatalogController {
   /** Atualizar template */
   @Put('templates/:id')
   @Roles('admin', 'super_admin')
-  async updateTemplate(@Param('id') id: string, @Body(new ZodValidationPipe(templateSchema)) dto: TemplateDto) {
+  async updateTemplate(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(templateSchema)) dto: TemplateDto,
+  ) {
     return prisma.template.update({
       where: { id },
       data: {

@@ -23,9 +23,15 @@ export const Errors = {
     new AppError(422, 'weak-password', 'Senha fraca', errors.join(' '), { errors }),
 
   invalidCredentials: (captchaRequired = false) =>
-    new AppError(401, 'invalid-credentials', 'Credenciais inválidas', 'E-mail ou senha incorretos.', {
-      captchaRequired,
-    }),
+    new AppError(
+      401,
+      'invalid-credentials',
+      'Credenciais inválidas',
+      'E-mail ou senha incorretos.',
+      {
+        captchaRequired,
+      },
+    ),
 
   accountLocked: (retryAfterSec: number) =>
     new AppError(
@@ -37,7 +43,12 @@ export const Errors = {
     ),
 
   emailNotVerified: () =>
-    new AppError(403, 'email-not-verified', 'E-mail não verificado', 'Confirme seu e-mail para continuar.'),
+    new AppError(
+      403,
+      'email-not-verified',
+      'E-mail não verificado',
+      'Confirme seu e-mail para continuar.',
+    ),
 
   invalidToken: () =>
     new AppError(400, 'invalid-token', 'Token inválido ou expirado', 'O link não é mais válido.'),
@@ -56,7 +67,8 @@ export const Errors = {
   accountSuspended: () =>
     new AppError(403, 'account-suspended', 'Conta suspensa', 'Sua conta está suspensa.'),
 
-  unauthorized: () => new AppError(401, 'unauthorized', 'Não autenticado', 'Autenticação necessária.'),
+  unauthorized: () =>
+    new AppError(401, 'unauthorized', 'Não autenticado', 'Autenticação necessária.'),
 
   forbidden: () =>
     new AppError(403, 'forbidden', 'Acesso negado', 'Você não tem permissão para esta ação.'),
@@ -101,10 +113,20 @@ export const Errors = {
     new AppError(401, 'app-locked', 'Acesso restrito', 'Este app exige senha ou convite.'),
 
   notInvited: () =>
-    new AppError(403, 'not-invited', 'Convite necessário', 'Seu e-mail não está na lista de convidados.'),
+    new AppError(
+      403,
+      'not-invited',
+      'Convite necessário',
+      'Seu e-mail não está na lista de convidados.',
+    ),
 
   appNotPublished: () =>
-    new AppError(404, 'app-not-published', 'App não publicado', 'Este app ainda não tem versão publicada.'),
+    new AppError(
+      404,
+      'app-not-published',
+      'App não publicado',
+      'Este app ainda não tem versão publicada.',
+    ),
 
   gradingRejected: (reason: string) =>
     new AppError(422, 'grading-rejected', 'Envio inválido', reason),

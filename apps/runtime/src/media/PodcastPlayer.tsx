@@ -68,7 +68,8 @@ export function PodcastPlayer({
           </p>
           {meta.durationSec != null && (
             <p className="text-xs" style={{ color: theme.muted }}>
-              {Math.floor(meta.durationSec / 60)}:{String(Math.floor(meta.durationSec % 60)).padStart(2, '0')}
+              {Math.floor(meta.durationSec / 60)}:
+              {String(Math.floor(meta.durationSec % 60)).padStart(2, '0')}
             </p>
           )}
         </div>
@@ -86,7 +87,9 @@ export function PodcastPlayer({
 
       {/* Controle de velocidade */}
       <div className="flex items-center gap-2">
-        <span className="text-xs" style={{ color: theme.muted }}>Velocidade:</span>
+        <span className="text-xs" style={{ color: theme.muted }}>
+          Velocidade:
+        </span>
         {SPEEDS.map((s) => (
           <button
             key={s}

@@ -48,11 +48,7 @@ export function FlashcardsView({
     );
   }
 
-  const cardClass = mastered
-    ? 'card-holo'
-    : reduced
-      ? ''
-      : 'card-3d';
+  const cardClass = mastered ? 'card-holo' : reduced ? '' : 'card-3d';
 
   return (
     <div>
@@ -106,10 +102,10 @@ export function FlashcardsView({
         style={{ background: theme.surface, borderColor: theme.border, color: theme.text }}
         className={`card-3d flex min-h-[120px] w-full items-center justify-center rounded-xl border text-center text-lg font-medium ${cardClass}`}
       >
-        <div className={`card-3d-inner flex w-full items-center justify-center ${flipped ? 'flipped' : ''}`}>
-          <div className="card-front p-6">
-            {card!.front_md}
-          </div>
+        <div
+          className={`card-3d-inner flex w-full items-center justify-center ${flipped ? 'flipped' : ''}`}
+        >
+          <div className="card-front p-6">{card!.front_md}</div>
           <div className="card-back absolute inset-0 flex items-center justify-center p-6">
             {card!.back_md}
           </div>

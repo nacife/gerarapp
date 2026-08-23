@@ -72,7 +72,13 @@ import { ApiKeysModule } from '../api-keys/api-keys.module';
             ? new SmtpMailer(
                 env.SMTP_URL
                   ? { url: env.SMTP_URL }
-                  : { host: env.SMTP_HOST, port: env.SMTP_PORT, user: env.SMTP_USER, pass: env.SMTP_PASS, from: env.SMTP_FROM },
+                  : {
+                      host: env.SMTP_HOST,
+                      port: env.SMTP_PORT,
+                      user: env.SMTP_USER,
+                      pass: env.SMTP_PASS,
+                      from: env.SMTP_FROM,
+                    },
               )
             : new ConsoleMailer(),
           new Argon2idHasher(),
@@ -96,7 +102,11 @@ import { ApiKeysModule } from '../api-keys/api-keys.module';
     {
       provide: MfaService,
       useFactory: () =>
-        new MfaService(new PrismaUserRepository(), new OtplibTotpService(), getEnv().AUTH_ENCRYPTION_KEY),
+        new MfaService(
+          new PrismaUserRepository(),
+          new OtplibTotpService(),
+          getEnv().AUTH_ENCRYPTION_KEY,
+        ),
     },
     {
       provide: AccountService,

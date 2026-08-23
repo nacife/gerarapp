@@ -39,7 +39,13 @@ export async function seedDemoApp(prisma: PrismaClient): Promise<void> {
   });
 
   const contentMap = await prisma.contentMap.create({
-    data: { projectId: project.id, revision: 1, approvedAt: new Date(), structureConfidence: 0.93, tree: {} },
+    data: {
+      projectId: project.id,
+      revision: 1,
+      approvedAt: new Date(),
+      structureConfidence: 0.93,
+      tree: {},
+    },
   });
 
   const blockMembrana = await prisma.contentBlock.create({
@@ -69,8 +75,20 @@ export async function seedDemoApp(prisma: PrismaClient): Promise<void> {
         title: 'A Célula',
         confidence: 0.93,
         children: [
-          { id: 's1', title: 'Membrana Celular', confidence: 0.95, kind: 'concept', blockId: blockMembrana.id },
-          { id: 's2', title: 'Núcleo e Organelas', confidence: 0.92, kind: 'concept', blockId: blockNucleo.id },
+          {
+            id: 's1',
+            title: 'Membrana Celular',
+            confidence: 0.95,
+            kind: 'concept',
+            blockId: blockMembrana.id,
+          },
+          {
+            id: 's2',
+            title: 'Núcleo e Organelas',
+            confidence: 0.92,
+            kind: 'concept',
+            blockId: blockNucleo.id,
+          },
         ],
       },
     ],

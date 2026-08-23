@@ -6,9 +6,13 @@ import { getEnv } from '@eduforge/config';
  * Em produção: JSON (pino-pretty ausente). Em dev: pretty-print colorido.
  * ADR-0072.
  */
-export const logger = getEnv().NODE_ENV === 'production'
-  ? pino({ level: 'info' })
-  : pino({
-      level: 'debug',
-      transport: { target: 'pino-pretty', options: { colorize: true, translateTime: 'HH:MM:ss' } },
-    });
+export const logger =
+  getEnv().NODE_ENV === 'production'
+    ? pino({ level: 'info' })
+    : pino({
+        level: 'debug',
+        transport: {
+          target: 'pino-pretty',
+          options: { colorize: true, translateTime: 'HH:MM:ss' },
+        },
+      });

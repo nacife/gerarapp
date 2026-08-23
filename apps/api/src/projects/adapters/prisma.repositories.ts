@@ -36,7 +36,11 @@ function mapProject(p: {
 }
 
 export class PrismaProjectRepository implements ProjectRepository {
-  async create(input: { ownerUserId: string; title: string; slug: string }): Promise<ProjectRecord> {
+  async create(input: {
+    ownerUserId: string;
+    title: string;
+    slug: string;
+  }): Promise<ProjectRecord> {
     const p = await prisma.project.create({ data: input });
     return mapProject(p);
   }

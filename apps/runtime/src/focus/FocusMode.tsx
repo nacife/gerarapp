@@ -12,13 +12,7 @@ import type { RuntimeTheme } from '../interactions/theme';
  *
  * Tudo respeita `prefers-reduced-motion`.
  */
-export function FocusMode({
-  contentMd,
-  theme,
-}: {
-  contentMd: string;
-  theme: RuntimeTheme;
-}) {
+export function FocusMode({ contentMd, theme }: { contentMd: string; theme: RuntimeTheme }) {
   const reduced = usePrefersReducedMotion();
   const [dyslexicFont, setDyslexicFont] = useState(false);
   const [rsvpActive, setRsvpActive] = useState(false);
@@ -89,8 +83,13 @@ export function FocusMode({
       `}</style>
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 rounded-lg border p-2" style={{ borderColor: theme.border, background: theme.surface }}>
-        <span className="text-xs font-semibold" style={{ color: theme.muted }}>Modo Foco:</span>
+      <div
+        className="flex flex-wrap items-center gap-2 rounded-lg border p-2"
+        style={{ borderColor: theme.border, background: theme.surface }}
+      >
+        <span className="text-xs font-semibold" style={{ color: theme.muted }}>
+          Modo Foco:
+        </span>
 
         <button
           onClick={() => setDyslexicFont(!dyslexicFont)}
@@ -104,7 +103,10 @@ export function FocusMode({
         </button>
 
         <button
-          onClick={() => { setRsvpActive(!rsvpActive); setPauseReminder(false); }}
+          onClick={() => {
+            setRsvpActive(!rsvpActive);
+            setPauseReminder(false);
+          }}
           style={{
             background: rsvpActive ? theme.accent : theme.border,
             color: rsvpActive ? theme.bg : theme.text,
@@ -153,12 +155,9 @@ export function FocusMode({
       {/* Pausa ativa */}
       {pauseReminder && (
         <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-300">
-          🧘 Pausa ativa sugerida! Você está lendo há 5 minutos.
-          Respire fundo, pisque os olhos e alongue o pescoço por 30 segundos.
-          <button
-            onClick={() => setPauseReminder(false)}
-            className="ml-2 underline"
-          >
+          🧘 Pausa ativa sugerida! Você está lendo há 5 minutos. Respire fundo, pisque os olhos e
+          alongue o pescoço por 30 segundos.
+          <button onClick={() => setPauseReminder(false)} className="ml-2 underline">
             Voltar
           </button>
         </div>
@@ -166,7 +165,10 @@ export function FocusMode({
 
       {/* RSVP Viewer */}
       {rsvpActive && words.length > 0 && (
-        <div className="flex min-h-[120px] items-center justify-center rounded-xl border p-8" style={{ borderColor: theme.border, background: dimBg ? theme.bg : theme.surface }}>
+        <div
+          className="flex min-h-[120px] items-center justify-center rounded-xl border p-8"
+          style={{ borderColor: theme.border, background: dimBg ? theme.bg : theme.surface }}
+        >
           <div className="text-center">
             <span className="rsvp-word" style={{ color: theme.text }}>
               {words[rsvpIndex]}
@@ -182,13 +184,31 @@ export function FocusMode({
       {!rsvpActive && (
         <div
           className={`prose max-w-none rounded-xl p-6 ${rulerActive ? 'reading-ruler' : ''}`}
-          style={{ background: dimBg ? theme.bg : theme.surface, color: theme.text, borderColor: theme.border }}
+          style={{
+            background: dimBg ? theme.bg : theme.surface,
+            color: theme.text,
+            borderColor: theme.border,
+          }}
         >
           {contentMd.split('\n').map((line, i) => {
-            if (line.startsWith('# ')) return <h1 key={i} className="mb-3 text-2xl font-bold" style={{ color: theme.primary }}>{line.slice(2)}</h1>;
-            if (line.startsWith('## ')) return <h2 key={i} className="mb-2 mt-4 text-xl font-semibold">{line.slice(3)}</h2>;
+            if (line.startsWith('# '))
+              return (
+                <h1 key={i} className="mb-3 text-2xl font-bold" style={{ color: theme.primary }}>
+                  {line.slice(2)}
+                </h1>
+              );
+            if (line.startsWith('## '))
+              return (
+                <h2 key={i} className="mb-2 mt-4 text-xl font-semibold">
+                  {line.slice(3)}
+                </h2>
+              );
             if (line.trim() === '') return <br key={i} />;
-            return <p key={i} className="mb-1 leading-relaxed">{line}</p>;
+            return (
+              <p key={i} className="mb-1 leading-relaxed">
+                {line}
+              </p>
+            );
           })}
         </div>
       )}

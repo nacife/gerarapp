@@ -35,14 +35,32 @@ export class PdfLibCertificateBuilder implements CertificatePdfBuilder {
       color: brand,
     });
     page.drawText(input.learnerName, { x: 60, y: height - 210, size: 24, font: bold });
-    page.drawText('concluiu com êxito o curso', { x: 60, y: height - 245, size: 13, font: regular });
+    page.drawText('concluiu com êxito o curso', {
+      x: 60,
+      y: height - 245,
+      size: 13,
+      font: regular,
+    });
     page.drawText(input.projectTitle, { x: 60, y: height - 280, size: 20, font: bold });
-    page.drawText(
-      `Emitido em ${input.issuedAt.toLocaleDateString('pt-BR', { timeZone: 'UTC' })}`,
-      { x: 60, y: height - 320, size: 12, font: regular },
-    );
-    page.drawText(`Código de verificação: ${input.verifyCode}`, { x: 60, y: 70, size: 10, font: regular });
-    page.drawText(input.verifyUrl, { x: 60, y: 54, size: 9, font: regular, color: rgb(0.4, 0.4, 0.4) });
+    page.drawText(`Emitido em ${input.issuedAt.toLocaleDateString('pt-BR', { timeZone: 'UTC' })}`, {
+      x: 60,
+      y: height - 320,
+      size: 12,
+      font: regular,
+    });
+    page.drawText(`Código de verificação: ${input.verifyCode}`, {
+      x: 60,
+      y: 70,
+      size: 10,
+      font: regular,
+    });
+    page.drawText(input.verifyUrl, {
+      x: 60,
+      y: 54,
+      size: 9,
+      font: regular,
+      color: rgb(0.4, 0.4, 0.4),
+    });
 
     const qrImage = await doc.embedPng(input.qrPng);
     const qrDim = 130;

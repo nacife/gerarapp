@@ -11,7 +11,11 @@ import type {
   FilingStatus,
   FilingStorage,
 } from '../ports';
-import type { SignatureCheckInput, SignatureCheckResult, SignatureValidator } from '../signature-validator';
+import type {
+  SignatureCheckInput,
+  SignatureCheckResult,
+  SignatureValidator,
+} from '../signature-validator';
 
 export class InMemoryFilingRepository implements FilingRepository {
   rows: FilingRow[] = [];
@@ -67,7 +71,9 @@ export class InMemoryFilingRepository implements FilingRepository {
 
   async listForQueue(status?: FilingStatus): Promise<FilingRow[]> {
     return this.rows
-      .filter((r) => (status ? r.status === status : !['granted', 'rejected', 'revoked'].includes(r.status)))
+      .filter((r) =>
+        status ? r.status === status : !['granted', 'rejected', 'revoked'].includes(r.status),
+      )
       .map((r) => ({ ...r }));
   }
 }
@@ -76,11 +82,19 @@ export class InMemoryFilingEventRepository implements FilingEventRepository {
   rows: (FilingEventRow & { filingId: string })[] = [];
 
   async record(filingId: string, kind: FilingEventKind, detail?: unknown): Promise<void> {
-    this.rows.push({ id: randomUUID(), filingId, kind, detail: detail ?? null, occurredAt: new Date() });
+    this.rows.push({
+      id: randomUUID(),
+      filingId,
+      kind,
+      detail: detail ?? null,
+      occurredAt: new Date(),
+    });
   }
 
   async listForFiling(filingId: string): Promise<FilingEventRow[]> {
-    return this.rows.filter((r) => r.filingId === filingId).map(({ filingId: _f, ...rest }) => rest);
+    return this.rows
+      .filter((r) => r.filingId === filingId)
+      .map(({ filingId: _f, ...rest }) => rest);
   }
 }
 
@@ -102,8 +116,13 @@ export class InMemoryFilingCertificateRepository implements FilingCertificateRep
     return cert;
   }
 
-  async getForOwner(certificateId: string, ownerUserId: string): Promise<FilingCertificateInfo | null> {
-    const c = this.certs.find((x) => x.certificateId === certificateId && x.ownerUserId === ownerUserId);
+  async getForOwner(
+    certificateId: string,
+    ownerUserId: string,
+  ): Promise<FilingCertificateInfo | null> {
+    const c = this.certs.find(
+      (x) => x.certificateId === certificateId && x.ownerUserId === ownerUserId,
+    );
     return c ? { ...c } : null;
   }
 

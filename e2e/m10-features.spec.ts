@@ -16,7 +16,9 @@ test.describe('M10 — Sensei (Tutor IA)', () => {
     const senseiBtn = page.locator('button', { hasText: /Sensei|Prof/ });
     const authForm = page.locator('form');
     // Pelo menos um dos dois deve estar visível
-    const visible = (await senseiBtn.isVisible().catch(() => false)) || (await authForm.isVisible().catch(() => false));
+    const visible =
+      (await senseiBtn.isVisible().catch(() => false)) ||
+      (await authForm.isVisible().catch(() => false));
     expect(visible).toBe(true);
   });
 
@@ -53,7 +55,11 @@ test.describe('M10 — Conquistas e Ranking', () => {
   test('endpoint de conquistas retorna 8 itens', async ({ request }) => {
     // Cria learner e enrollment via API
     const signupRes = await request.post(`${API}/v1/learner/signup`, {
-      data: { email: `e2e-ach-${Date.now()}@test.com`, name: 'E2E Achievements', password: 'TestPass2026!' },
+      data: {
+        email: `e2e-ach-${Date.now()}@test.com`,
+        name: 'E2E Achievements',
+        password: 'TestPass2026!',
+      },
     });
     expect(signupRes.ok()).toBe(true);
     const { learnerId } = await signupRes.json();

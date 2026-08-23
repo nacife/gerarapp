@@ -58,7 +58,17 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function UsageBar({ label, used, limit, suffix = '' }: { label: string; used: number; limit: number; suffix?: string }) {
+function UsageBar({
+  label,
+  used,
+  limit,
+  suffix = '',
+}: {
+  label: string;
+  used: number;
+  limit: number;
+  suffix?: string;
+}) {
   const pct = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
   return (
     <div>
@@ -157,7 +167,8 @@ export default function PainelPage() {
               limit={usage.limits.aiCreditsMonthly}
             />
             <p className="text-xs text-gray-500">
-              Armazenamento: {formatBytes(usage.usage.storageBytes)} / {usage.limits.uploadMb} MB por arquivo
+              Armazenamento: {formatBytes(usage.usage.storageBytes)} / {usage.limits.uploadMb} MB
+              por arquivo
             </p>
           </div>
         )}
@@ -168,7 +179,10 @@ export default function PainelPage() {
           <h2 className="text-sm font-medium uppercase tracking-wider text-gray-500">Destaques</h2>
           <div className="space-y-1.5">
             {home.highlights.map((h, i) => (
-              <p key={i} className="rounded-lg border border-white/[0.06] bg-slate-900/40 px-3 py-2 text-sm text-slate-300">
+              <p
+                key={i}
+                className="rounded-lg border border-white/[0.06] bg-slate-900/40 px-3 py-2 text-sm text-slate-300"
+              >
                 ✨ {h}
               </p>
             ))}
@@ -191,15 +205,25 @@ export default function PainelPage() {
                   key={p.id}
                   className="overflow-hidden rounded-xl border border-white/[0.06] glass transition hover:-translate-y-0.5 hover:bg-slate-900"
                 >
-                  <Link href={p.displayStatus === 'published' ? `/projeto/${p.id}/revisar` : `/projeto/${p.id}/mapa`}>
+                  <Link
+                    href={
+                      p.displayStatus === 'published'
+                        ? `/projeto/${p.id}/revisar`
+                        : `/projeto/${p.id}/mapa`
+                    }
+                  >
                     <div
                       className="h-2"
-                      style={{ background: `linear-gradient(90deg, ${colors.primary}, ${colors.accent})` }}
+                      style={{
+                        background: `linear-gradient(90deg, ${colors.primary}, ${colors.accent})`,
+                      }}
                     />
                     <div className="p-4 pb-2">
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-semibold">{p.title}</p>
-                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${STATUS_STYLE[p.displayStatus]}`}>
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${STATUS_STYLE[p.displayStatus]}`}
+                        >
                           {STATUS_LABEL[p.displayStatus]}
                         </span>
                       </div>
@@ -207,7 +231,9 @@ export default function PainelPage() {
                         {p.slug} · {p.interactionCount} interações
                       </p>
                       {p.displayStatus !== 'draft' && (
-                        <p className="mt-2 text-xs text-gray-400">{p.sessionsThisWeek} sessões esta semana</p>
+                        <p className="mt-2 text-xs text-gray-400">
+                          {p.sessionsThisWeek} sessões esta semana
+                        </p>
                       )}
                     </div>
                   </Link>

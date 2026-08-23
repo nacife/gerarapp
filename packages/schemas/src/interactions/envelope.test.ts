@@ -35,8 +35,6 @@ describe('envelopeSchema', () => {
   });
 
   it('rejeita objective acima de 200 caracteres', () => {
-    expect(() =>
-      envelopeSchema.parse({ ...validEnvelope, objective: 'x'.repeat(201) }),
-    ).toThrow();
+    expect(() => envelopeSchema.parse({ ...validEnvelope, objective: 'x'.repeat(201) })).toThrow();
   });
 });

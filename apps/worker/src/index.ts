@@ -183,7 +183,10 @@ async function main() {
         encryptionKey: env.AUTH_ENCRYPTION_KEY,
       });
     },
-    { connection, settings: { backoffStrategy: (attemptsMade) => computeWebhookBackoffMs(attemptsMade) } },
+    {
+      connection,
+      settings: { backoffStrategy: (attemptsMade) => computeWebhookBackoffMs(attemptsMade) },
+    },
   );
 
   // Indexação do RAG do Sensei (RF-06.1): embeda blocos do mapa aprovado no publish.
@@ -232,7 +235,17 @@ async function main() {
     { connection },
   );
 
-  const workers = [systemWorker, anonymizeWorker, ingestWorker, generateWorker, inpiWorker, webhookWorker, senseiWorker, podcastWorker, timeCapsuleWorker];
+  const workers = [
+    systemWorker,
+    anonymizeWorker,
+    ingestWorker,
+    generateWorker,
+    inpiWorker,
+    webhookWorker,
+    senseiWorker,
+    podcastWorker,
+    timeCapsuleWorker,
+  ];
   for (const w of workers) {
     w.on('failed', (job, err) => {
       // eslint-disable-next-line no-console

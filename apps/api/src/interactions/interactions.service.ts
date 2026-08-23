@@ -1,11 +1,7 @@
 import type { AiProvider, InteractionDensity } from '@eduforge/ai';
 import { type InteractionType, validateInteraction } from '@eduforge/schemas';
 import { Errors } from '../common/errors';
-import type {
-  ContentMapRepository,
-  JobRepository,
-  ProjectRepository,
-} from '../projects/ports';
+import type { ContentMapRepository, JobRepository, ProjectRepository } from '../projects/ports';
 import type {
   CreditRepository,
   GenerateEnqueuer,

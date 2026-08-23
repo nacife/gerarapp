@@ -17,7 +17,10 @@ export class SystemService {
 
     // DB check
     let dbOk = false;
-    try { await prisma.$queryRaw(Prisma.sql`SELECT 1`); dbOk = true; } catch {}
+    try {
+      await prisma.$queryRaw(Prisma.sql`SELECT 1`);
+      dbOk = true;
+    } catch {}
 
     // Redis check
     let redisOk = false;
@@ -67,7 +70,14 @@ export class SystemService {
   private async getQueueStats() {
     const env = getEnv();
     const redis = new IORedis(env.REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 2000 });
-    const queues = ['ingest', 'generate', 'tts', 'inpi-package', 'sensei-embed', 'webhook-delivery'];
+    const queues = [
+      'ingest',
+      'generate',
+      'tts',
+      'inpi-package',
+      'sensei-embed',
+      'webhook-delivery',
+    ];
 
     const stats: Record<string, unknown> = {};
     for (const q of queues) {
@@ -90,16 +100,27 @@ export class SystemService {
   }
 
   async changeRole(userId: string, role: string) {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, role: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: true },
+    });
     if (!user) throw Errors.notFound('Usuário');
 
-    await prisma.user.update({ where: { id: userId }, data: { role: role as 'learner' | 'creator' | 'admin' | 'support' | 'org_admin' | 'super_admin' } });
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        role: role as 'learner' | 'creator' | 'admin' | 'support' | 'org_admin' | 'super_admin',
+      },
+    });
 
     return { userId, previousRole: user.role, newRole: role };
   }
 
   async resetMfa(userId: string) {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, mfa: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, mfa: true },
+    });
     if (!user) throw Errors.notFound('Usuário');
 
     await prisma.user.update({ where: { id: userId }, data: { mfa: Prisma.DbNull } });

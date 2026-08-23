@@ -1,10 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { Errors } from '../common/errors';
-import {
-  CONTENT_TYPE_BY_MIME,
-  sanitizeFilename,
-  validateUpload,
-} from './domain/source-file';
+import { CONTENT_TYPE_BY_MIME, sanitizeFilename, validateUpload } from './domain/source-file';
 import type {
   IngestEnqueuer,
   JobStep,

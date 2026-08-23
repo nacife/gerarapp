@@ -41,7 +41,9 @@ export class CertificateService {
     if (!complete) return null;
 
     const certificate = await this.issue(enrollmentId);
-    await this.webhooks.dispatchForProject(enrollment.projectId, 'learner.completed', { enrollmentId });
+    await this.webhooks.dispatchForProject(enrollment.projectId, 'learner.completed', {
+      enrollmentId,
+    });
     await this.webhooks.dispatchForProject(enrollment.projectId, 'certificate.issued', {
       enrollmentId,
       verifyCode: certificate.verifyCode,

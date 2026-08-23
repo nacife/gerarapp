@@ -1,22 +1,17 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getEnv } from '@eduforge/config';
+import { createS3Client } from '../../common/s3.client';
 import type { Storage } from '../ports';
 
-/** Armazenamento S3/MinIO com URLs pré-assinadas de PUT (RF-01). */
+/** Armazenamento S3/MinIO/R2 com URLs pré-assinadas de PUT (RF-01). */
 export class S3Storage implements Storage {
   private readonly client: S3Client;
   private readonly bucket: string;
 
   constructor() {
-    const env = getEnv();
-    this.client = new S3Client({
-      endpoint: env.S3_ENDPOINT,
-      region: 'us-east-1',
-      forcePathStyle: true, // MinIO usa path-style
-      credentials: { accessKeyId: env.S3_ACCESS_KEY, secretAccessKey: env.S3_SECRET_KEY },
-    });
-    this.bucket = env.S3_BUCKET_UPLOADS;
+    this.client = createS3Client();
+    this.bucket = getEnv().S3_BUCKET_UPLOADS;
   }
 
   async presignPut(key: string): Promise<{ url: string; key: string }> {

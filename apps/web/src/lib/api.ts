@@ -48,5 +48,10 @@ export async function apiFetch<T>(
   }
 
   if (res.ok) return { ok: true, status: res.status, data: json as T, problem: null };
-  return { ok: false, status: res.status, data: null, problem: (json as Problem) ?? { title: 'Erro' } };
+  return {
+    ok: false,
+    status: res.status,
+    data: null,
+    problem: (json as Problem) ?? { title: 'Erro' },
+  };
 }

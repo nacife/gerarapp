@@ -65,14 +65,23 @@ export default function ConfiguracoesPage() {
   }
 
   async function startMfaSetup() {
-    const res = await apiFetch<{ secret: string; otpauthUrl: string }>('/auth/mfa/setup', { method: 'POST' });
-    if (res.ok && res.data) { setMfaSecret(res.data.secret); setMfaOtpauthUrl(res.data.otpauthUrl); }
+    const res = await apiFetch<{ secret: string; otpauthUrl: string }>('/auth/mfa/setup', {
+      method: 'POST',
+    });
+    if (res.ok && res.data) {
+      setMfaSecret(res.data.secret);
+      setMfaOtpauthUrl(res.data.otpauthUrl);
+    }
   }
 
   // Renderiza QR code quando otpauthUrl estiver disponível
   useEffect(() => {
     if (!mfaOtpauthUrl || !qrCanvasRef.current) return;
-    QRCode.toCanvas(qrCanvasRef.current, mfaOtpauthUrl, { width: 200, margin: 1, color: { dark: '#e2e8f0', light: '#0f172a' } });
+    QRCode.toCanvas(qrCanvasRef.current, mfaOtpauthUrl, {
+      width: 200,
+      margin: 1,
+      color: { dark: '#e2e8f0', light: '#0f172a' },
+    });
   }, [mfaOtpauthUrl]);
 
   async function enableMfa(e: FormEvent) {
@@ -99,7 +108,10 @@ export default function ConfiguracoesPage() {
   async function disableMfa(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const res = await apiFetch('/auth/mfa/disable', { method: 'POST', body: { code: disableCode } });
+    const res = await apiFetch('/auth/mfa/disable', {
+      method: 'POST',
+      body: { code: disableCode },
+    });
     setBusy(false);
     setDisableCode('');
     setMsg(res.ok ? 'MFA desativado.' : (res.problem?.detail ?? 'Código inválido.'));
@@ -145,7 +157,11 @@ export default function ConfiguracoesPage() {
         <h1 className="mt-1 text-2xl font-bold tracking-tight">Configurações</h1>
       </div>
 
-      {msg && <p className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-300">{msg}</p>}
+      {msg && (
+        <p className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-300">
+          {msg}
+        </p>
+      )}
 
       <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
         <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Perfil</h2>
@@ -180,7 +196,9 @@ export default function ConfiguracoesPage() {
       </section>
 
       <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Autenticação em duas etapas</h2>
+        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+          Autenticação em duas etapas
+        </h2>
         {me.mfaEnabled ? (
           <>
             <p className="text-sm text-emerald-400">✓ MFA ativo</p>
@@ -257,7 +275,9 @@ export default function ConfiguracoesPage() {
       </section>
 
       <section className="space-y-2 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Sessões ativas</h2>
+        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+          Sessões ativas
+        </h2>
         {sessions.length === 0 ? (
           <p className="text-sm text-slate-500">Nenhuma sessão ativa.</p>
         ) : (
@@ -268,12 +288,18 @@ export default function ConfiguracoesPage() {
                 className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm"
               >
                 <div>
-                  <p className="text-slate-300">{s.device?.userAgent ?? 'Dispositivo desconhecido'}</p>
+                  <p className="text-slate-300">
+                    {s.device?.userAgent ?? 'Dispositivo desconhecido'}
+                  </p>
                   <p className="text-xs text-slate-500">
-                    {s.device?.ip ?? '—'} · expira em {new Date(s.expiresAt).toLocaleDateString('pt-BR')}
+                    {s.device?.ip ?? '—'} · expira em{' '}
+                    {new Date(s.expiresAt).toLocaleDateString('pt-BR')}
                   </p>
                 </div>
-                <button onClick={() => revokeSession(s.id)} className="text-xs text-rose-400 hover:underline">
+                <button
+                  onClick={() => revokeSession(s.id)}
+                  className="text-xs text-rose-400 hover:underline"
+                >
                   Encerrar
                 </button>
               </div>
@@ -283,7 +309,9 @@ export default function ConfiguracoesPage() {
       </section>
 
       <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Desenvolvedores</h2>
+        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+          Desenvolvedores
+        </h2>
         <p className="text-sm text-slate-400">
           API keys e webhooks para integrar o EduForge aos seus sistemas (API pública /v1).
         </p>
@@ -296,7 +324,9 @@ export default function ConfiguracoesPage() {
       </section>
 
       <section className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Privacidade (LGPD)</h2>
+        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+          Privacidade (LGPD)
+        </h2>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={exportData}

@@ -22,7 +22,11 @@ export function computeCompletionByChapter(
       const done = doneBlocksByEnrollment.get(eid) ?? new Set<string>();
       return ch.blockIds.length > 0 && ch.blockIds.every((b) => done.has(b));
     }).length;
-    return { chapterId: ch.chapterId, chapterTitle: ch.chapterTitle, pct: Math.round((doneCount / total) * 100) };
+    return {
+      chapterId: ch.chapterId,
+      chapterTitle: ch.chapterTitle,
+      pct: Math.round((doneCount / total) * 100),
+    };
   });
 }
 
@@ -38,7 +42,11 @@ export function computeAbandonmentFunnel(
       const touched = touchedBlocksByEnrollment.get(eid) ?? new Set<string>();
       return ch.blockIds.some((b) => touched.has(b));
     }).length;
-    return { chapterId: ch.chapterId, chapterTitle: ch.chapterTitle, pct: Math.round((reached / total) * 100) };
+    return {
+      chapterId: ch.chapterId,
+      chapterTitle: ch.chapterTitle,
+      pct: Math.round((reached / total) * 100),
+    };
   });
 }
 
@@ -60,7 +68,10 @@ export interface DifficultyRow {
 
 /** Mapa de calor de dificuldade (RF-10): interações com mais erro primeiro. */
 export function computeDifficultyHeatmap(events: AnswerEvent[]): DifficultyRow[] {
-  const acc = new Map<string, { contentBlockId: string; interactionType: string; wrong: number; correct: number }>();
+  const acc = new Map<
+    string,
+    { contentBlockId: string; interactionType: string; wrong: number; correct: number }
+  >();
   for (const e of events) {
     const row = acc.get(e.interactionId) ?? {
       contentBlockId: e.contentBlockId,

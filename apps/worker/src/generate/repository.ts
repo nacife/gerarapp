@@ -1,10 +1,5 @@
 import { Prisma, prisma } from '@eduforge/db';
-import type {
-  DraftInteraction,
-  GenBlock,
-  GenerateProgress,
-  GenerateRepository,
-} from './pipeline';
+import type { DraftInteraction, GenBlock, GenerateProgress, GenerateRepository } from './pipeline';
 
 export class PrismaGenerateRepository implements GenerateRepository {
   async getApprovedBlocks(projectId: string): Promise<GenBlock[] | null> {
@@ -53,15 +48,17 @@ export class PrismaGenerateRepository implements GenerateRepository {
 
   async saveJob(
     jobId: string,
-    patch: { status?: 'running' | 'succeeded' | 'failed'; progress?: GenerateProgress; error?: string },
+    patch: {
+      status?: 'running' | 'succeeded' | 'failed';
+      progress?: GenerateProgress;
+      error?: string;
+    },
   ): Promise<void> {
     await prisma.job.update({
       where: { id: jobId },
       data: {
         status: patch.status,
-        progress: patch.progress
-          ? (patch.progress as unknown as Prisma.InputJsonValue)
-          : undefined,
+        progress: patch.progress ? (patch.progress as unknown as Prisma.InputJsonValue) : undefined,
         error: patch.error,
       },
     });

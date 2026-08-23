@@ -1,13 +1,9 @@
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { getEnv } from '@eduforge/config';
+import { createS3Client } from '../../common/s3.client';
 import { Prisma, prisma } from '@eduforge/db';
 import type { BuiltBlock } from './build-map';
-import type {
-  IngestRepository,
-  IngestSourceFile,
-  IngestStorage,
-  JobProgress,
-} from './pipeline';
+import type { IngestRepository, IngestSourceFile, IngestStorage, JobProgress } from './pipeline';
 import type { ContentMapTree } from '@eduforge/schemas';
 
 export class S3IngestStorage implements IngestStorage {
@@ -15,14 +11,8 @@ export class S3IngestStorage implements IngestStorage {
   private readonly bucket: string;
 
   constructor() {
-    const env = getEnv();
-    this.client = new S3Client({
-      endpoint: env.S3_ENDPOINT,
-      region: 'us-east-1',
-      forcePathStyle: true,
-      credentials: { accessKeyId: env.S3_ACCESS_KEY, secretAccessKey: env.S3_SECRET_KEY },
-    });
-    this.bucket = env.S3_BUCKET_UPLOADS;
+    this.client = createS3Client();
+    this.bucket = getEnv().S3_BUCKET_UPLOADS;
   }
 
   async download(s3Key: string): Promise<Buffer> {
@@ -50,9 +40,7 @@ export class PrismaIngestRepository implements IngestRepository {
       where: { id: jobId },
       data: {
         status: patch.status,
-        progress: patch.progress
-          ? (patch.progress as unknown as Prisma.InputJsonValue)
-          : undefined,
+        progress: patch.progress ? (patch.progress as unknown as Prisma.InputJsonValue) : undefined,
         error: patch.error,
       },
     });

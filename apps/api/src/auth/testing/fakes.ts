@@ -194,12 +194,16 @@ export class InMemoryAuthTokenRepository implements AuthTokenRepository {
   }
   async invalidateForUser(userId: string, type: AuthTokenType): Promise<void> {
     const now = new Date();
-    for (const r of this.rows) if (r.userId === userId && r.type === type && !r.usedAt) r.usedAt = now;
+    for (const r of this.rows)
+      if (r.userId === userId && r.type === type && !r.usedAt) r.usedAt = now;
   }
 }
 
 export class InMemoryLoginAttemptStore implements LoginAttemptStore {
-  private map = new Map<string, { failures: number; firstAt: number; lockedUntil: number | null }>();
+  private map = new Map<
+    string,
+    { failures: number; firstAt: number; lockedUntil: number | null }
+  >();
   constructor(private readonly clock: Clock) {}
 
   async get(key: string): Promise<AttemptSnapshot> {
@@ -312,5 +316,15 @@ export function buildAuthService() {
     clock,
   );
 
-  return { service, mfaService, accountService, users, sessions, authTokens, mailer, deletion, clock };
+  return {
+    service,
+    mfaService,
+    accountService,
+    users,
+    sessions,
+    authTokens,
+    mailer,
+    deletion,
+    clock,
+  };
 }

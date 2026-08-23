@@ -3,7 +3,13 @@ import { AppError } from '../common/errors';
 import { InMemoryProjectRepository } from '../projects/testing/fakes';
 import { AnalyticsService } from './analytics.service';
 import { HomeService } from './home.service';
-import type { AnalyticsRawData, AnalyticsRepository, HomeProjectRow, HomeRepository, PlanUsage } from './ports';
+import type {
+  AnalyticsRawData,
+  AnalyticsRepository,
+  HomeProjectRow,
+  HomeRepository,
+  PlanUsage,
+} from './ports';
 
 const OWNER = 'owner-1';
 
@@ -160,7 +166,9 @@ describe('AnalyticsService (RF-10)', () => {
     const projects = new InMemoryProjectRepository();
     const project = projects.seedProject(OWNER);
     const service = new AnalyticsService(projects, new FakeAnalyticsRepository());
-    const err = await expectError(() => service.summary(project.id, 'intruso', new Date(0), new Date()));
+    const err = await expectError(() =>
+      service.summary(project.id, 'intruso', new Date(0), new Date()),
+    );
     expect(err.slug).toBe('not-found');
   });
 });

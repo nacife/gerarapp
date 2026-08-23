@@ -132,7 +132,9 @@ export default function ContentMapPage({ params }: { params: { id: string } }) {
           <h1 className="mt-1 text-2xl font-bold tracking-tight">Mapa de Conteúdo</h1>
           <p className="text-sm text-slate-500">
             revisão {map.revision} · confiança média{' '}
-            {map.structureConfidence != null ? `${Math.round(map.structureConfidence * 100)}%` : '—'}
+            {map.structureConfidence != null
+              ? `${Math.round(map.structureConfidence * 100)}%`
+              : '—'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -203,7 +205,9 @@ export default function ContentMapPage({ params }: { params: { id: string } }) {
                       (window as unknown as { __efDrag?: string }).__efDrag = section.id;
                     }}
                     className={`flex cursor-grab items-center gap-2 rounded-lg border px-3 py-2 text-sm active:cursor-grabbing ${
-                      low ? 'border-amber-500/40 bg-amber-500/5' : 'border-slate-800 bg-slate-900/60'
+                      low
+                        ? 'border-amber-500/40 bg-amber-500/5'
+                        : 'border-slate-800 bg-slate-900/60'
                     }`}
                   >
                     <span className="text-slate-600">⠿</span>
@@ -234,7 +238,9 @@ export default function ContentMapPage({ params }: { params: { id: string } }) {
 
       <footer className="mt-4 flex items-center justify-between border-t border-slate-800 pt-4 text-sm">
         <span className="text-slate-500">
-          {approved ? 'Mapa aprovado — pronto para gerar interações.' : 'Aprove o mapa para avançar.'}
+          {approved
+            ? 'Mapa aprovado — pronto para gerar interações.'
+            : 'Aprove o mapa para avançar.'}
         </span>
         {approved ? (
           <a

@@ -60,7 +60,11 @@ export class FakeSenseiProjectRepository implements SenseiProjectRepository {
   async getPublicBySlug(slug: string) {
     const projectId = this.slugProjectIdMap.get(slug);
     if (!projectId) return null;
-    const config = this.configs.get(projectId) ?? { name: 'Sensei', avatar: '🤖', tone: 'formal' as SenseiTone };
+    const config = this.configs.get(projectId) ?? {
+      name: 'Sensei',
+      avatar: '🤖',
+      tone: 'formal' as SenseiTone,
+    };
     return { config, indexed: true };
   }
 }

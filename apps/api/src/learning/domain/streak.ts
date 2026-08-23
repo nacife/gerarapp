@@ -22,7 +22,11 @@ function parseIso(s: string): [number, number, number] {
  */
 export function computeStreak(state: StreakState, todayIso: string): StreakState {
   if (!state.lastActivityAt) {
-    return { streakDays: 1, lastActivityAt: todayIso, streakFreezeUsedAt: state.streakFreezeUsedAt };
+    return {
+      streakDays: 1,
+      lastActivityAt: todayIso,
+      streakFreezeUsedAt: state.streakFreezeUsedAt,
+    };
   }
   if (state.lastActivityAt === todayIso) {
     return state; // já contabilizado hoje
@@ -38,9 +42,14 @@ export function computeStreak(state: StreakState, todayIso: string): StreakState
   }
 
   const freezeAvailable =
-    !state.streakFreezeUsedAt || daysBetween(state.streakFreezeUsedAt, todayIso) >= FREEZE_COOLDOWN_DAYS;
+    !state.streakFreezeUsedAt ||
+    daysBetween(state.streakFreezeUsedAt, todayIso) >= FREEZE_COOLDOWN_DAYS;
   if (gap === 2 && freezeAvailable) {
-    return { streakDays: state.streakDays + 1, lastActivityAt: todayIso, streakFreezeUsedAt: todayIso };
+    return {
+      streakDays: state.streakDays + 1,
+      lastActivityAt: todayIso,
+      streakFreezeUsedAt: todayIso,
+    };
   }
 
   return { streakDays: 1, lastActivityAt: todayIso, streakFreezeUsedAt: state.streakFreezeUsedAt };

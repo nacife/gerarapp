@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { buildInpiPackage, buildManifestFiles, type BuildInpiPackageInput } from './package-builder';
+import {
+  buildInpiPackage,
+  buildManifestFiles,
+  type BuildInpiPackageInput,
+} from './package-builder';
 import { buildMetadata } from '@eduforge/schemas';
 
 function fixture(): BuildInpiPackageInput {
@@ -68,6 +72,8 @@ describe('buildManifestFiles', () => {
     const lines = manifest.trim().split('\n');
     expect(lines[0]).toContain('a.txt');
     expect(lines[1]).toContain('b.txt');
-    expect(lines[0]).toMatch(new RegExp(`^${createHash('sha256').update('A').digest('hex')}  a.txt$`));
+    expect(lines[0]).toMatch(
+      new RegExp(`^${createHash('sha256').update('A').digest('hex')}  a.txt$`),
+    );
   });
 });

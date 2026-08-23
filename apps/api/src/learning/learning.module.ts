@@ -14,7 +14,12 @@ import { EventsService } from './events.service';
 import { CertificateService } from './certificate.service';
 
 import { LearnerAuthGuard } from './learner-auth.guard';
-import { LEARNER_COOKIE_OPTS, LEARNER_TOKEN_SERVICE, PROJECT_REPOSITORY, TIME_CAPSULE_ENQUEUER } from './tokens';
+import {
+  LEARNER_COOKIE_OPTS,
+  LEARNER_TOKEN_SERVICE,
+  PROJECT_REPOSITORY,
+  TIME_CAPSULE_ENQUEUER,
+} from './tokens';
 import { JwtLearnerTokenService } from './domain/learner-token';
 import { SystemClock } from '../auth/domain/clock';
 import { Argon2idHasher } from '../auth/domain/password-hasher';
@@ -36,13 +41,22 @@ import { WebhooksService } from '../webhooks/webhooks.service';
 
 @Module({
   imports: [WebhooksModule],
-  controllers: [LearnerAuthController, EnrollmentController, LeaderboardController, CertificatesController, LearnersController, DnaPublicController, DnaCreatorController],
+  controllers: [
+    LearnerAuthController,
+    EnrollmentController,
+    LeaderboardController,
+    CertificatesController,
+    LearnersController,
+    DnaPublicController,
+    DnaCreatorController,
+  ],
   providers: [
     LearnerAuthGuard,
     { provide: LearningDnaService, useFactory: () => new LearningDnaService() },
     {
       provide: LEARNER_TOKEN_SERVICE,
-      useFactory: () => new JwtLearnerTokenService(getEnv().JWT_SECRET, LEARNER_AUTH.accessTokenTtlSec),
+      useFactory: () =>
+        new JwtLearnerTokenService(getEnv().JWT_SECRET, LEARNER_AUTH.accessTokenTtlSec),
     },
     {
       provide: TIME_CAPSULE_ENQUEUER,
@@ -76,7 +90,7 @@ import { WebhooksService } from '../webhooks/webhooks.service';
           new PrismaCertificateRepository(),
           new Argon2idHasher(),
           webhooks,
-          timeCapsuleEnqueuer
+          timeCapsuleEnqueuer,
         ),
     },
     {

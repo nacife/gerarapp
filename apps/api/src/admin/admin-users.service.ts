@@ -103,7 +103,12 @@ export class AdminUsersService {
     return { revoked: count };
   }
 
-  async grantCredits(actor: AdminActor, targetId: string, delta: number, reason: string): Promise<void> {
+  async grantCredits(
+    actor: AdminActor,
+    targetId: string,
+    delta: number,
+    reason: string,
+  ): Promise<void> {
     const user = await this.users.findById(targetId);
     if (!user) throw Errors.notFound('Usuário');
 

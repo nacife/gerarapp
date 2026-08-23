@@ -9,8 +9,14 @@ export interface MediaAssetRow {
 export interface MediaRepository {
   listByProject(projectId: string): Promise<MediaAssetRow[]>;
   listByPublishedSlug(slug: string): Promise<MediaAssetRow[]>;
-  getOwnedProject(projectId: string, ownerUserId: string): Promise<{ id: string; title: string } | null>;
-  getChapter(projectId: string, chapterId: string): Promise<{ id: string; contentMd: string } | null>;
+  getOwnedProject(
+    projectId: string,
+    ownerUserId: string,
+  ): Promise<{ id: string; title: string } | null>;
+  getChapter(
+    projectId: string,
+    chapterId: string,
+  ): Promise<{ id: string; contentMd: string } | null>;
   createJob(projectId: string, chapterId: string): Promise<string>;
   isPublished(slug: string): Promise<boolean>;
   /** Paleta do tema atual do projeto (cores claras para ilustração). */

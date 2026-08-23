@@ -3,7 +3,11 @@ import { Errors } from '../common/errors';
 import type { SecretHasher } from '../studio/ports';
 import type { WebhooksService } from '../webhooks/webhooks.service';
 import { annotateChapters, type AnnotatedNode } from './domain/annotate';
-import { computeAchievements, type Achievement, type AchievementStats } from './domain/achievements';
+import {
+  computeAchievements,
+  type Achievement,
+  type AchievementStats,
+} from './domain/achievements';
 import type {
   CertificateRepository,
   EnrolledLearnerRow,
@@ -56,7 +60,11 @@ export class EnrollmentService {
     const existing = await this.repo.findByLearnerAndProject(input.learnerId, project.id);
     const enrollment =
       existing ??
-      (await this.repo.create({ learnerId: input.learnerId, projectId: project.id, pinnedVersionId: null }));
+      (await this.repo.create({
+        learnerId: input.learnerId,
+        projectId: project.id,
+        pinnedVersionId: null,
+      }));
 
     if (!existing) {
       await this.webhooks.dispatchForProject(project.id, 'learner.enrolled', {
@@ -87,7 +95,9 @@ export class EnrollmentService {
       totalBlocks: totalBlocks.length,
       doneBlocks: doneCount,
       chapters: annotateChapters(manifest.content, done),
-      certificate: certificate ? { verifyCode: certificate.verifyCode, issuedAt: certificate.issuedAt } : null,
+      certificate: certificate
+        ? { verifyCode: certificate.verifyCode, issuedAt: certificate.issuedAt }
+        : null,
     };
   }
 
@@ -135,7 +145,7 @@ export class EnrollmentService {
     learnerId: string,
     learnerEmail: string,
     message: string,
-    delayMs: number
+    delayMs: number,
   ) {
     const enrollment = await this.repo.findByIdForLearner(enrollmentId, learnerId);
     if (!enrollment) throw Errors.notFound('Matrícula');

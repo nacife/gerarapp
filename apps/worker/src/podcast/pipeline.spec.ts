@@ -11,12 +11,7 @@ class FakeRepo implements PodcastRepository {
     return this.sections;
   }
 
-  async createMediaAsset(input: {
-    projectId: string;
-    s3Key: string;
-    kind: string;
-    meta: unknown;
-  }) {
+  async createMediaAsset(input: { projectId: string; s3Key: string; kind: string; meta: unknown }) {
     this.assets.push(input);
     return { id: 'asset-1' };
   }
@@ -40,7 +35,10 @@ describe('runPodcastGeneration', () => {
   it('gera podcast completo: roteiro → áudio → upload → media_asset', async () => {
     const repo = new FakeRepo([
       { title: 'Introdução', contentMd: 'Neste capítulo veremos a fotossíntese.' },
-      { title: 'Fase Clara', contentMd: 'A fase clara ocorre nos tilacoides e produz ATP e NADPH.' },
+      {
+        title: 'Fase Clara',
+        contentMd: 'A fase clara ocorre nos tilacoides e produz ATP e NADPH.',
+      },
       { title: 'Ciclo de Calvin', contentMd: 'O ciclo de Calvin fixa o carbono em glicose.' },
     ]);
     const storage = new FakeStorage();

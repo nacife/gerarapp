@@ -37,7 +37,8 @@ export class JwtAccessTokenService implements AccessTokenService {
         sub: decoded.sub,
         role: decoded.role as Role,
         mfa: decoded.mfa === true,
-        impersonatorId: typeof decoded.impersonatorId === 'string' ? decoded.impersonatorId : undefined,
+        impersonatorId:
+          typeof decoded.impersonatorId === 'string' ? decoded.impersonatorId : undefined,
       };
     } catch {
       return null;

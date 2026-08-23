@@ -56,7 +56,11 @@ export function QuizView({
               aria-checked={isSelected}
               disabled={submitted}
               onClick={() => toggle(opt.id)}
-              style={{ background: bg, borderColor: theme.border, color: showResult && opt.correct ? theme.bg : theme.text }}
+              style={{
+                background: bg,
+                borderColor: theme.border,
+                color: showResult && opt.correct ? theme.bg : theme.text,
+              }}
               className="w-full rounded-lg border px-4 py-2 text-left text-sm transition disabled:cursor-default"
             >
               {opt.text_md}

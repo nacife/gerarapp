@@ -26,7 +26,9 @@ export interface InpiPackagePorts {
   ai: AiProvider;
   repo: PrismaInpiRepository;
   storage: S3WormStorage;
-  captureScreenshots: (input: CaptureScreenshotsInput) => Promise<{ path: string; content: Buffer }[]>;
+  captureScreenshots: (
+    input: CaptureScreenshotsInput,
+  ) => Promise<{ path: string; content: Buffer }[]>;
   runtimeBaseUrl: string;
   apiBaseUrl: string;
   loadSnippets: typeof loadRuntimeSnippets;
@@ -46,7 +48,12 @@ function freshProgress(): InpiPackageProgress {
   };
 }
 
-function markStep(progress: InpiPackageProgress, key: string, status: 'running' | 'done', pct = status === 'done' ? 100 : 0) {
+function markStep(
+  progress: InpiPackageProgress,
+  key: string,
+  status: 'running' | 'done',
+  pct = status === 'done' ? 100 : 0,
+) {
   const step = progress.steps.find((s) => s.key === key);
   if (step) {
     step.status = status;

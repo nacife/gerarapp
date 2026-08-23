@@ -20,7 +20,10 @@ export class PlansController {
 
   @Patch(':id')
   @Roles('super_admin')
-  async updatePlan(@Param('id') id: string, @Body() body: { name?: string; priceCentsMonth?: number }) {
+  async updatePlan(
+    @Param('id') id: string,
+    @Body() body: { name?: string; priceCentsMonth?: number },
+  ) {
     const data: any = {};
     if (body.name !== undefined) data.name = body.name;
     if (body.priceCentsMonth !== undefined) data.priceCentsMonth = body.priceCentsMonth;

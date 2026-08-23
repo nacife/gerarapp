@@ -60,10 +60,16 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
     if (!reason.trim()) return setMsg('Informe o motivo da suspensão.');
     if (!window.confirm(`Suspender a conta de ${detail?.email}?`)) return;
     setBusy(true);
-    const res = await apiFetch(`/admin/users/${userId}/suspend`, { method: 'POST', body: { reason } });
+    const res = await apiFetch(`/admin/users/${userId}/suspend`, {
+      method: 'POST',
+      body: { reason },
+    });
     setBusy(false);
     setMsg(res.ok ? 'Conta suspensa.' : (res.problem?.detail ?? 'Falha ao suspender.'));
-    if (res.ok) { setReason(''); await load(); }
+    if (res.ok) {
+      setReason('');
+      await load();
+    }
   }
 
   async function reactivate() {
@@ -76,9 +82,15 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
 
   async function revokeSessions() {
     setBusy(true);
-    const res = await apiFetch<{ revoked: number }>(`/admin/users/${userId}/revoke-sessions`, { method: 'POST' });
+    const res = await apiFetch<{ revoked: number }>(`/admin/users/${userId}/revoke-sessions`, {
+      method: 'POST',
+    });
     setBusy(false);
-    setMsg(res.ok ? `${res.data?.revoked ?? 0} sessão(ões) revogada(s).` : (res.problem?.detail ?? 'Falha.'));
+    setMsg(
+      res.ok
+        ? `${res.data?.revoked ?? 0} sessão(ões) revogada(s).`
+        : (res.problem?.detail ?? 'Falha.'),
+    );
     if (res.ok) await load();
   }
 
@@ -98,8 +110,13 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
       body: { delta: creditDelta, reason: creditReason },
     });
     setBusy(false);
-    setMsg(res.ok ? 'Créditos concedidos.' : (res.problem?.detail ?? 'Falha ao conceder créditos.'));
-    if (res.ok) { setCreditReason(''); await load(); }
+    setMsg(
+      res.ok ? 'Créditos concedidos.' : (res.problem?.detail ?? 'Falha ao conceder créditos.'),
+    );
+    if (res.ok) {
+      setCreditReason('');
+      await load();
+    }
   }
 
   async function impersonate() {
@@ -112,15 +129,22 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
     )
       return;
     setBusy(true);
-    const res = await apiFetch<{ token: string }>(`/admin/users/${userId}/impersonate`, { method: 'POST' });
+    const res = await apiFetch<{ token: string }>(`/admin/users/${userId}/impersonate`, {
+      method: 'POST',
+    });
     setBusy(false);
-    if (!res.ok || !res.data) return setMsg(res.problem?.detail ?? 'Falha ao iniciar impersonação.');
+    if (!res.ok || !res.data)
+      return setMsg(res.problem?.detail ?? 'Falha ao iniciar impersonação.');
     window.open(`${WEB_APP_URL}/impersonar?token=${encodeURIComponent(res.data.token)}`, '_blank');
     setMsg('Sessão de suporte aberta em nova aba.');
   }
 
   if (notFound) {
-    return <main className="grid min-h-screen place-items-center text-zinc-500">Usuário não encontrado.</main>;
+    return (
+      <main className="grid min-h-screen place-items-center text-zinc-500">
+        Usuário não encontrado.
+      </main>
+    );
   }
   if (!detail) {
     return <main className="grid min-h-screen place-items-center text-zinc-500">Carregando…</main>;
@@ -166,7 +190,11 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
         ))}
       </section>
 
-      {msg && <p className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300">{msg}</p>}
+      {msg && (
+        <p className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300">
+          {msg}
+        </p>
+      )}
 
       <section className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
         <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">Ações</h2>
@@ -224,8 +252,8 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
         </div>
         {canImpersonate && (
           <p className="text-xs text-zinc-500">
-            Abre em nova aba e substitui sua sessão de admin neste navegador. Use uma janela
-            anônima se precisar manter as duas sessões ativas ao mesmo tempo.
+            Abre em nova aba e substitui sua sessão de admin neste navegador. Use uma janela anônima
+            se precisar manter as duas sessões ativas ao mesmo tempo.
           </p>
         )}
 
@@ -235,8 +263,13 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
             value={detail.role}
             onChange={async (e) => {
               const newRole = e.target.value;
-              const res = await apiFetch(`/admin/users/${userId}/role`, { method: 'POST', body: { role: newRole } });
-              setMsg(res.ok ? `Papel alterado para ${newRole}.` : (res.problem?.detail ?? 'Falha.'));
+              const res = await apiFetch(`/admin/users/${userId}/role`, {
+                method: 'POST',
+                body: { role: newRole },
+              });
+              setMsg(
+                res.ok ? `Papel alterado para ${newRole}.` : (res.problem?.detail ?? 'Falha.'),
+              );
               if (res.ok) void load();
             }}
             className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none"
@@ -258,7 +291,10 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
           </button>
         </div>
 
-        <form onSubmit={grantCredits} className="flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-3">
+        <form
+          onSubmit={grantCredits}
+          className="flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-3"
+        >
           <input
             type="number"
             value={creditDelta}
@@ -281,18 +317,27 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
       </section>
 
       <section>
-        <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-zinc-500">Trilha de auditoria</h2>
+        <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-zinc-500">
+          Trilha de auditoria
+        </h2>
         {logs.length === 0 ? (
           <p className="text-sm text-zinc-500">Nenhum evento registrado.</p>
         ) : (
           <div className="space-y-2">
             {logs.map((l) => (
-              <div key={l.id} className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-3 text-sm">
+              <div
+                key={l.id}
+                className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-3 text-sm"
+              >
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{l.action}</span>
-                  <span className="text-xs text-zinc-500">{new Date(l.createdAt).toLocaleString('pt-BR')}</span>
+                  <span className="text-xs text-zinc-500">
+                    {new Date(l.createdAt).toLocaleString('pt-BR')}
+                  </span>
                 </div>
-                <p className="mt-1 text-xs text-zinc-500">ator: {l.actorId ?? 'sistema'} ({l.actorRole ?? '—'})</p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  ator: {l.actorId ?? 'sistema'} ({l.actorRole ?? '—'})
+                </p>
                 {l.beforeAfter != null && (
                   <pre className="mt-1 overflow-x-auto rounded bg-zinc-950 p-2 text-xs text-zinc-400">
                     {JSON.stringify(l.beforeAfter, null, 2)}

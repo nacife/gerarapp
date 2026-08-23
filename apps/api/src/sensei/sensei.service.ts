@@ -13,7 +13,6 @@ import {
   SIMILARITY_THRESHOLD,
   TOP_K,
   enforceCitationGate,
-  type GatedAnswer,
   selectContext,
 } from './domain/guardrails';
 
@@ -67,11 +66,7 @@ export class SenseiService {
   }
 
   /** Pergunta do aprendiz ao Sensei (RF-06.1). */
-  async ask(
-    enrollmentId: string,
-    learnerId: string,
-    dto: AskSenseiDto,
-  ): Promise<AskOutput> {
+  async ask(enrollmentId: string, learnerId: string, dto: AskSenseiDto): Promise<AskOutput> {
     // a) Resolve matrícula → projeto + dono.
     const enrollment = await this.projects.getProjectForEnrollment(enrollmentId, learnerId);
     if (!enrollment) throw Errors.notFound('Matrícula');
@@ -98,8 +93,7 @@ export class SenseiService {
     const context = selectContext(chunks, TOP_K, SIMILARITY_THRESHOLD);
 
     // Config do tutor para o tom.
-    const config =
-      (await this.projects.getSenseiConfig(projectId)) ?? DEFAULT_SENSEI_CONFIG;
+    const config = (await this.projects.getSenseiConfig(projectId)) ?? DEFAULT_SENSEI_CONFIG;
 
     const raw = await this.ai.tutorAnswer({
       question: dto.question,

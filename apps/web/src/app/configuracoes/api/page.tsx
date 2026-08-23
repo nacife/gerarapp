@@ -118,7 +118,8 @@ export default function ApiSettingsPage() {
   }
 
   async function revokeKey(id: string) {
-    if (!window.confirm('Revogar esta chave? Integrações que a usam vão parar imediatamente.')) return;
+    if (!window.confirm('Revogar esta chave? Integrações que a usam vão parar imediatamente.'))
+      return;
     await apiFetch(`/api-keys/${id}`, { method: 'DELETE' });
     await load();
   }
@@ -202,11 +203,17 @@ export default function ApiSettingsPage() {
         </p>
       </div>
 
-      {msg && <p className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-300">{msg}</p>}
+      {msg && (
+        <p className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-300">
+          {msg}
+        </p>
+      )}
 
       {createdKey && (
         <div className="rounded-2xl border border-amber-500/40 bg-amber-500/5 p-5">
-          <p className="text-sm font-semibold text-amber-200">Copie sua chave agora — ela não será exibida de novo.</p>
+          <p className="text-sm font-semibold text-amber-200">
+            Copie sua chave agora — ela não será exibida de novo.
+          </p>
           <div className="mt-3 flex items-center gap-2">
             <code className="min-w-0 flex-1 break-all rounded bg-slate-950 px-3 py-2 font-mono text-sm text-emerald-300">
               {createdKey}
@@ -218,7 +225,10 @@ export default function ApiSettingsPage() {
               {copied ? '✓ Copiada' : 'Copiar'}
             </button>
           </div>
-          <button onClick={() => setCreatedKey(null)} className="mt-3 text-xs text-slate-400 hover:underline">
+          <button
+            onClick={() => setCreatedKey(null)}
+            className="mt-3 text-xs text-slate-400 hover:underline"
+          >
             Já guardei, fechar
           </button>
         </div>
@@ -232,14 +242,19 @@ export default function ApiSettingsPage() {
         ) : (
           <div className="space-y-2">
             {keys.map((k) => (
-              <div key={k.id} className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm">
+              <div
+                key={k.id}
+                className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm"
+              >
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate font-medium">
                       {k.name}{' '}
                       <span
                         className={`ml-1 rounded px-1.5 py-0.5 text-[10px] uppercase ${
-                          k.environment === 'live' ? 'bg-emerald-500/15 text-emerald-300' : 'bg-sky-500/15 text-sky-300'
+                          k.environment === 'live'
+                            ? 'bg-emerald-500/15 text-emerald-300'
+                            : 'bg-sky-500/15 text-sky-300'
                         }`}
                       >
                         {k.environment}
@@ -253,14 +268,20 @@ export default function ApiSettingsPage() {
                     <p className="truncate font-mono text-xs text-slate-500">{k.keyPrefix}…</p>
                   </div>
                   {!k.revokedAt && (
-                    <button onClick={() => void revokeKey(k.id)} className="shrink-0 text-xs text-rose-400 hover:underline">
+                    <button
+                      onClick={() => void revokeKey(k.id)}
+                      className="shrink-0 text-xs text-rose-400 hover:underline"
+                    >
                       Revogar
                     </button>
                   )}
                 </div>
                 <p className="mt-1 flex flex-wrap gap-1">
                   {k.scopes.map((s) => (
-                    <span key={s} className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">
+                    <span
+                      key={s}
+                      className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400"
+                    >
                       {s}
                     </span>
                   ))}
@@ -321,17 +342,29 @@ export default function ApiSettingsPage() {
         ) : (
           <div className="space-y-2">
             {hooks.map((h) => (
-              <div key={h.id} className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm">
+              <div
+                key={h.id}
+                className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm"
+              >
                 <div className="flex items-center justify-between gap-2">
                   <p className="min-w-0 truncate font-mono text-xs">{h.url}</p>
                   <div className="flex shrink-0 items-center gap-2 text-xs">
-                    <button onClick={() => void showDeliveries(h.id)} className="text-sky-400 hover:underline">
+                    <button
+                      onClick={() => void showDeliveries(h.id)}
+                      className="text-sky-400 hover:underline"
+                    >
                       {deliveriesFor === h.id ? 'Ocultar' : 'Entregas'}
                     </button>
-                    <button onClick={() => void toggleHook(h)} className="text-slate-400 hover:underline">
+                    <button
+                      onClick={() => void toggleHook(h)}
+                      className="text-slate-400 hover:underline"
+                    >
                       {h.active ? 'Desativar' : 'Ativar'}
                     </button>
-                    <button onClick={() => void removeHook(h.id)} className="text-rose-400 hover:underline">
+                    <button
+                      onClick={() => void removeHook(h.id)}
+                      className="text-rose-400 hover:underline"
+                    >
                       Remover
                     </button>
                   </div>
@@ -339,13 +372,18 @@ export default function ApiSettingsPage() {
                 <p className="mt-1 flex flex-wrap items-center gap-1">
                   <span
                     className={`rounded px-1.5 py-0.5 text-[10px] uppercase ${
-                      h.active ? 'bg-emerald-500/15 text-emerald-300' : 'bg-slate-700/40 text-slate-400'
+                      h.active
+                        ? 'bg-emerald-500/15 text-emerald-300'
+                        : 'bg-slate-700/40 text-slate-400'
                     }`}
                   >
                     {h.active ? 'ativo' : 'inativo'}
                   </span>
                   {h.events.map((ev) => (
-                    <span key={ev} className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">
+                    <span
+                      key={ev}
+                      className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400"
+                    >
                       {ev}
                     </span>
                   ))}
@@ -374,7 +412,10 @@ export default function ApiSettingsPage() {
                             · {d.attempts}× · HTTP {d.responseStatus ?? '—'}
                           </span>
                           {d.status !== 'pending' && (
-                            <button onClick={() => void redeliver(d.id)} className="shrink-0 text-sky-400 hover:underline">
+                            <button
+                              onClick={() => void redeliver(d.id)}
+                              className="shrink-0 text-sky-400 hover:underline"
+                            >
                               Reenviar
                             </button>
                           )}

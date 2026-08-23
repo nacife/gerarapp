@@ -93,7 +93,14 @@ function build() {
     new InMemoryWebhookEnqueuer(),
     'test-encryption-key-32-chars-ok',
   );
-  const enrollmentService = new EnrollmentService(enrollments, progress, certificatesRepo, hasher, webhooks, { enqueue: async () => {} });
+  const enrollmentService = new EnrollmentService(
+    enrollments,
+    progress,
+    certificatesRepo,
+    hasher,
+    webhooks,
+    { enqueue: async () => {} },
+  );
   const certificateService = new CertificateService(
     enrollments,
     progress,
@@ -104,7 +111,14 @@ function build() {
     'http://localhost:3000',
     webhooks,
   );
-  const eventsService = new EventsService(events, progress, enrollments, certificateService, clock, webhooks);
+  const eventsService = new EventsService(
+    events,
+    progress,
+    enrollments,
+    certificateService,
+    clock,
+    webhooks,
+  );
 
   return {
     learnerAuth,
@@ -131,14 +145,24 @@ async function makeLearner(kit: ReturnType<typeof build>, email = 'ana@ex.com') 
 describe('LearnerAuthService — conta leve', () => {
   it('rejeita senha fraca', async () => {
     const kit = build();
-    const err = await expectError(() => kit.learnerAuth.signup({ email: 'a@b.com', password: 'curta', name: 'A' }));
+    const err = await expectError(() =>
+      kit.learnerAuth.signup({ email: 'a@b.com', password: 'curta', name: 'A' }),
+    );
     expect(err.slug).toBe('weak-password');
   });
 
   it('cadastro duplicado com a MESMA senha apenas autentica (conta leve)', async () => {
     const kit = build();
-    const first = await kit.learnerAuth.signup({ email: 'a@b.com', password: 'SenhaBoa123', name: 'A' });
-    const second = await kit.learnerAuth.signup({ email: 'a@b.com', password: 'SenhaBoa123', name: 'A' });
+    const first = await kit.learnerAuth.signup({
+      email: 'a@b.com',
+      password: 'SenhaBoa123',
+      name: 'A',
+    });
+    const second = await kit.learnerAuth.signup({
+      email: 'a@b.com',
+      password: 'SenhaBoa123',
+      name: 'A',
+    });
     expect(second.learnerId).toBe(first.learnerId);
   });
 
@@ -154,7 +178,9 @@ describe('LearnerAuthService — conta leve', () => {
   it('login com senha errada falha', async () => {
     const kit = build();
     await kit.learnerAuth.signup({ email: 'a@b.com', password: 'SenhaBoa123', name: 'A' });
-    const err = await expectError(() => kit.learnerAuth.login({ email: 'a@b.com', password: 'errada' }));
+    const err = await expectError(() =>
+      kit.learnerAuth.login({ email: 'a@b.com', password: 'errada' }),
+    );
     expect(err.slug).toBe('invalid-credentials');
   });
 });
@@ -164,7 +190,11 @@ describe('EnrollmentService.enroll (RF-05)', () => {
     const kit = build();
     kit.enrollments.seedProject({ slug: 'bio-demo', title: 'Biologia Demo', manifest });
     const learnerId = await makeLearner(kit);
-    const res = await kit.enrollmentService.enroll({ slug: 'bio-demo', learnerId, learnerEmail: 'ana@ex.com' });
+    const res = await kit.enrollmentService.enroll({
+      slug: 'bio-demo',
+      learnerId,
+      learnerEmail: 'ana@ex.com',
+    });
     expect(res.manifest.slug).toBe('bio-demo');
   });
 
@@ -172,7 +202,9 @@ describe('EnrollmentService.enroll (RF-05)', () => {
     const kit = build();
     kit.enrollments.seedProject({ slug: 'bio-demo', title: 'Biologia Demo', manifest: null });
     const learnerId = await makeLearner(kit);
-    const err = await expectError(() => kit.enrollmentService.enroll({ slug: 'bio-demo', learnerId, learnerEmail: 'ana@ex.com' }));
+    const err = await expectError(() =>
+      kit.enrollmentService.enroll({ slug: 'bio-demo', learnerId, learnerEmail: 'ana@ex.com' }),
+    );
     expect(err.slug).toBe('app-not-published');
   });
 
@@ -214,7 +246,11 @@ describe('EnrollmentService.enroll (RF-05)', () => {
     expect(blocked.slug).toBe('not-invited');
 
     await kit.enrollments.addInvite(project.id, 'ana@ex.com');
-    const ok = await kit.enrollmentService.enroll({ slug: 'bio-demo', learnerId, learnerEmail: 'ana@ex.com' });
+    const ok = await kit.enrollmentService.enroll({
+      slug: 'bio-demo',
+      learnerId,
+      learnerEmail: 'ana@ex.com',
+    });
     expect(ok.enrollmentId).toBeTruthy();
   });
 
@@ -222,14 +258,26 @@ describe('EnrollmentService.enroll (RF-05)', () => {
     const kit = build();
     kit.enrollments.seedProject({ slug: 'bio-demo', title: 'Biologia Demo', manifest });
     const learnerId = await makeLearner(kit);
-    const first = await kit.enrollmentService.enroll({ slug: 'bio-demo', learnerId, learnerEmail: 'ana@ex.com' });
-    const second = await kit.enrollmentService.enroll({ slug: 'bio-demo', learnerId, learnerEmail: 'ana@ex.com' });
+    const first = await kit.enrollmentService.enroll({
+      slug: 'bio-demo',
+      learnerId,
+      learnerEmail: 'ana@ex.com',
+    });
+    const second = await kit.enrollmentService.enroll({
+      slug: 'bio-demo',
+      learnerId,
+      learnerEmail: 'ana@ex.com',
+    });
     expect(second.enrollmentId).toBe(first.enrollmentId);
   });
 
   it('primeira matrícula dispara learner.enrolled; re-matrícula não dispara de novo', async () => {
     const kit = build();
-    const project = kit.enrollments.seedProject({ slug: 'bio-demo', title: 'Biologia Demo', manifest });
+    const project = kit.enrollments.seedProject({
+      slug: 'bio-demo',
+      title: 'Biologia Demo',
+      manifest,
+    });
     kit.webhookProjects.ownedProjectIds.set(project.id, 'owner-1');
     await kit.webhookEndpoints.create({
       ownerUserId: 'owner-1',
@@ -256,10 +304,28 @@ describe('EventsService.record — XP, mastery, SM-2, certificado', () => {
     kit = build();
     kit.enrollments.seedProject({ slug: 'bio-demo', title: 'Biologia Demo', manifest });
     const learnerId = await makeLearner(kit);
-    const enrolled = await kit.enrollmentService.enroll({ slug: 'bio-demo', learnerId, learnerEmail: 'ana@ex.com' });
+    const enrolled = await kit.enrollmentService.enroll({
+      slug: 'bio-demo',
+      learnerId,
+      learnerEmail: 'ana@ex.com',
+    });
     enrollmentId = enrolled.enrollmentId;
-    kit.events.seedInteraction({ id: 'int-quiz', projectId: '', contentBlockId: BLOCK_1, type: 'quiz', payload: {}, xp: 10 });
-    kit.events.seedInteraction({ id: 'int-cards', projectId: '', contentBlockId: BLOCK_2, type: 'flashcard_deck', payload: {}, xp: 15 });
+    kit.events.seedInteraction({
+      id: 'int-quiz',
+      projectId: '',
+      contentBlockId: BLOCK_1,
+      type: 'quiz',
+      payload: {},
+      xp: 10,
+    });
+    kit.events.seedInteraction({
+      id: 'int-cards',
+      projectId: '',
+      contentBlockId: BLOCK_2,
+      type: 'flashcard_deck',
+      payload: {},
+      xp: 15,
+    });
     // projectId nas interações precisa bater com o do enrollment — corrige após criar:
     const enr = kit.enrollments.enrollments.find((e) => e.id === enrollmentId)!;
     kit.events.interactions.get('int-quiz')!.projectId = enr.projectId;
@@ -267,19 +333,27 @@ describe('EventsService.record — XP, mastery, SM-2, certificado', () => {
   });
 
   it('resposta correta concede XP uma única vez (retry não duplica)', async () => {
-    const r1 = await kit.eventsService.record(enrollmentId, kit.enrollments.enrollments[0].learnerId, {
-      event: 'answer',
-      interactionId: 'int-quiz',
-      detail: { correct: true },
-    });
+    const r1 = await kit.eventsService.record(
+      enrollmentId,
+      kit.enrollments.enrollments[0].learnerId,
+      {
+        event: 'answer',
+        interactionId: 'int-quiz',
+        detail: { correct: true },
+      },
+    );
     expect(r1.xpAwarded).toBe(10);
     expect(r1.xpTotal).toBe(10);
 
-    const r2 = await kit.eventsService.record(enrollmentId, kit.enrollments.enrollments[0].learnerId, {
-      event: 'answer',
-      interactionId: 'int-quiz',
-      detail: { correct: true },
-    });
+    const r2 = await kit.eventsService.record(
+      enrollmentId,
+      kit.enrollments.enrollments[0].learnerId,
+      {
+        event: 'answer',
+        interactionId: 'int-quiz',
+        detail: { correct: true },
+      },
+    );
     expect(r2.xpAwarded).toBe(0);
     expect(r2.xpTotal).toBe(10);
   });

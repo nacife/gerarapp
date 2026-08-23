@@ -51,8 +51,7 @@ export function sanitizeFilename(name: string): string {
 }
 
 export type UploadValidation =
-  | { ok: true; mime: SourceMimeKey }
-  | { ok: false; reason: 'too_large' | 'unsupported' };
+  { ok: true; mime: SourceMimeKey } | { ok: false; reason: 'too_large' | 'unsupported' };
 
 /** Valida um upload antes de criar a URL pré-assinada (US-ING-01). */
 export function validateUpload(input: {

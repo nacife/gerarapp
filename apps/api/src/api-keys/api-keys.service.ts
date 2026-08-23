@@ -1,6 +1,11 @@
 import { Errors } from '../common/errors';
 import { generateApiKeyValue, hashApiKeyValue, type ApiKeyEnvironment } from './domain/key';
-import type { ActiveApiKeyAuth, ApiKeyProjectRepository, ApiKeyRepository, ApiKeyRow } from './ports';
+import type {
+  ActiveApiKeyAuth,
+  ApiKeyProjectRepository,
+  ApiKeyRepository,
+  ApiKeyRow,
+} from './ports';
 
 export interface CreateApiKeyRequest {
   name: string;

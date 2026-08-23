@@ -5,13 +5,22 @@ export const AA_LARGE = 3;
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace('#', '');
-  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const full =
+    h.length === 3
+      ? h
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : h;
   const n = parseInt(full, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
 function rgbToHex(r: number, g: number, b: number): string {
-  const c = (v: number) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+  const c = (v: number) =>
+    Math.max(0, Math.min(255, Math.round(v)))
+      .toString(16)
+      .padStart(2, '0');
   return `#${c(r)}${c(g)}${c(b)}`;
 }
 
@@ -48,7 +57,8 @@ export const darken = (hex: string, amount: number): string => mix(hex, [0, 0, 0
 /** Ajusta `fg` (clareando/escurecendo) até atingir a razão alvo sobre `bg`. */
 export function adjustForContrast(fg: string, bg: string, target = AA_NORMAL): string {
   if (contrastRatio(fg, bg) >= target) return fg;
-  const toward: [number, number, number] = relativeLuminance(bg) > 0.4 ? [0, 0, 0] : [255, 255, 255];
+  const toward: [number, number, number] =
+    relativeLuminance(bg) > 0.4 ? [0, 0, 0] : [255, 255, 255];
   for (let t = 0.05; t <= 1.0001; t += 0.05) {
     const candidate = mix(fg, toward, t);
     if (contrastRatio(candidate, bg) >= target) return candidate;

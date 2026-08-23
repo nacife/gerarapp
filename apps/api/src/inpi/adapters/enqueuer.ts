@@ -10,7 +10,11 @@ export class BullMqInpiEnqueuer implements InpiEnqueuer {
     this.queue = new Queue(QUEUES.inpiPackage, { connection });
   }
 
-  async enqueuePackage(input: { jobId: string; appVersionId: string; requestedById: string }): Promise<void> {
+  async enqueuePackage(input: {
+    jobId: string;
+    appVersionId: string;
+    requestedById: string;
+  }): Promise<void> {
     await this.queue.add('inpi-package', input, { removeOnComplete: 100, attempts: 1 });
   }
 }

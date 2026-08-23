@@ -100,7 +100,11 @@ export class AnthropicAiProvider implements AiProvider {
 
   async tutorAnswer(input: TutorAnswerInput): Promise<TutorAnswerOutput> {
     if (input.chunks.length === 0) {
-      return { answer: 'Desculpe, não encontrei informação sobre isso no material.', citations: [], refused: true };
+      return {
+        answer: 'Desculpe, não encontrei informação sobre isso no material.',
+        citations: [],
+        refused: true,
+      };
     }
 
     const contextText = input.chunks
@@ -111,7 +115,8 @@ export class AnthropicAiProvider implements AiProvider {
       default: 'Responda de forma clara e didática, citando as fontes.',
       explain_different: 'Explique o mesmo conceito de uma forma diferente, usando analogias.',
       test_me: 'Crie uma pergunta de teste sobre o conteúdo e aguarde a resposta do aluno.',
-      socratic: 'Responda com perguntas que guiem o aprendiz a descobrir a resposta por conta própria.',
+      socratic:
+        'Responda com perguntas que guiem o aprendiz a descobrir a resposta por conta própria.',
     };
 
     const system = `Você é "${input.tutorName}", um tutor com tom ${input.tone}. Use APENAS o conteúdo das fontes. Se a pergunta não puder ser respondida com as fontes, recuse. Sempre cite com [FONTE N]. ${modeInstructions[input.mode] ?? modeInstructions.default}`;
@@ -147,7 +152,10 @@ export class AnthropicAiProvider implements AiProvider {
     } catch {
       return {
         title: input.chapterTitle,
-        lines: input.sections.map((s, i) => ({ speaker: (i % 2 === 0 ? 'A' : 'B') as 'A' | 'B', text: s.contentMd })),
+        lines: input.sections.map((s, i) => ({
+          speaker: (i % 2 === 0 ? 'A' : 'B') as 'A' | 'B',
+          text: s.contentMd,
+        })),
       };
     }
   }

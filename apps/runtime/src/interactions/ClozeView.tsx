@@ -82,7 +82,9 @@ export function ClozeView({
         </button>
       ) : (
         <p className="text-sm" style={{ color: theme.muted }}>
-          {Object.values(result).every(Boolean) ? 'Tudo certo!' : 'Algumas respostas precisam de revisão.'}
+          {Object.values(result).every(Boolean)
+            ? 'Tudo certo!'
+            : 'Algumas respostas precisam de revisão.'}
         </p>
       )}
     </div>

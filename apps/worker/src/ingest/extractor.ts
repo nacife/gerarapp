@@ -73,11 +73,14 @@ export class MimeDocumentExtractor implements DocumentExtractor {
       }
 
       // Get base directory of OPF for resolving relative paths
-      const opfDir = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/') + 1) : '';
+      const opfDir = opfPath.includes('/')
+        ? opfPath.substring(0, opfPath.lastIndexOf('/') + 1)
+        : '';
 
       // Extract manifest items (id → href mapping)
       const manifestItems = new Map<string, string>();
-      const itemRegex = /<item\s+[^>]*id="([^"]+)"[^>]*href="([^"]+)"[^>]*media-type="([^"]+)"[^>]*/g;
+      const itemRegex =
+        /<item\s+[^>]*id="([^"]+)"[^>]*href="([^"]+)"[^>]*media-type="([^"]+)"[^>]*/g;
       let itemMatch;
       while ((itemMatch = itemRegex.exec(opfContent)) !== null) {
         if (itemMatch[3]?.includes('html') || itemMatch[3]?.includes('xml')) {

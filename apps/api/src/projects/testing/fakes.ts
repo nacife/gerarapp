@@ -32,7 +32,11 @@ export class InMemoryProjectRepository implements ProjectRepository {
     this.projects.push(rec);
     return rec;
   }
-  async create(input: { ownerUserId: string; title: string; slug: string }): Promise<ProjectRecord> {
+  async create(input: {
+    ownerUserId: string;
+    title: string;
+    slug: string;
+  }): Promise<ProjectRecord> {
     const rec: ProjectRecord = {
       id: randomUUID(),
       ownerUserId: input.ownerUserId,

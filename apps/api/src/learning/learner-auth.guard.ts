@@ -1,4 +1,10 @@
-import { type CanActivate, type ExecutionContext, Inject, Injectable, createParamDecorator } from '@nestjs/common';
+import {
+  type CanActivate,
+  type ExecutionContext,
+  Inject,
+  Injectable,
+  createParamDecorator,
+} from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 import { Errors } from '../common/errors';
 import type { LearnerTokenService } from './domain/learner-token';

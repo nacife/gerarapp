@@ -44,7 +44,11 @@ export interface AdminUserDetail extends AdminUserRow {
 }
 
 export interface AdminUserRepository {
-  search(query: string | undefined, status: UserStatus | undefined, limit: number): Promise<AdminUserRow[]>;
+  search(
+    query: string | undefined,
+    status: UserStatus | undefined,
+    limit: number,
+  ): Promise<AdminUserRow[]>;
   findById(id: string): Promise<AdminUserRow | null>;
   getDetail(id: string): Promise<AdminUserDetail | null>;
   setStatus(id: string, status: UserStatus): Promise<void>;

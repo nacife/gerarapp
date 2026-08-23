@@ -58,15 +58,20 @@ export interface EnrollmentRepository {
   ): Promise<{ learnerName: string; projectTitle: string } | null>;
   updateGamification(
     id: string,
-    patch: { xp?: number; streakDays?: number; lastActivityAt?: string; streakFreezeUsedAt?: string | null },
+    patch: {
+      xp?: number;
+      streakDays?: number;
+      lastActivityAt?: string;
+      streakFreezeUsedAt?: string | null;
+    },
   ): Promise<void>;
   getActiveManifest(projectId: string): Promise<Manifest | null>;
-  listForProject(
-    projectId: string,
-  ): Promise<EnrolledLearnerRow[]>;
+  listForProject(projectId: string): Promise<EnrolledLearnerRow[]>;
   addInvite(projectId: string, email: string): Promise<void>;
   /** Top 10 matrículas por XP de um app publicado (slug). */
-  getLeaderboard(slug: string): Promise<{ enrollmentId: string; learnerName: string; xp: number }[]>;
+  getLeaderboard(
+    slug: string,
+  ): Promise<{ enrollmentId: string; learnerName: string; xp: number }[]>;
   createTimeCapsule(input: { enrollmentId: string; message: string }): Promise<string>;
 }
 

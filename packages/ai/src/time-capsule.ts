@@ -14,7 +14,11 @@ export interface TimeCapsuleNote {
   delivered: boolean;
 }
 
-export function buildTimeCapsuleQuiz(projectTitle: string): { question: string; options: string[]; correctIndex: number } {
+export function buildTimeCapsuleQuiz(projectTitle: string): {
+  question: string;
+  options: string[];
+  correctIndex: number;
+} {
   return {
     question: `O que você mais lembra sobre o conteúdo de "${projectTitle}"?`,
     options: [

@@ -61,7 +61,11 @@ export default function InpiQueuePage() {
   const atRiskCount = rows.filter((r) => r.slaAtRisk).length;
 
   if (denied) {
-    return <main className="grid min-h-screen place-items-center text-rose-400">Acesso restrito a administradores.</main>;
+    return (
+      <main className="grid min-h-screen place-items-center text-rose-400">
+        Acesso restrito a administradores.
+      </main>
+    );
   }
 
   return (
@@ -114,7 +118,9 @@ export default function InpiQueuePage() {
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">{STATUS_LABEL[r.status]}</span>
+                <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
+                  {STATUS_LABEL[r.status]}
+                </span>
                 {r.slaAtRisk && <span className="text-xs text-amber-400">⚠ SLA</span>}
               </div>
             </Link>

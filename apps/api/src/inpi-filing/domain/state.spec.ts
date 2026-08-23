@@ -15,9 +15,16 @@ import {
 
 describe('transições de status do Registro Assistido', () => {
   it('canRevoke é verdadeiro em qualquer status não-terminal', () => {
-    const nonTerminal: FilingStatus[] = ['draft', 'awaiting_poa', 'awaiting_payment', 'in_review', 'filed'];
+    const nonTerminal: FilingStatus[] = [
+      'draft',
+      'awaiting_poa',
+      'awaiting_payment',
+      'in_review',
+      'filed',
+    ];
     for (const s of nonTerminal) expect(canRevoke(s)).toBe(true);
-    for (const s of ['granted', 'rejected', 'revoked'] as FilingStatus[]) expect(canRevoke(s)).toBe(false);
+    for (const s of ['granted', 'rejected', 'revoked'] as FilingStatus[])
+      expect(canRevoke(s)).toBe(false);
   });
 
   it('cada ação só é permitida no status esperado', () => {
@@ -46,23 +53,39 @@ describe('transições de status do Registro Assistido', () => {
 
 describe('validatePoaSignature (Gherkin §3.5)', () => {
   it('procuração válida: PAdES presente + PF assina com e-CPF', () => {
-    const r = validatePoaSignature({ holderType: 'pf', signerDocType: 'e-cpf', hasPadesMarkers: true });
+    const r = validatePoaSignature({
+      holderType: 'pf',
+      signerDocType: 'e-cpf',
+      hasPadesMarkers: true,
+    });
     expect(r.valid).toBe(true);
   });
 
   it('procuração válida: PAdES presente + PJ assina com e-CNPJ', () => {
-    const r = validatePoaSignature({ holderType: 'pj', signerDocType: 'e-cnpj', hasPadesMarkers: true });
+    const r = validatePoaSignature({
+      holderType: 'pj',
+      signerDocType: 'e-cnpj',
+      hasPadesMarkers: true,
+    });
     expect(r.valid).toBe(true);
   });
 
   it('sem assinatura PAdES é sempre recusado', () => {
-    const r = validatePoaSignature({ holderType: 'pf', signerDocType: 'e-cpf', hasPadesMarkers: false });
+    const r = validatePoaSignature({
+      holderType: 'pf',
+      signerDocType: 'e-cpf',
+      hasPadesMarkers: false,
+    });
     expect(r.valid).toBe(false);
     expect(r.reason).toContain('PAdES');
   });
 
   it('PJ assinado com e-CPF do representante é recusado com explicação', () => {
-    const r = validatePoaSignature({ holderType: 'pj', signerDocType: 'e-cpf', hasPadesMarkers: true });
+    const r = validatePoaSignature({
+      holderType: 'pj',
+      signerDocType: 'e-cpf',
+      hasPadesMarkers: true,
+    });
     expect(r.valid).toBe(false);
     expect(r.reason).toContain('e-CNPJ');
   });

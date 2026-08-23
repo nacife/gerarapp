@@ -20,7 +20,7 @@ export class OrgsController {
     ]);
 
     return {
-      data: orgs.map(o => ({ ...o, memberCount: o.memberships.length })),
+      data: orgs.map((o) => ({ ...o, memberCount: o.memberships.length })),
       meta: { page: pageNum, limit, total, totalPages: Math.ceil(total / limit) },
     };
   }
@@ -30,14 +30,15 @@ export class OrgsController {
   async getOrg(@Param('id') id: string) {
     return prisma.organization.findUnique({
       where: { id },
-      include: { memberships: { include: { user: { select: { id: true, name: true, email: true } } } } },
+      include: {
+        memberships: { include: { user: { select: { id: true, name: true, email: true } } } },
+      },
     });
   }
 
   @Patch(':id/status')
   @Roles('super_admin')
-  async updateStatus(@Param('id') id: string, @Body() body: { active: boolean }) {
+  updateOrg(@Param('id') _id: string, @Body() _body: { active: boolean }) {
     return { status: 'Not implemented' };
   }
 }
-

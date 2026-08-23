@@ -60,33 +60,51 @@ Para configurar a infraestrutura de desenvolvimento na máquina local:
 5. **Integração Contínua (Local):**
    - Garantir linting, types e testes: `pnpm verify`
 
-*(Certifique-se de que o Docker Desktop esteja rodando antes de executar comandos `docker:up` ou `db:reset`).*
+_(Certifique-se de que o Docker Desktop esteja rodando antes de executar comandos `docker:up` ou `db:reset`)._
 
 ---
 
 ## 4. Subsistemas Críticos
 
 ### Identidade e RBAC (Role-Based Access Control)
-- Arquitetura Hexagonal com *Domínio Puro* (`AuthUser`, `SessionRecord`).
+
+- Arquitetura Hexagonal com _Domínio Puro_ (`AuthUser`, `SessionRecord`).
 - **Autenticação:** Baseada em cookies http-only e JWT. Suporta login, recuperação de senha, e bloqueio de tentativas brutas (Lockout).
 - **MFA (TOTP):** Implementação nativa (`otplib`), garantindo segurança robusta em áreas administrativas.
 - **Impersonação:** Permite que um administrador gere um token e acesse a UI Web como se fosse um usuário específico para debug e suporte.
 
 ### Criação e Pipeline de IA
+
 - **Ingestão (`worker/ingest`):** Consome arquivos via URL pré-assinada do MinIO. Converte PDF, DOCX, EPUB ou MD em blocos lógicos usando processadores semânticos (ex: unpdf).
 - **Interações (`worker/generate`):** A geração baseia-se num prompt estrito valendo-se do `packages/schemas`. O resultado é validado via Zod; se inválido, entra em loop de retry (2x) antes de falhar de vez. Toda geração cobra do `ai_credit_ledger`.
 - **Sensei (RAG):** Vetores injetados no PostgreSQL via `pgvector`. A IA (Sensei) usa RAG em cima do conhecimento isolado de um único `Manifest`.
 
 ### Sistema de Proteção e INPI
+
 O módulo mais sensível juridicamente. Garante empacotamento **Determinístico**.
+
 - Arquivos de código, Playwright Headless para print das telas (mobile/desktop), Memorial Descritivo gerado por IA.
 - Assinatura: SHA-512 canônico + zip armazenado num bucket S3 do tipo WORM (Write-Once-Read-Many).
 - Assinatura PAdES: PDFs assinados com e-CNPJ são verificados nativamente (`scanForPadesMarkers`).
 
 ### Webhooks e API (Extensibilidade)
+
 - As integrações externas usam Chaves de API encriptadas por Pepper + Hash.
 - Toda requisição sensível obriga a passagem de `Idempotency-Key` processada com lock distribuído em Redis (evitando double-spend e double-publish).
 - Webhooks são disparados do `worker` e entregues via fila `webhook-delivery` usando assinatura criptográfica local **HMAC-SHA256**.
+
+### Armazenamento de Objetos (MinIO & Cloudflare R2)
+
+O EduForge utiliza uma camada de abstração unificada (`createS3Client`) compatível com qualquer provedor S3:
+
+- **Desenvolvimento Local:** MinIO containerizado (`http://localhost:9000`) com `S3_FORCE_PATH_STYLE=true`.
+- **Produção (Cloudflare R2):**
+  - Endpoint: `https://<ACCOUNT_ID>.r2.cloudflarestorage.com` com `S3_REGION=auto` e `S3_FORCE_PATH_STYLE=false`.
+  - **Zero Egress Fees:** Elimina custos de transferência de saída para assets de aprendizes e mídia.
+  - **Buckets:**
+    1. `S3_BUCKET_UPLOADS`: Arquivos fontes (PDFs, DOCX) enviados via URLs pré-assinadas de PUT.
+    2. `S3_BUCKET_APPS`: Manifestos de publicação, podcasts gerados e certificados de conclusão.
+    3. `S3_BUCKET_WORM`: Dossiês do INPI e procurações assinadas com retenção imutável.
 
 ---
 
@@ -95,6 +113,6 @@ O módulo mais sensível juridicamente. Garante empacotamento **Determinístico*
 1. **Imutabilidade Auditável:** Modificações nas tabelas `audit_logs`, `inpi_certificates` e `ai_credit_ledger` são proibidas via `UPDATE`/`DELETE` em banco, graças à role endurecida `eduforge_app` nas permissões do PostgreSQL.
 2. **Type Safety na Borda:** Nunca ignore o Zod. Qualquer I/O precisa ter schema explícito definido em `packages/schemas` se for trafegado entre os serviços.
 3. **Problem Details:** Erros RESTful seguem obrigatoriamente a [RFC 9457 (Problem Details)](https://datatracker.ietf.org/doc/html/rfc9457).
-4. **Sem Placeholders:** Caso haja dependências externas não prontas, deve-se usar os Providers falsos injetados e documentar no ticket. 
+4. **Sem Placeholders:** Caso haja dependências externas não prontas, deve-se usar os Providers falsos injetados e documentar no ticket.
 
 Dúvidas de mapeamento de código ou diagramas? Verifique o arquivo detalhado de decisões base em `docs/DECISIONS.md`.

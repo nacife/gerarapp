@@ -1,21 +1,6 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { Roles } from '../common/decorators';
-import { ZodValidationPipe } from '../common/zod-validation.pipe';
-import { z } from 'zod';
 import { AI_CREDITS, getEnv } from '@eduforge/config';
-
-const rateLimitSchema = z.object({
-  maxRequestsPerMinute: z.number().int().min(1).max(10000).default(60),
-  windowSeconds: z.number().int().min(10).max(3600).default(60),
-});
-
-const aiCreditsSchema = z.object({
-  costPerInteraction: z.number().int().min(1).default(3),
-  costTutorQuestion: z.number().int().min(1).default(1),
-  costPodcast: z.number().int().min(1).default(5),
-  costIllustration: z.number().int().min(1).default(2),
-  lowBalanceThreshold: z.number().int().min(1).default(30),
-});
 
 @Controller('admin/config')
 export class ApiConfigController {
@@ -65,14 +50,19 @@ export class ApiConfigController {
     // Retorna os escopos disponíveis e as filas
     return {
       scopes: [
-        'projects:read', 'projects:write',
-        'content:read', 'content:write',
-        'design:read', 'design:write',
+        'projects:read',
+        'projects:write',
+        'content:read',
+        'content:write',
+        'design:read',
+        'design:write',
         'ai:invoke',
         'publish',
         'analytics:read',
-        'learners:read', 'learners:write',
-        'inpi:read', 'inpi:write',
+        'learners:read',
+        'learners:write',
+        'inpi:read',
+        'inpi:write',
         'billing:read',
         'jobs:read',
       ],

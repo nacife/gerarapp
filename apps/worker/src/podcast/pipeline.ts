@@ -23,10 +23,7 @@ export interface PodcastRepository {
     meta: unknown;
   }): Promise<{ id: string }>;
   /** Salva status do job (sucesso ou falha). */
-  saveJob(
-    jobId: string,
-    patch: { status: 'completed' | 'failed'; error?: string },
-  ): Promise<void>;
+  saveJob(jobId: string, patch: { status: 'completed' | 'failed'; error?: string }): Promise<void>;
 }
 
 export interface PodcastStorage {

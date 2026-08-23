@@ -95,7 +95,10 @@ export class PrismaApiKeyRepository implements ApiKeyRepository {
 
 export class PrismaApiKeyProjectRepository implements ApiKeyProjectRepository {
   async findByIdForOwner(id: string, ownerUserId: string): Promise<{ id: string } | null> {
-    const found = await prisma.project.findFirst({ where: { id, ownerUserId }, select: { id: true } });
+    const found = await prisma.project.findFirst({
+      where: { id, ownerUserId },
+      select: { id: true },
+    });
     return found;
   }
 }

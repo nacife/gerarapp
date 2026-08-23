@@ -177,7 +177,9 @@ export default function InteracoesPage({ params }: { params: { id: string } }) {
         <div className="space-y-6">
           {groups.map((blockId, gi) => (
             <section key={blockId ?? gi}>
-              <h2 className="mb-2 text-xs uppercase tracking-wider text-slate-500">Seção {gi + 1}</h2>
+              <h2 className="mb-2 text-xs uppercase tracking-wider text-slate-500">
+                Seção {gi + 1}
+              </h2>
               <div className="space-y-2">
                 {items
                   .filter((it) => it.contentBlockId === blockId)

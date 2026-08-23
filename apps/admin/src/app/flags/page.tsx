@@ -69,12 +69,23 @@ export default function FlagsPage() {
       method: 'POST',
       body: { subjectType: pinSubjectType, subjectId: pinSubjectId, enabled: pinEnabled },
     });
-    setMsg(res.ok ? `Flag "${pinKey}" fixada para ${pinSubjectType} ${pinSubjectId}.` : (res.problem?.detail ?? 'Falha ao fixar.'));
-    if (res.ok) { setPinKey(null); setPinSubjectId(''); }
+    setMsg(
+      res.ok
+        ? `Flag "${pinKey}" fixada para ${pinSubjectType} ${pinSubjectId}.`
+        : (res.problem?.detail ?? 'Falha ao fixar.'),
+    );
+    if (res.ok) {
+      setPinKey(null);
+      setPinSubjectId('');
+    }
   }
 
   if (denied) {
-    return <main className="grid min-h-screen place-items-center text-rose-400">Acesso restrito a administradores.</main>;
+    return (
+      <main className="grid min-h-screen place-items-center text-rose-400">
+        Acesso restrito a administradores.
+      </main>
+    );
   }
 
   return (
@@ -84,10 +95,15 @@ export default function FlagsPage() {
           ← Painel admin
         </Link>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">Feature Flags</h1>
-        <p className="text-sm text-zinc-500">Rollout percentual determinístico por usuário (RF-13).</p>
+        <p className="text-sm text-zinc-500">
+          Rollout percentual determinístico por usuário (RF-13).
+        </p>
       </div>
 
-      <form onSubmit={createFlag} className="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <form
+        onSubmit={createFlag}
+        className="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4"
+      >
         <input
           value={newKey}
           onChange={(e) => setNewKey(e.target.value)}
@@ -111,7 +127,11 @@ export default function FlagsPage() {
         </button>
       </form>
 
-      {msg && <p className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300">{msg}</p>}
+      {msg && (
+        <p className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300">
+          {msg}
+        </p>
+      )}
 
       {!loaded ? (
         <p className="text-zinc-500">Carregando…</p>
@@ -150,7 +170,10 @@ export default function FlagsPage() {
                 {pinKey === f.key ? 'cancelar' : 'fixar para usuário/org/plano →'}
               </button>
               {pinKey === f.key && (
-                <form onSubmit={pin} className="mt-3 flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-3">
+                <form
+                  onSubmit={pin}
+                  className="mt-3 flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-3"
+                >
                   <select
                     value={pinSubjectType}
                     onChange={(e) => setPinSubjectType(e.target.value as 'user' | 'org' | 'plan')}

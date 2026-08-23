@@ -36,7 +36,11 @@ export class ContentMapService {
   }
 
   /** Salva uma nova revisão com a árvore editada (US-ING-02). */
-  async update(projectId: string, ownerUserId: string, tree: ContentMapTree): Promise<ContentMapRecord> {
+  async update(
+    projectId: string,
+    ownerUserId: string,
+    tree: ContentMapTree,
+  ): Promise<ContentMapRecord> {
     await this.assertOwner(projectId, ownerUserId);
     return this.maps.createRevision({
       projectId,
