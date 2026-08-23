@@ -1,0 +1,12 @@
+.git
+.gitignore
+.turbo
+.next
+node_modules
+dist
+test-results
+*.log
+.env
+.env.local
+.DS_Store
+Thumbs.db

@@ -1,0 +1,35 @@
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+FROM base AS builder
+WORKDIR /app
+RUN apk add --no-cache libc6-compat
+
+# Copia arquivos de configuração do monorepo
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json tsconfig.base.json ./
+COPY packages/ ./packages/
+COPY apps/api/ ./apps/api/
+
+# Instala dependências
+RUN pnpm install --frozen-lockfile
+
+# Gera cliente Prisma e compila os pacotes e a API
+RUN pnpm --filter @eduforge/db db:generate
+RUN pnpm --filter @eduforge/api build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN apk add --no-cache libc6-compat
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nestjs
+
+COPY --from=builder /app /app
+
+USER nestjs
+EXPOSE 3333
+ENV PORT=3333
+
+CMD ["node", "apps/api/dist/main.js"]

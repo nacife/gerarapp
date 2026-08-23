@@ -1,0 +1,112 @@
+name: eduforge-prod
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: eduforge_prod_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-eduforge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eduforge_secure_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-eduforge}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U eduforge -d eduforge']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: eduforge_prod_redis
+    restart: always
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', '${REDIS_PASSWORD:-redis_secure_pass_2026}']
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD:-redis_secure_pass_2026}', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: eduforge_prod_api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - '${API_PORT:-3333}:3333'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:3333/health || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: eduforge_prod_worker
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - '${WORKER_PORT:-3334}:3334'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:3334/health || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: eduforge_prod_web
+    restart: always
+    depends_on:
+      - api
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    container_name: eduforge_prod_admin
+    restart: always
+    depends_on:
+      - api
+    env_file:
+      - .env
+    ports:
+      - '3001:3001'
+
+  runtime:
+    build:
+      context: .
+      dockerfile: Dockerfile.runtime
+    container_name: eduforge_prod_runtime
+    restart: always
+    ports:
+      - '5173:80'
+
+volumes:
+  postgres_data:
+  redis_data:
