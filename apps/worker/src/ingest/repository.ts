@@ -1,6 +1,6 @@
 import { GetObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { getEnv } from '@eduforge/config';
-import { createS3Client } from '../../common/s3.client';
+import { createS3Client } from '../common/s3.client';
 import { Prisma, prisma } from '@eduforge/db';
 import type { BuiltBlock } from './build-map';
 import type { IngestRepository, IngestSourceFile, IngestStorage, JobProgress } from './pipeline';

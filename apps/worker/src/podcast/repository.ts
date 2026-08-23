@@ -1,7 +1,7 @@
 import { Prisma, prisma } from '@eduforge/db';
 import { PutObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { getEnv } from '@eduforge/config';
-import { createS3Client } from '../../common/s3.client';
+import { createS3Client } from '../common/s3.client';
 import type { PodcastRepository, PodcastStorage } from './pipeline';
 
 /** Extrai o título da primeira linha de um bloco markdown (ex.: "# Título" → "Título"). */
