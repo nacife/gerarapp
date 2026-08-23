@@ -19,6 +19,7 @@ export const envSchema = z
     S3_SECRET_KEY: z.string().min(1),
     S3_BUCKET_UPLOADS: z.string().min(1),
     S3_BUCKET_APPS: z.string().min(1),
+    S3_BUCKET_WORM: z.string().min(1),
     S3_FORCE_PATH_STYLE: z
       .preprocess((val) => {
         if (typeof val === 'string') {
