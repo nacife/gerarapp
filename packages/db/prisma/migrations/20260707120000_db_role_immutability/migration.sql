@@ -10,10 +10,10 @@ BEGIN
   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'eduforge_app') THEN
     CREATE ROLE eduforge_app LOGIN PASSWORD 'eduforge_app';
   END IF;
+  EXECUTE format('GRANT CONNECT ON DATABASE %I TO eduforge_app', current_database());
 END
 $$;
 
-GRANT CONNECT ON DATABASE eduforge TO eduforge_app;
 GRANT USAGE ON SCHEMA public TO eduforge_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO eduforge_app;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO eduforge_app;

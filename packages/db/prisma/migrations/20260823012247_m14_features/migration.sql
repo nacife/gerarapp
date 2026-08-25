@@ -1,24 +1,21 @@
 -- CreateEnum
-CREATE TYPE "TicketStatus" AS ENUM ('open', 'in_progress', 'resolved', 'closed');
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'TicketStatus') THEN
+    CREATE TYPE "TicketStatus" AS ENUM ('open', 'in_progress', 'resolved', 'closed');
+  END IF;
+END $$;
 
--- DropIndex
-DROP INDEX "idx_ai_credit_ledger_reason";
-
--- DropIndex
-DROP INDEX "idx_jobs_status";
-
--- DropIndex
-DROP INDEX "idx_learner_progress_next_review";
-
--- DropIndex
-DROP INDEX "idx_learning_events_enrollment_occurred";
-
--- DropIndex
-DROP INDEX "idx_webhook_deliveries_created_at";
+-- DropIndex (se existirem)
+DROP INDEX IF EXISTS "idx_ai_credit_ledger_reason";
+DROP INDEX IF EXISTS "idx_jobs_status";
+DROP INDEX IF EXISTS "idx_learner_progress_next_review";
+DROP INDEX IF EXISTS "idx_learning_events_enrollment_occurred";
+DROP INDEX IF EXISTS "idx_webhook_deliveries_created_at";
 
 -- AlterTable
-ALTER TABLE "users" ADD COLUMN     "provider" TEXT,
-ADD COLUMN     "provider_id" TEXT;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "provider" TEXT,
+ADD COLUMN IF NOT EXISTS "provider_id" TEXT;
 
 -- CreateTable
 CREATE TABLE "time_capsules" (
