@@ -8,7 +8,7 @@ DO
 $$
 BEGIN
   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'eduforge_app') THEN
-    CREATE ROLE eduforge_app LOGIN PASSWORD 'eduforge_app';
+    CREATE ROLE eduforge_app LOGIN PASSWORD 'EduForge!App2026_SecureKey';
   END IF;
   EXECUTE format('GRANT CONNECT ON DATABASE %I TO eduforge_app', current_database());
 END

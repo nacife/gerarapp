@@ -38,7 +38,9 @@
     "@eduforge/schemas": "workspace:*",
     "@eduforge/ui": "workspace:*",
     "@node-rs/argon2": "^2.0.2",
+    "@types/pg": "^8.23.1",
     "dotenv-cli": "^8.0.0",
+    "pg": "^8.23.0",
     "prisma": "^5.22.0"
   }
 }
