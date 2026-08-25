@@ -1,7 +1,9 @@
 name: eduforge-prod
 
 services:
+  # Banco de Dados local opcional (usado apenas com `--profile local-db`)
   postgres:
+    profiles: ["local-db"]
     image: pgvector/pgvector:pg16
     container_name: eduforge_prod_postgres
     restart: always
@@ -17,7 +19,9 @@ services:
       timeout: 5s
       retries: 5
 
+  # Redis local opcional (usado apenas com `--profile local-db`)
   redis:
+    profiles: ["local-db"]
     image: redis:7-alpine
     container_name: eduforge_prod_redis
     restart: always
@@ -36,17 +40,12 @@ services:
       dockerfile: Dockerfile.api
     container_name: eduforge_prod_api
     restart: always
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     env_file:
       - .env
     ports:
       - '${API_PORT:-3333}:3333'
     healthcheck:
-      test: ['CMD-SHELL', 'wget -qO- http://localhost:3333/health || exit 1']
+      test: ['CMD', 'node', '-e', 'require("http").get("http://localhost:3333/health", (r) => process.exit(r.statusCode === 200 ? 0 : 1))']
       interval: 15s
       timeout: 5s
       retries: 3
@@ -57,17 +56,12 @@ services:
       dockerfile: Dockerfile.worker
     container_name: eduforge_prod_worker
     restart: always
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     env_file:
       - .env
     ports:
       - '${WORKER_PORT:-3334}:3334'
     healthcheck:
-      test: ['CMD-SHELL', 'wget -qO- http://localhost:3334/health || exit 1']
+      test: ['CMD', 'node', '-e', 'require("http").get("http://localhost:3334/health", (r) => process.exit(r.statusCode === 200 ? 0 : 1))']
       interval: 15s
       timeout: 5s
       retries: 3

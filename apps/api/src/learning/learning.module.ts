@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import IORedis, { type Redis } from 'ioredis';
 import { LEARNER_AUTH, getEnv } from '@eduforge/config';
 
 import { LearnerAuthController } from './learner-auth.controller';
@@ -39,6 +40,8 @@ import { PdfLibCertificateBuilder } from './adapters/pdf.builder';
 import { WebhooksModule } from '../webhooks/webhooks.module';
 import { WebhooksService } from '../webhooks/webhooks.service';
 
+const LEARNING_REDIS = Symbol('LEARNING_REDIS');
+
 @Module({
   imports: [WebhooksModule],
   controllers: [
@@ -52,6 +55,10 @@ import { WebhooksService } from '../webhooks/webhooks.service';
   ],
   providers: [
     LearnerAuthGuard,
+    {
+      provide: LEARNING_REDIS,
+      useFactory: (): Redis => new IORedis(getEnv().REDIS_URL, { maxRetriesPerRequest: null }),
+    },
     { provide: LearningDnaService, useFactory: () => new LearningDnaService() },
     {
       provide: LEARNER_TOKEN_SERVICE,
@@ -60,8 +67,8 @@ import { WebhooksService } from '../webhooks/webhooks.service';
     },
     {
       provide: TIME_CAPSULE_ENQUEUER,
-      inject: ['Redis'],
-      useFactory: (redis) => new BullMqTimeCapsuleEnqueuer(redis),
+      inject: [LEARNING_REDIS],
+      useFactory: (redis: Redis) => new BullMqTimeCapsuleEnqueuer(redis),
     },
     {
       provide: LEARNER_COOKIE_OPTS,
