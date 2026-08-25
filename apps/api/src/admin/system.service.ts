@@ -15,21 +15,28 @@ export class SystemService {
   async getHealth() {
     const env = getEnv();
 
-    // DB check
+    // DB check com latência
     let dbOk = false;
+    let dbLatencyMs = 0;
     try {
+      const start = Date.now();
       await prisma.$queryRaw(Prisma.sql`SELECT 1`);
+      dbLatencyMs = Date.now() - start;
       dbOk = true;
     } catch {}
 
-    // Redis check
+    // Redis check com latência
     let redisOk = false;
+    let redisLatencyMs = 0;
     try {
-      const redis = new IORedis(env.REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 2000 });
-      await redis.ping();
+      const start = Date.now();
+      await this.redis.ping();
+      redisLatencyMs = Date.now() - start;
       redisOk = true;
-      redis.disconnect();
     } catch {}
+
+    // R2 / S3 check
+    const storageProvider = env.S3_FORCE_PATH_STYLE ? 'MinIO Local' : 'Cloudflare R2';
 
     // Queue stats
     const queueStats = await this.getQueueStats();
@@ -59,7 +66,10 @@ export class SystemService {
       nodeVersion: process.version,
       memoryMb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
       db: dbOk ? 'ok' : 'error',
+      dbLatencyMs,
       redis: redisOk ? 'ok' : 'error',
+      redisLatencyMs,
+      storageProvider,
       queues: queueStats,
       users: { total: totalUsers, active: activeUsers, suspended: suspendedUsers },
       projects: { total: totalProjects, published: publishedProjects },

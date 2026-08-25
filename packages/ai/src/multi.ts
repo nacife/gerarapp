@@ -24,17 +24,41 @@ import type {
  */
 export class MultiProvider implements AiProvider {
   readonly name = 'multi';
+  private static readonly DEFAULT_TIMEOUT_MS = 25000;
 
   constructor(
     private readonly providers: AiProvider[],
     private readonly mockFallback: AiProvider | null = null,
+    private readonly timeoutMs: number = MultiProvider.DEFAULT_TIMEOUT_MS,
   ) {}
+
+  private async withTimeout<T>(p: AiProvider, promise: Promise<T>): Promise<T> {
+    let timer: NodeJS.Timeout;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        reject(new Error(`Timeout de ${this.timeoutMs}ms excedido no provider '${p.name}'`));
+      }, this.timeoutMs);
+    });
+
+    try {
+      return await Promise.race([promise, timeoutPromise]);
+    } finally {
+      clearTimeout(timer!);
+    }
+  }
 
   private async fallback<T>(method: string, fn: (p: AiProvider) => Promise<T>): Promise<T> {
     const errors: string[] = [];
     for (const p of this.providers) {
+      const start = Date.now();
       try {
-        return await fn(p);
+        const res = await this.withTimeout(p, fn(p));
+        const duration = Date.now() - start;
+        if (duration > 5000) {
+          // eslint-disable-next-line no-console
+          console.warn(`[AI MultiProvider] ${p.name}.${method} demorou ${duration}ms`);
+        }
+        return res;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         errors.push(`${p.name}: ${msg}`);

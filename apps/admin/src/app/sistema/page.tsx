@@ -10,7 +10,10 @@ interface SystemHealth {
   nodeVersion: string;
   memoryMb: number;
   db: string;
+  dbLatencyMs?: number;
   redis: string;
+  redisLatencyMs?: number;
+  storageProvider?: string;
   queues: Record<string, { waiting: number; active: number; failed: number; completed: number }>;
   users: { total: number; active: number; suspended: number };
   projects: { total: number; published: number };
@@ -30,13 +33,20 @@ export default function SistemaPage() {
   const router = useRouter();
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
+  function fetchHealth() {
+    setRefreshing(true);
     apiFetch<SystemHealth>('/admin/health').then((res) => {
       if (res.status === 401) return router.replace('/entrar');
       if (res.ok && res.data) setHealth(res.data);
       setLoading(false);
+      setRefreshing(false);
     });
+  }
+
+  useEffect(() => {
+    fetchHealth();
   }, [router]);
 
   if (loading)
@@ -45,10 +55,22 @@ export default function SistemaPage() {
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-6 py-12">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-100">Dashboard do Sistema</h1>
-        <Link href="/" className="text-sm text-cyan-400 hover:underline">
-          ← Voltar
-        </Link>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-100">Dashboard do Sistema</h1>
+          <p className="text-xs text-gray-400 mt-0.5">Métricas de infraestrutura em tempo real</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchHealth}
+            disabled={refreshing}
+            className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 transition"
+          >
+            {refreshing ? 'Atualizando...' : '🔄 Atualizar'}
+          </button>
+          <Link href="/" className="text-sm text-cyan-400 hover:underline">
+            ← Voltar
+          </Link>
+        </div>
       </div>
 
       {/* Métricas rápidas */}
@@ -68,20 +90,26 @@ export default function SistemaPage() {
               color="text-cyan-300"
             />
             <StatCard
-              label="Banco"
+              label="Neon PostgreSQL"
               value={health.db === 'ok' ? 'OK' : 'ERRO'}
-              sub="PostgreSQL"
+              sub={health.dbLatencyMs ? `${health.dbLatencyMs}ms latência` : 'PostgreSQL'}
               color={health.db === 'ok' ? 'text-emerald-300' : 'text-red-300'}
             />
             <StatCard
-              label="Redis"
+              label="Upstash Redis"
               value={health.redis === 'ok' ? 'OK' : 'ERRO'}
-              sub="BullMQ + Cache"
+              sub={health.redisLatencyMs ? `${health.redisLatencyMs}ms latência` : 'BullMQ + Cache'}
               color={health.redis === 'ok' ? 'text-emerald-300' : 'text-red-300'}
             />
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              label="Storage de Objetos"
+              value={health.storageProvider || 'Cloudflare R2'}
+              sub="Zero Egress"
+              color="text-amber-300"
+            />
             <StatCard
               label="Total Usuários"
               value={String(health.users.total)}
