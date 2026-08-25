@@ -1,118 +1,139 @@
-# Manual Técnico - EduForge
+# ⚙️ Manual Técnico de Engenharia & Arquitetura — EduForge
 
-Este documento destina-se a engenheiros de software, mantenedores e arquitetos do **EduForge**, detalhando a infraestrutura e a arquitetura das aplicações que operam a plataforma.
-
-O EduForge é um monorepo TypeScript gerenciado com `pnpm workspaces` e `Turborepo`, focado em transformar documentos em aplicativos de aprendizagem progressivos (PWAs) utilizando inteligência artificial.
+Este documento destina-se a engenheiros de software, arquitetos de soluções, DevOps e mantenedores do **EduForge**, detalhando a infraestrutura, os padrões de código e a operação da plataforma em desenvolvimento e produção.
 
 ---
 
-## 1. Arquitetura e Stack (Milestone 14)
+## 🏛️ 1. Visão Geral da Arquitetura
 
-A stack tecnológica do EduForge foi desenhada para altíssima resiliência e validação estrita nas bordas.
+O EduForge é estruturado como um monorepo TypeScript modular sob **pnpm workspaces** e **Turborepo**, orientado a arquitetura hexagonal (Ports & Adapters) na camada de domínio da API e jobs assíncronos desacoplados por filas.
 
-- **Linguagem Principal:** TypeScript (Estrito)
-- **Painéis (Admin e Criador):** Next.js 14 (App Router)
-- **API Backend:** NestJS 10 + Fastify
-- **Processamento em Background (Jobs):** BullMQ + Redis
-- **Banco de Dados:** PostgreSQL 16 (com `pgvector` para Busca Semântica/RAG) + Prisma ORM
-- **Runtime PWA:** Vite 5 + React 18
-- **Validação de Dados:** Zod (usado extensivamente na borda, com `ZodValidationPipe`)
-- **Arquivos e Objetos:** S3 compatível (MinIO local)
+```
+                                  ┌───────────────────────────────┐
+                                  │      Cloudflare Edge CDN      │
+                                  └───────────────┬───────────────┘
+                                                  │
+                ┌─────────────────────────────────┼─────────────────────────────────┐
+                ▼                                 ▼                                 ▼
+      ┌──────────────────┐              ┌──────────────────┐              ┌──────────────────┐
+      │  apps/web (:3000)│              │ apps/admin(:3001)│              │apps/runtime(:5173│
+      │  Next.js 14 SSR  │              │  Next.js 14 SSR  │              │ NGINX Static PWA │
+      └─────────┬────────┘              └─────────┬────────┘              └─────────┬────────┘
+                │                                 │                                 │
+                └─────────────────────────────────┼─────────────────────────────────┘
+                                                  ▼
+                                      ┌───────────────────────┐
+                                      │   apps/api (:3333)    │
+                                      │ NestJS 10 + Fastify   │
+                                      └───────────┬───────────┘
+                                                  │
+                     ┌────────────────────────────┼────────────────────────────┐
+                     ▼                            ▼                            ▼
+          ┌──────────────────────┐     ┌──────────────────────┐     ┌──────────────────────┐
+          │   Neon PostgreSQL    │     │    Upstash Redis     │     │   Cloudflare R2 S3   │
+          │ Serverless + pgvector│     │ BullMQ + Cache + Rate│     │ WORM & Asset Storage │
+          └──────────────────────┘     └──────────┬───────────┘     └──────────────────────┘
+                                                  │
+                                                  ▼
+                                      ┌───────────────────────┐
+                                      │  apps/worker (:3334)  │
+                                      │ BullMQ Background Jobs│
+                                      └───────────────────────┘
+```
 
 ---
 
-## 2. Estrutura do Monorepo
-
-O projeto está dividido entre `apps/` (aplicações executáveis) e `packages/` (bibliotecas compartilhadas internas).
+## 📦 2. Estrutura de Aplicações e Pacotes
 
 ```
 apps/
-  ├─ api/       (NestJS REST API, porta: 3333, base em hexagonal e adapters)
-  ├─ worker/    (Processamento via BullMQ, porta: 3334. Ingestão, AI, INPI, Webhooks)
-  ├─ admin/     (Next.js Admin Console, porta: 3001)
-  ├─ web/       (Next.js Painel do Criador, porta: 3000)
-  └─ runtime/   (Vite PWA, roda no navegador servindo os templates publicados)
+  ├─ api/       (NestJS 10 REST API sobre Fastify 4, portas 3333 /v1)
+  ├─ worker/    (BullMQ background processor: ingestão, geração IA, INPI, TTS, webhooks)
+  ├─ admin/     (Console Administrativo em Next.js 14 Standalone, porta 3001)
+  ├─ web/       (Portal do Criador em Next.js 14 Standalone, porta 3000)
+  └─ runtime/   (PWA de aprendizagem em Vite 5 + React 18, servido por NGINX, porta 5173)
 
 packages/
-  ├─ db/        (Prisma Schema, Client Singleton, Seeds e Migrations)
-  ├─ schemas/   (Validações Zod essenciais das interações, cryptos e regras de negócio)
-  ├─ ai/        (Provedores de IA - Mock e Anthropic)
-  ├─ ui/        (Tokens de Design e Paletas baseados no WCAG)
-  ├─ config/    (RootEnv, constantes de Roles)
-  └─ testing/   (Fakes, Factories e Fixtures para TDD e Testes de Integração)
+  ├─ db/        (Prisma 5 ORM, migrations SQL dinâmicas, seeds e client singleton)
+  ├─ schemas/   (Validações Zod para os 9 tipos de interações, crypto AES/HMAC e regras)
+  ├─ ai/        (Provedores de IA: Anthropic Claude, OpenAI GPT-4o, DeepSeek e MultiProvider)
+  ├─ ui/        (Tokens de design, temas, variáveis CSS e verificador de contraste WCAG AA)
+  ├─ config/    (Validação de variáveis de ambiente com Zod e tipagem estrita)
+  └─ testing/   (Factories, fixtures e geradores de carga para testes automatizados)
 ```
 
 ---
 
-## 3. Configuração Local e Setup
+## ☁️ 3. Integrações de Nuvem em Produção
 
-Para configurar a infraestrutura de desenvolvimento na máquina local:
+### 🐘 Banco de Dados: Neon PostgreSQL Serverless
+- Conexão principal via pooling (`DATABASE_URL`) com SSL obrigatório (`sslmode=require`).
+- Conexão direta sem pooler (`DIRECT_DATABASE_URL`) para migrações DDL do Prisma.
+- Extensão `pgvector` habilitada para indexação vetorial e buscas semânticas do tutor Sensei (dimensão 1536d).
+- Imutabilidade a nível de banco de dados (`eduforge_app` role) para tabelas críticas (`audit_logs`, `app_versions`, `ai_credit_ledger`, `inpi_certificates`).
 
-1. **Dependências Node:** `pnpm install`
-2. **Infraestrutura Docker:** (Garante o Postgres, Redis e MinIO no ar)
-   - Iniciar: `pnpm docker:up`
-   - Resetar Volumes: `pnpm docker:reset`
-3. **Banco de Dados:**
-   - Popular banco do zero: `pnpm db:reset`
-   - Migrar (em caso de alterações no schema): `pnpm db:migrate`
-4. **Execução Local:**
-   - Rodar todas as aplicações de uma vez via Turbo: `pnpm dev`
-5. **Integração Contínua (Local):**
-   - Garantir linting, types e testes: `pnpm verify`
+### ⚡ Mensageria e Cache: Upstash Redis
+- Conexão segura via TLS (`rediss://...`) com timeout de conexão calibrado e failover.
+- Gerenciamento de 9 filas no BullMQ:
+  1. `ingest`: Extração e leitura de documentos (PDF, DOCX, Markdown).
+  2. `generate`: Geração de atividades e interações com IA.
+  3. `tts`: Roteirização e síntese de áudio de podcasts.
+  4. `inpi-package`: Montagem do pacote determinístico e captura de telas via Playwright.
+  5. `sensei-embed`: Geração de embeddings e indexação semântica.
+  6. `webhook-delivery`: Entrega resiliente de webhooks com backoff exponencial.
+  7. `system`: Limpeza periódica e jobs de manutenção.
+  8. `account-anonymize`: Anonimização e exclusão LGPD assíncrona.
+  9. `time-capsule`: Agendamento de revisões espaçadas.
 
-_(Certifique-se de que o Docker Desktop esteja rodando antes de executar comandos `docker:up` ou `db:reset`)._
+### 🗄️ Armazenamento de Objetos: Cloudflare R2
+- Compatível com a API AWS S3 SDK v3, operando com **zero taxa de tráfego de saída (Zero Egress)**.
+- Geração de URLs pré-assinadas (`presigned URLs`) para upload e download direto de arquivos grandes.
+- Bucket WORM dedicado (`S3_BUCKET_WORM`) para preservação imutável de pacotes e declarações do INPI.
 
----
-
-## 4. Subsistemas Críticos
-
-### Identidade e RBAC (Role-Based Access Control)
-
-- Arquitetura Hexagonal com _Domínio Puro_ (`AuthUser`, `SessionRecord`).
-- **Autenticação:** Baseada em cookies http-only e JWT. Suporta login, recuperação de senha, e bloqueio de tentativas brutas (Lockout).
-- **MFA (TOTP):** Implementação nativa (`otplib`), garantindo segurança robusta em áreas administrativas.
-- **Impersonação:** Permite que um administrador gere um token e acesse a UI Web como se fosse um usuário específico para debug e suporte.
-
-### Criação e Pipeline de IA
-
-- **Ingestão (`worker/ingest`):** Consome arquivos via URL pré-assinada do MinIO. Converte PDF, DOCX, EPUB ou MD em blocos lógicos usando processadores semânticos (ex: unpdf).
-- **Interações (`worker/generate`):** A geração baseia-se num prompt estrito valendo-se do `packages/schemas`. O resultado é validado via Zod; se inválido, entra em loop de retry (2x) antes de falhar de vez. Toda geração cobra do `ai_credit_ledger`.
-- **Sensei (RAG):** Vetores injetados no PostgreSQL via `pgvector`. A IA (Sensei) usa RAG em cima do conhecimento isolado de um único `Manifest`.
-
-### Sistema de Proteção e INPI
-
-O módulo mais sensível juridicamente. Garante empacotamento **Determinístico**.
-
-- Arquivos de código, Playwright Headless para print das telas (mobile/desktop), Memorial Descritivo gerado por IA.
-- Assinatura: SHA-512 canônico + zip armazenado num bucket S3 do tipo WORM (Write-Once-Read-Many).
-- Assinatura PAdES: PDFs assinados com e-CNPJ são verificados nativamente (`scanForPadesMarkers`).
-
-### Webhooks e API (Extensibilidade)
-
-- As integrações externas usam Chaves de API encriptadas por Pepper + Hash.
-- Toda requisição sensível obriga a passagem de `Idempotency-Key` processada com lock distribuído em Redis (evitando double-spend e double-publish).
-- Webhooks são disparados do `worker` e entregues via fila `webhook-delivery` usando assinatura criptográfica local **HMAC-SHA256**.
-
-### Armazenamento de Objetos (MinIO & Cloudflare R2)
-
-O EduForge utiliza uma camada de abstração unificada (`createS3Client`) compatível com qualquer provedor S3:
-
-- **Desenvolvimento Local:** MinIO containerizado (`http://localhost:9000`) com `S3_FORCE_PATH_STYLE=true`.
-- **Produção (Cloudflare R2):**
-  - Endpoint: `https://<ACCOUNT_ID>.r2.cloudflarestorage.com` com `S3_REGION=auto` e `S3_FORCE_PATH_STYLE=false`.
-  - **Zero Egress Fees:** Elimina custos de transferência de saída para assets de aprendizes e mídia.
-  - **Buckets:**
-    1. `S3_BUCKET_UPLOADS`: Arquivos fontes (PDFs, DOCX) enviados via URLs pré-assinadas de PUT.
-    2. `S3_BUCKET_APPS`: Manifestos de publicação, podcasts gerados e certificados de conclusão.
-    3. `S3_BUCKET_WORM`: Dossiês do INPI e procurações assinadas com retenção imutável.
+### 🤖 Multi-Provider de Inteligência Artificial
+- Orquestrador `MultiProvider` que chaveia automaticamente entre múltiplos modelos:
+  - **Anthropic Claude 3.5 Sonnet:** Modelagem complexa, mapas de conteúdo e geração pedagógica.
+  - **OpenAI GPT-4o:** Avaliação por rubrica e estruturação de texto.
+  - **DeepSeek V3 / Chat:** Alta velocidade e baixo custo para tarefas de alta densidade.
+- Circuit breaker com medição de latência em milissegundos e timeout de 25s por chamada.
 
 ---
 
-## 5. Diretrizes para Contribuição
+## 🔒 4. Segurança e Performance
 
-1. **Imutabilidade Auditável:** Modificações nas tabelas `audit_logs`, `inpi_certificates` e `ai_credit_ledger` são proibidas via `UPDATE`/`DELETE` em banco, graças à role endurecida `eduforge_app` nas permissões do PostgreSQL.
-2. **Type Safety na Borda:** Nunca ignore o Zod. Qualquer I/O precisa ter schema explícito definido em `packages/schemas` se for trafegado entre os serviços.
-3. **Problem Details:** Erros RESTful seguem obrigatoriamente a [RFC 9457 (Problem Details)](https://datatracker.ietf.org/doc/html/rfc9457).
-4. **Sem Placeholders:** Caso haja dependências externas não prontas, deve-se usar os Providers falsos injetados e documentar no ticket.
+- **Fastify Compress:** Compressão automática Gzip e Deflate de respostas HTTP para redução de banda de até 70%.
+- **Fastify Helmet:** Headers de segurança HTTP (`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `X-XSS-Protection: 0`).
+- **Autenticação Hexagonal:** Sessões com JWT rotativo, suporte a TOTP MFA com encriptação AES-256 de segredos (`AUTH_ENCRYPTION_KEY`) e bloqueio progressivo anti-força bruta.
+- **PWA Offline Resilience:** Workbox Service Worker configurado com `CacheFirst` para fontes e `NetworkFirst` (com cache de até 7 dias) para manifestos de aplicativos.
+- **Error Boundaries:** Componentes `error.tsx` e `global-error.tsx` em `apps/web` e `apps/admin` com opções de recuperação instantânea e limpeza de cache.
 
-Dúvidas de mapeamento de código ou diagramas? Verifique o arquivo detalhado de decisões base em `docs/DECISIONS.md`.
+---
+
+## 🛠️ 5. Comandos de Operação e Manutenção
+
+| Comando | Finalidade |
+| :--- | :--- |
+| `pnpm install` | Instala todas as dependências do monorepo |
+| `pnpm verify` | Executa linter, typecheck e todos os 257 testes em paralelo |
+| `pnpm build` | Compila todos os pacotes e aplicações |
+| `pnpm db:migrate` | Aplica migrações pendentes no banco PostgreSQL |
+| `pnpm db:seed` | Executa o seed inicial de planos, templates, paletas e app demo |
+| `pnpm test:api` | Executa a suíte de testes de integração Supertest contra a API REST |
+| `docker compose -f docker-compose.prod.yml up -d --build` | Compila e inicia os 5 containers de produção |
+
+---
+
+## 🚀 6. Pipeline de CI/CD e Deploy em Produção
+
+O repositório conta com pipelines automatizados no GitHub Actions:
+
+- `.github/workflows/ci.yml`: Validação automática de Lint, TypeScript estrito e 257 testes automatizados a cada Pull Request ou commit na `main`.
+- `.github/workflows/deploy.yml`: Compilação das imagens Docker multi-stage com OpenSSL e healthchecks nativos do Node.js.
+
+### Deploy Manual em VPS / Servidor Remoto
+```bash
+git clone https://github.com/nacife/gerarapp.git
+cd gerarapp
+# Crie o arquivo .env com as credenciais de produção
+docker compose -f docker-compose.prod.yml up -d --build
+```

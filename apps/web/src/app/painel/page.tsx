@@ -134,8 +134,11 @@ export default function PainelPage() {
             <p className="text-xs text-gray-500">{me.email}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/configuracoes" className="text-sm text-gray-400 hover:text-gray-200">
+        <div className="flex items-center gap-4">
+          <Link href="/manuais" className="text-sm text-gray-400 hover:text-sky-400 transition">
+            📖 Manuais
+          </Link>
+          <Link href="/configuracoes" className="text-sm text-gray-400 hover:text-gray-200 transition">
             Configurações
           </Link>
           <button

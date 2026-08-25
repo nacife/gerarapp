@@ -150,11 +150,19 @@ export default function ConfiguracoesPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-6 py-12">
-      <div>
-        <Link href="/painel" className="text-sm text-sky-400 hover:underline">
-          ← painel
+      <div className="flex items-center justify-between">
+        <div>
+          <Link href="/painel" className="text-sm text-sky-400 hover:underline">
+            ← painel
+          </Link>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight">Configurações</h1>
+        </div>
+        <Link
+          href="/manuais"
+          className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-xs text-sky-400 hover:bg-slate-800 transition"
+        >
+          📖 Ver Manuais
         </Link>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight">Configurações</h1>
       </div>
 
       {msg && (
